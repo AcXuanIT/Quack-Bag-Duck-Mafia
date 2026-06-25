@@ -21,18 +21,18 @@ public class UIGameManager : MonoBehaviour
     [SerializeField] private int defaultButtonIndex = 0;
 
     [Header("=== LoadMap Animation ===")]
-    [Tooltip("Script điều khiển hiệu ứng LoadMap DOTween - gắn vào GameObject LoadMap")]
+    [Tooltip("LoadMapAnimator gắn trên GameObject LoadMap")]
     [SerializeField] private LoadMapAnimator loadMapAnimator;
 
-    [Tooltip("Thời gian chạy animation LoadMap từ trái sang phải (giây). Mặc định 1.5s.")]
+    [Tooltip("Thời gian slide LoadMap từ trái sang phải (giây)")]
     [SerializeField] private float loadMapDuration = 1.5f;
 
     [Header("=== Battle Map UI ===")]
-    [Tooltip("UI BattleMap (UIGame/StartGame/BatteMap) - được bật sau khi LoadMap animation xong")]
+    [Tooltip("UI BattleMap (UIGame/StartGame/BatteMap) - bật sau khi LoadMap xong")]
     [SerializeField] private BattleMapUI battleMapUI;
 
     [Header("=== Game Manager (Non-UI) ===")]
-    [Tooltip("GameManager quản lý các GameObject không phải UI (BatteMap root object)")]
+    [Tooltip("GameManager quản lý các GameObject không phải UI")]
     [SerializeField] private GameManager gameManager;
 
     private void Start()
@@ -42,13 +42,11 @@ public class UIGameManager : MonoBehaviour
 
     private void InitializeUI()
     {
-        // 1. Loading screen
         if (loadingStartGameUI != null)
             loadingStartGameUI.StartLoadingSequence();
         else
             Debug.LogWarning("[UIGameManager] LoadingStartGameUI chưa được gán!");
 
-        // 2. Menu bottom navigation
         if (menuBottomController != null)
             menuBottomController.Initialize(menuAnimDuration, defaultButtonIndex);
         else
@@ -56,34 +54,31 @@ public class UIGameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gọi khi nhấn button Play trong MenuMid → Map.
-    /// Chạy animation LoadMap rồi mở BattleMapUI và bật BatteMap GameObject.
+    /// Gọi từ Button Play (MenuMid → Map).
+    /// Chạy LoadMap slide rồi mở BattleMap.
     /// </summary>
     public void OnPlayButtonClicked()
     {
         if (loadMapAnimator == null)
         {
-            Debug.LogWarning("[UIGameManager] LoadMapAnimator chưa được gán! Mở BattleMap ngay.");
+            Debug.LogWarning("[UIGameManager] LoadMapAnimator chưa được gán!");
             OpenBattleMap();
             return;
         }
 
-        // Chạy animation LoadMap với thời gian cấu hình được
-        loadMapAnimator.PlayAnimation(loadMapDuration, onComplete: OpenBattleMap);
+        loadMapAnimator.Play(loadMapDuration, onComplete: OpenBattleMap);
     }
 
     /// <summary>
-    /// Mở UI BattleMap và bật GameObject BatteMap qua GameManager.
+    /// Bật UI BattleMap và GameObject BatteMap qua GameManager.
     /// </summary>
     private void OpenBattleMap()
     {
-        // Bật UI BattleMap
         if (battleMapUI != null)
             battleMapUI.Show();
         else
             Debug.LogWarning("[UIGameManager] BattleMapUI chưa được gán!");
 
-        // Bật non-UI BatteMap GameObject thông qua GameManager
         if (gameManager != null)
             gameManager.EnableBatteMap();
         else
