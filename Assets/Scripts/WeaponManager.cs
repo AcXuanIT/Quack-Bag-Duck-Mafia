@@ -175,7 +175,11 @@ public class WeaponManager : MonoBehaviour
         if (w == null) { Debug.LogWarning($"[WeaponManager] UpdateWeapon: ID {updated.ID} not found."); return; }
 
         w.Name          = updated.Name;
-        w.Icon          = updated.Icon;
+        w.IconLevel1      = updated.IconLevel1;
+        w.IconLevel2      = updated.IconLevel2;
+        w.IconLevel3      = updated.IconLevel3;
+        w.IconLevel4      = updated.IconLevel4;
+        w.ShapeSprite     = updated.ShapeSprite;
         w.Level         = Mathf.Clamp(updated.Level, 1, 5);
         w.XP            = updated.XP;
         w.XPToNextLevel = updated.XPToNextLevel;

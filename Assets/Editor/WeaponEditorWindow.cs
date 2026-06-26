@@ -329,10 +329,10 @@ public class WeaponEditorWindow : EditorWindow
 
         // Icon (48×48)
         var iconR = new Rect(rect.x+10, rect.y+6, 48, 48);
-        if (w.Icon != null)
+        if (w.IconLevel1 != null)
         {
-            var tex = AssetPreview.GetAssetPreview(w.Icon);
-            GUI.DrawTexture(iconR, tex != null ? tex : w.Icon.texture, ScaleMode.ScaleToFit);
+            var tex = AssetPreview.GetAssetPreview(w.IconLevel1);
+            GUI.DrawTexture(iconR, tex != null ? tex : w.IconLevel1.texture, ScaleMode.ScaleToFit);
         }
         else
         {
@@ -452,20 +452,20 @@ public class WeaponEditorWindow : EditorWindow
             var iconR = GUILayoutUtility.GetRect(90, 90);
             iconR = new Rect(iconR.x+10, iconR.y, 90, 90);
             EditorGUI.DrawRect(iconR, new Color(0.18f,0.20f,0.24f));
-            if (_editing.Icon != null)
+            if (_editing.IconLevel1 != null)
             {
-                var prev = AssetPreview.GetAssetPreview(_editing.Icon);
-                GUI.DrawTexture(iconR, prev != null ? prev : _editing.Icon.texture, ScaleMode.ScaleToFit);
+                var prev = AssetPreview.GetAssetPreview(_editing.IconLevel1);
+                GUI.DrawTexture(iconR, prev != null ? prev : _editing.IconLevel1.texture, ScaleMode.ScaleToFit);
             }
             else
                 GUI.Label(iconR, "No Icon", new GUIStyle(GUI.skin.label){ alignment=TextAnchor.MiddleCenter, normal={textColor=Color.gray} });
 
             GUILayout.Space(4);
             if (GUILayout.Button("🖼 Chọn Icon…", GUILayout.Width(100))) { _showIconPicker = true; _iconSearch = ""; }
-            if (_editing.Icon != null)
+            if (_editing.IconLevel1 != null)
             {
                 GUI.color = new Color(1f,0.4f,0.4f);
-                if (GUILayout.Button("✕ Xóa", GUILayout.Width(100))) _editing.Icon = null;
+                if (GUILayout.Button("✕ Xóa", GUILayout.Width(100))) _editing.IconLevel1 = null;
                 GUI.color = Color.white;
             }
         }
@@ -694,7 +694,7 @@ public class WeaponEditorWindow : EditorWindow
             var imgR  = new Rect(cell.x+6, cell.y+4, 72, 68);
             var lblR  = new Rect(cell.x, cell.yMax-16, 84, 14);
 
-            bool isSel = filtered[i] == _editing.Icon;
+            bool isSel = filtered[i] == _editing.IconLevel1;
             EditorGUI.DrawRect(cell, isSel ? CSel : new Color(0.20f,0.22f,0.26f));
             if (isSel) EditorGUI.DrawRect(new Rect(cell.x, cell.y, cell.width, 2), CCyan);
 
@@ -706,7 +706,7 @@ public class WeaponEditorWindow : EditorWindow
                     normal={textColor=isSel?Color.white:Color.gray} });
 
             if (Event.current.type == EventType.MouseDown && cell.Contains(Event.current.mousePosition))
-            { _editing.Icon = filtered[i]; _showIconPicker = false; Event.current.Use(); Repaint(); }
+            { _editing.IconLevel1 = filtered[i]; _showIconPicker = false; Event.current.Use(); Repaint(); }
         }
         GUI.EndScrollView();
     }
@@ -894,11 +894,11 @@ public class WeaponEditorWindow : EditorWindow
     }
 
     private WeaponEntry CloneEntry(WeaponEntry s) => new WeaponEntry
-    { ID=s.ID, Name=s.Name, Icon=s.Icon, Level=s.Level, XP=s.XP,
+    { ID=s.ID, Name=s.Name, IconLevel1=s.IconLevel1, Level=s.Level, XP=s.XP,
       XPToNextLevel=s.XPToNextLevel, Damage=s.Damage, HP=s.HP, Coin=s.Coin, IsLocked=s.IsLocked };
 
     private void CopyEntry(WeaponEntry s, WeaponEntry d)
-    { d.ID=s.ID; d.Name=s.Name; d.Icon=s.Icon; d.Level=s.Level; d.XP=s.XP;
+    { d.ID=s.ID; d.Name=s.Name; d.IconLevel1=s.IconLevel1; d.Level=s.Level; d.XP=s.XP;
       d.XPToNextLevel=s.XPToNextLevel; d.Damage=s.Damage; d.HP=s.HP; d.Coin=s.Coin; d.IsLocked=s.IsLocked; }
 
     #endregion

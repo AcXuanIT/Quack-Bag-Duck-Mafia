@@ -50,7 +50,7 @@ public class WeaponSlotUI : MonoBehaviour
         // --- Icon ---
         if (iconImage)
         {
-            iconImage.sprite = data.Icon;
+            iconImage.sprite = data.GetCurrentIcon();
             iconImage.color = unlocked ? Color.white : new Color(0.4f, 0.4f, 0.4f, 1f);
         }
         if (lockOverlay) lockOverlay.gameObject.SetActive(!unlocked);
