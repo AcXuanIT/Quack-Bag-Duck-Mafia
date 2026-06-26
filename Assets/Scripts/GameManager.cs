@@ -1,12 +1,16 @@
 using UnityEngine;
 
 /// <summary>
-/// GameManager - Quản lý các GameObject không phải UI trong scene.
-/// Bật/tắt BatteMap GameObject (non-UI) khi vào màn hình chiến đấu.
+/// GameManager - Root manager, quản lý các sub-manager và GameObject non-UI.
+/// Singleton. Tất cả sub-manager là con của GameObject này.
 /// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+
+    [Header("=== Sub Managers ===")]
+    [Tooltip("WeaponManager child — quản lý toàn bộ dữ liệu vũ khí")]
+    [SerializeField] public WeaponManager weaponManager;
 
     [Header("=== Non-UI GameObjects ===")]
     [Tooltip("GameObject BatteMap chứa logic game, được bật khi vào Battle")]
@@ -14,41 +18,21 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // Đảm bảo BatteMap tắt khi bắt đầu
         if (batteMapObject != null)
             batteMapObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Bật GameObject BatteMap (non-UI) - gọi từ UIGameManager sau LoadMap.
-    /// </summary>
     public void EnableBatteMap()
     {
-        if (batteMapObject != null)
-        {
-            batteMapObject.SetActive(true);
-            Debug.Log("[GameManager] BatteMap đã được bật.");
-        }
-        else
-        {
-            Debug.LogWarning("[GameManager] BatteMap GameObject chưa được gán!");
-        }
+        if (batteMapObject != null) batteMapObject.SetActive(true);
+        else Debug.LogWarning("[GameManager] BatteMap chưa được gán!");
     }
 
-    /// <summary>
-    /// Tắt GameObject BatteMap.
-    /// </summary>
     public void DisableBatteMap()
     {
-        if (batteMapObject != null)
-            batteMapObject.SetActive(false);
+        if (batteMapObject != null) batteMapObject.SetActive(false);
     }
 }

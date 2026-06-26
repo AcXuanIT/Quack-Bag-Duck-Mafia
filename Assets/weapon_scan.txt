@@ -1,0 +1,5 @@
+Assets/Editor/WeaponEditorWindow.cs
+Assets/Scripts/Data/WeaponData.cs
+Assets/Scripts/UI/WeaponSlotUI.cs
+Assets/Scripts/WeaponManager.cs
+DB: Assets/Resources/Data/WeaponDatabase.asset
