@@ -16,67 +16,106 @@ public class WeaponGridCell
 [System.Serializable]
 public class WeaponEntry
 {
+    // ─── Identity ────────────────────────────────────────────
     [Header("=== Identity ===")]
     public int    ID;
     public string Name;
 
-    // ─── Tier sprites (dùng trong chiến đấu) ─────────────────
-    // Không liên quan đến Level upgrade của weapon.
-    // Tier thể hiện độ hiếm / sức mạnh cơ bản của vũ khí.
-    // Tier1 là mặc định, cũng là sprite hiển thị trên UI Gear.
-    [Header("=== Tier Sprites (chiến đấu, tier 1-4) ===")]
-    [Tooltip("Sprite dùng khi tier 1 — cũng là icon mặc định trên UIGear")]
+    // ─── Tier Sprites (dùng trong chiến đấu) ─────────────────
+    [Header("=== Tier Sprites (tier 1-4) ===")]
+    [Tooltip("Sprite tier 1 — icon mặc định trên UIGear")]
     public Sprite SpriteTier1;
 
-    [Tooltip("Sprite dùng khi tier 2")]
+    [Tooltip("Sprite tier 2")]
     public Sprite SpriteTier2;
 
-    [Tooltip("Sprite dùng khi tier 3")]
+    [Tooltip("Sprite tier 3")]
     public Sprite SpriteTier3;
 
-    [Tooltip("Sprite dùng khi tier 4")]
+    [Tooltip("Sprite tier 4")]
     public Sprite SpriteTier4;
 
     // ─── Shape / Grid ─────────────────────────────────────────
-    [Header("=== Shape (UI Frame) ===")]
-    [Tooltip("Sprite khung hình dạng của weapon (shape frame)")]
+    [Header("=== Shape & Grid ===")]
+    [Tooltip("Sprite khung hình dạng của weapon")]
     public Sprite ShapeSprite;
 
-    [Tooltip("Danh sách các ô grid mà weapon này chiếm khi gắn vào lưới")]
+    [Tooltip("Các ô grid mà weapon chiếm khi gắn vào lưới")]
     public WeaponGridCell[] GridCells;
 
-    // ─── Level (1-5, upgrade trong UIGear) ───────────────────
-    [Header("=== Level (upgrade 1-5) ===")]
+    // ─── Level ───────────────────────────────────────────────
+    [Header("=== Level (1-5) ===")]
     [Range(1, 5)]
     public int Level = 1;
 
-    [Tooltip("XP hiện tại (số quái đã tiêu diệt bằng weapon)")]
+    [Tooltip("XP hiện tại")]
     public int XP;
 
-    [Tooltip("XP cần để đạt level tiếp theo")]
+    [Tooltip("XP cần để đạt level tiếp theo (0 nếu đã max)")]
     public int XPToNextLevel;
 
-    // ─── Stats ───────────────────────────────────────────────
-    [Header("=== Stats ===")]
-    public float Damage;
-    public float HP;
+    // ─── Stats per Level ──────────────────────────────────────
+    [Header("=== Stats per Level (index 0=Lv1 … 4=Lv5) ===")]
+    [Tooltip("Damage tại mỗi Level — index 0=Lv1, 1=Lv2, 2=Lv3, 3=Lv4, 4=Lv5")]
+    public float[] DamagePerLevel = new float[5];
 
+    [Tooltip("HP tại mỗi Level — index 0=Lv1, 1=Lv2, 2=Lv3, 3=Lv4, 4=Lv5")]
+    public float[] HPPerLevel = new float[5];
+
+    // ─── Unlock Requirement ───────────────────────────────────
+    [Header("=== Unlock ===")]
+    [Tooltip("Level Player tối thiểu để mở khóa weapon này (0 = không yêu cầu)")]
+    [Min(0)]
+    public int LevelLock;
+
+    // ─── Upgrade Cost ─────────────────────────────────────────
+    [Header("=== Upgrade ===")]
     [Tooltip("Coin cần để nâng level khi XP đầy")]
     public int Coin;
 
-    public bool IsLocked;   // true = chưa mở khoá
+    [Tooltip("Chưa mở khoá = true")]
+    public bool IsLocked;
 
     // ─── Spawn ───────────────────────────────────────────────
     [Header("=== Spawn ===")]
-    [Tooltip("Thời gian delay (giây) trước khi weapon được spawn vào scene")]
+    [Tooltip("Thời gian delay (giây) trước khi weapon spawn")]
     public float TimeDelay;
 
-    // ─── Helpers ─────────────────────────────────────────────
+    // ─── Public API ───────────────────────────────────────────
 
-    /// <summary>
-    /// Trả về sprite theo tier (1-4).
-    /// Dùng trong chiến đấu để hiển thị sprite tương ứng với tier của weapon.
-    /// </summary>
+    /// <summary>Damage tại level chỉ định (1-5).</summary>
+    public float GetDamage(int level)
+    {
+        if (DamagePerLevel == null || DamagePerLevel.Length < 5) return 0f;
+        return DamagePerLevel[Mathf.Clamp(level - 1, 0, 4)];
+    }
+
+    /// <summary>Damage tại Level hiện tại.</summary>
+    public float GetCurrentDamage() => GetDamage(Level);
+
+    public float GetNextLevelDamage()
+    {
+        if (Level >= 5) return GetCurrentDamage();
+        return GetDamage(Level + 1);
+    }
+
+    /// <summary>HP tại level chỉ định (1-5).</summary>
+    public float GetHP(int level)
+    {
+        if (HPPerLevel == null || HPPerLevel.Length < 5) return 0f;
+        return HPPerLevel[Mathf.Clamp(level - 1, 0, 4)];
+    }
+
+    /// <summary>HP tại Level hiện tại.</summary>
+    public float GetCurrentHP() => GetHP(Level);
+
+    public float GetNextLevelHP()
+    {
+        if (Level >= 5) return GetCurrentHP();
+        return GetHP(Level + 1);
+    }
+
+    /// <summary>Sprite theo tier (1-4), fallback về Tier1.</summary>
     public Sprite GetSpriteByTier(int tier)
     {
         switch (tier)
@@ -84,16 +123,14 @@ public class WeaponEntry
             case 2:  return SpriteTier2 != null ? SpriteTier2 : SpriteTier1;
             case 3:  return SpriteTier3 != null ? SpriteTier3 : SpriteTier1;
             case 4:  return SpriteTier4 != null ? SpriteTier4 : SpriteTier1;
-            default: return SpriteTier1;  // tier 1 hoặc fallback
+            default: return SpriteTier1;
         }
     }
 
-    /// <summary>
-    /// Sprite mặc định hiển thị trên UIGear (luôn là Tier 1).
-    /// </summary>
+    /// <summary>Icon mặc định trên UIGear (Tier 1).</summary>
     public Sprite GetUIIcon() => SpriteTier1;
 
-    /// <summary>Kiểm tra vị trí grid có bị weapon chiếm không.</summary>
+    /// <summary>Kiểm tra ô grid có bị weapon chiếm không.</summary>
     public bool IsGridPositionOccupied(Vector2Int position)
     {
         if (GridCells == null) return false;
@@ -111,7 +148,7 @@ public class WeaponEntry
             if (cell.gridPosition == position) { cell.isOccupied = true; return; }
     }
 
-    /// <summary>Giải phóng tất cả các ô grid weapon đang chiếm.</summary>
+    /// <summary>Giải phóng tất cả ô grid.</summary>
     public void ReleaseAllCells()
     {
         if (GridCells == null) return;

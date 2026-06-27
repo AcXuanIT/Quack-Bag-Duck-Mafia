@@ -129,8 +129,8 @@ public class WeaponManager : MonoBehaviour
         playerCoin      -= w.Coin;
         w.XP            -= w.XPToNextLevel;
         w.Level          = Mathf.Clamp(w.Level + 1, 1, 5);
-        w.Damage        *= 1.15f;
-        w.HP            *= 1.10f;
+        for (int i = 0; i < w.DamagePerLevel.Length; i++) w.DamagePerLevel[i] *= 1.15f;
+        for (int i = 0; i < w.HPPerLevel.Length; i++) w.HPPerLevel[i] *= 1.10f;
         w.Coin           = Mathf.RoundToInt(w.Coin * 1.5f);
         w.XPToNextLevel  = Mathf.RoundToInt(w.XPToNextLevel * 1.3f);
 
@@ -153,8 +153,8 @@ public class WeaponManager : MonoBehaviour
         w.Level         = Mathf.Clamp(updated.Level, 1, 5);
         w.XP            = updated.XP;
         w.XPToNextLevel = updated.XPToNextLevel;
-        w.Damage        = updated.Damage;
-        w.HP            = updated.HP;
+        w.DamagePerLevel = updated.DamagePerLevel;
+        w.HPPerLevel    = updated.HPPerLevel;
         w.Coin          = updated.Coin;
         w.IsLocked      = updated.IsLocked;
 

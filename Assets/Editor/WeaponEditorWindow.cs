@@ -7,7 +7,7 @@ using UnityEngine;
 // ================================================================
 //  WeaponEditorWindow  –  Tools ▸ ⚔ Weapon Database Editor
 //  Full CRUD editor: thêm / sửa / nhân bản / xoá / sắp xếp
-//  Cấu trúc khớp với WeaponEntry / WeaponData / WeaponGridCell
+//  Hỗ trợ DamagePerLevel[5] & HPPerLevel[5] (không còn Damage/HP đơn lẻ)
 // ================================================================
 public class WeaponEditorWindow : EditorWindow
 {
@@ -63,12 +63,22 @@ public class WeaponEditorWindow : EditorWindow
     private static readonly Color CPurple   = new Color(0.65f, 0.35f, 0.90f);
     private static readonly Color CDirtyTag = new Color(0.90f, 0.50f, 0.10f);
 
+    // Level colors Lv1→Lv5
+    private static readonly Color[] CLevelColors =
+    {
+        new Color(0.50f, 0.70f, 1.00f),
+        new Color(0.40f, 0.90f, 0.50f),
+        new Color(1.00f, 0.85f, 0.25f),
+        new Color(1.00f, 0.55f, 0.15f),
+        new Color(0.90f, 0.30f, 0.90f),
+    };
+
     // ── Menu ──────────────────────────────────────────────────
     [MenuItem("Tools/⚔ Weapon Database Editor")]
     public static void Open()
     {
         var w = GetWindow<WeaponEditorWindow>("⚔ Weapon DB");
-        w.minSize = new Vector2(960, 560);
+        w.minSize = new Vector2(1020, 600);
         w.Show();
     }
 
@@ -257,12 +267,12 @@ public class WeaponEditorWindow : EditorWindow
 
         switch (_sortMode)
         {
-            case SortMode.ID:     _filtered = _sortAscending ? _filtered.OrderBy(w=>w.ID).ToList()       : _filtered.OrderByDescending(w=>w.ID).ToList(); break;
-            case SortMode.Name:   _filtered = _sortAscending ? _filtered.OrderBy(w=>w.Name).ToList()     : _filtered.OrderByDescending(w=>w.Name).ToList(); break;
-            case SortMode.Level:  _filtered = _sortAscending ? _filtered.OrderBy(w=>w.Level).ToList()    : _filtered.OrderByDescending(w=>w.Level).ToList(); break;
-            case SortMode.Damage: _filtered = _sortAscending ? _filtered.OrderBy(w=>w.Damage).ToList()   : _filtered.OrderByDescending(w=>w.Damage).ToList(); break;
-            case SortMode.HP:     _filtered = _sortAscending ? _filtered.OrderBy(w=>w.HP).ToList()       : _filtered.OrderByDescending(w=>w.HP).ToList(); break;
-            case SortMode.Locked: _filtered = _sortAscending ? _filtered.OrderBy(w=>w.IsLocked).ToList() : _filtered.OrderByDescending(w=>w.IsLocked).ToList(); break;
+            case SortMode.ID:     _filtered = _sortAscending ? _filtered.OrderBy(w=>w.ID).ToList()                   : _filtered.OrderByDescending(w=>w.ID).ToList(); break;
+            case SortMode.Name:   _filtered = _sortAscending ? _filtered.OrderBy(w=>w.Name).ToList()                 : _filtered.OrderByDescending(w=>w.Name).ToList(); break;
+            case SortMode.Level:  _filtered = _sortAscending ? _filtered.OrderBy(w=>w.Level).ToList()                : _filtered.OrderByDescending(w=>w.Level).ToList(); break;
+            case SortMode.Damage: _filtered = _sortAscending ? _filtered.OrderBy(w=>w.GetCurrentDamage()).ToList()   : _filtered.OrderByDescending(w=>w.GetCurrentDamage()).ToList(); break;
+            case SortMode.HP:     _filtered = _sortAscending ? _filtered.OrderBy(w=>w.GetCurrentHP()).ToList()       : _filtered.OrderByDescending(w=>w.GetCurrentHP()).ToList(); break;
+            case SortMode.Locked: _filtered = _sortAscending ? _filtered.OrderBy(w=>w.IsLocked).ToList()            : _filtered.OrderByDescending(w=>w.IsLocked).ToList(); break;
         }
     }
 
@@ -293,13 +303,12 @@ public class WeaponEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1, rect.width, 1), CSep);
 
         // Accent bar (color by level)
-        Color accent = w.IsLocked ? Color.gray : Color.Lerp(CCyan, CGold, (w.Level - 1) / 4f);
+        Color accent = w.IsLocked ? Color.gray : CLevelColors[Mathf.Clamp(w.Level - 1, 0, 4)];
         EditorGUI.DrawRect(new Rect(rect.x, rect.y, 3, rect.height), accent);
 
         if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
         { SelectWeapon(idx); Event.current.Use(); Repaint(); }
 
-        // SpriteTier1 = UIGear icon (theo GetUIIcon())
         var iconR = new Rect(rect.x + 10, rect.y + 6, 48, 48);
         if (w.SpriteTier1 != null)
         {
@@ -317,10 +326,12 @@ public class WeaponEditorWindow : EditorWindow
 
         GUI.Label(new Rect(rect.x + 64, rect.y + 5, rect.width - 108, 22), w.Name ?? "(no name)", _sRowName);
 
-        int   gridCount = w.GridCells != null ? w.GridCells.Length : 0;
+        int    gridCount  = w.GridCells != null ? w.GridCells.Length : 0;
+        float  curDmg     = w.GetCurrentDamage();
+        float  curHp      = w.GetCurrentHP();
         string sub = w.IsLocked
             ? $"Locked  |  Lv{w.Level}  |  {gridCount} cells"
-            : $"Lv{w.Level}  ⚔{w.Damage:0}  ♥{w.HP:0}  💰{w.Coin}  ⏱{w.TimeDelay:0.0}s  [{gridCount}c]";
+            : $"Lv{w.Level}  ⚔{curDmg:0}  ♥{curHp:0}  💰{w.Coin}  ⏱{w.TimeDelay:0.0}s  [{gridCount}c]";
         GUI.Label(new Rect(rect.x + 64, rect.y + 28, rect.width - 108, 18), sub, _sRowSub);
 
         GUI.Label(new Rect(rect.xMax - 42, rect.y + 4, 38, 18), $"#{w.ID}", _sRowID);
@@ -421,7 +432,7 @@ public class WeaponEditorWindow : EditorWindow
             FieldRow("Tên vũ khí", () => _editing.Name = EditorGUILayout.TextField(_editing.Name));
             FieldRow("Trạng thái", () =>
             {
-                GUI.color      = _editing.IsLocked ? CRed : CGreen;
+                GUI.color         = _editing.IsLocked ? CRed : CGreen;
                 _editing.IsLocked = EditorGUILayout.Toggle(_editing.IsLocked, GUILayout.Width(20));
                 GUILayout.Label(_editing.IsLocked ? "🔒 Bị khoá" : "🔓 Đã mở", GUILayout.Width(90));
                 GUI.color = Color.white;
@@ -530,42 +541,139 @@ public class WeaponEditorWindow : EditorWindow
         DrawDividerH();
         GUILayout.Space(10);
 
-        // ══ COMBAT STATS ═══════════════════════════════════════
-        SectionLabel("⚔  Chỉ Số Chiến Đấu");
-        GUILayout.Space(6);
+        // ══ STATS PER LEVEL ════════════════════════════════════
+        SectionLabel("⚔  Stats Per Level  (Damage & HP theo từng Level 1-5)");
+        GUILayout.Space(8);
 
+        // Đảm bảo array đủ 5 phần tử
+        if (_editing.DamagePerLevel == null || _editing.DamagePerLevel.Length != 5)
+            _editing.DamagePerLevel = new float[5];
+        if (_editing.HPPerLevel == null || _editing.HPPerLevel.Length != 5)
+            _editing.HPPerLevel = new float[5];
+
+        // Header row
         EditorGUILayout.BeginHorizontal();
         GUILayout.Space(16);
-        EditorGUILayout.BeginVertical(GUILayout.Width(320));
+        GUILayout.Label("", GUILayout.Width(60));
+        for (int lv = 1; lv <= 5; lv++)
         {
-            FieldRow("Sát thương (Damage)", () =>
-            {
-                _editing.Damage = EditorGUILayout.FloatField(_editing.Damage, GUILayout.Width(100));
-                SliderHint(ref _editing.Damage, 1f, 1000f);
-            });
-            FieldRow("Máu (HP)", () =>
-            {
-                _editing.HP = EditorGUILayout.FloatField(_editing.HP, GUILayout.Width(100));
-                SliderHint(ref _editing.HP, 1f, 2000f);
-            });
-            FieldRow("TimeDelay spawn (s)", () =>
-            {
-                _editing.TimeDelay = EditorGUILayout.FloatField(_editing.TimeDelay, GUILayout.Width(100));
-                _editing.TimeDelay = Mathf.Max(0f, _editing.TimeDelay);
-            });
+            bool isCurrentLv = lv == _editing.Level;
+            GUI.color = isCurrentLv ? CLevelColors[lv - 1] : new Color(0.6f, 0.6f, 0.6f);
+            GUILayout.Label((isCurrentLv ? "★ " : "") + "Lv " + lv,
+                new GUIStyle(EditorStyles.boldLabel){ alignment = TextAnchor.MiddleCenter },
+                GUILayout.Width(100));
         }
-        EditorGUILayout.EndVertical();
+        GUI.color = Color.white;
+        EditorGUILayout.EndHorizontal();
 
-        GUILayout.Space(30);
+        GUILayout.Space(4);
 
+        // Damage row
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Space(16);
+        GUI.color = COrange;
+        GUILayout.Label("⚔ Damage", GUILayout.Width(60));
+        GUI.color = Color.white;
+        for (int lv = 0; lv < 5; lv++)
+        {
+            bool isCurrentLv = (lv + 1) == _editing.Level;
+            if (isCurrentLv)
+            {
+                var oldBg = GUI.backgroundColor;
+                GUI.backgroundColor = new Color(0.3f, 0.2f, 0.05f);
+                _editing.DamagePerLevel[lv] = EditorGUILayout.FloatField(_editing.DamagePerLevel[lv], GUILayout.Width(100));
+                GUI.backgroundColor = oldBg;
+            }
+            else
+                _editing.DamagePerLevel[lv] = EditorGUILayout.FloatField(_editing.DamagePerLevel[lv], GUILayout.Width(100));
+        }
+        EditorGUILayout.EndHorizontal();
+
+        GUILayout.Space(2);
+
+        // HP row
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Space(16);
+        GUI.color = CGreen;
+        GUILayout.Label("♥ HP", GUILayout.Width(60));
+        GUI.color = Color.white;
+        for (int lv = 0; lv < 5; lv++)
+        {
+            bool isCurrentLv = (lv + 1) == _editing.Level;
+            if (isCurrentLv)
+            {
+                var oldBg = GUI.backgroundColor;
+                GUI.backgroundColor = new Color(0.05f, 0.2f, 0.05f);
+                _editing.HPPerLevel[lv] = EditorGUILayout.FloatField(_editing.HPPerLevel[lv], GUILayout.Width(100));
+                GUI.backgroundColor = oldBg;
+            }
+            else
+                _editing.HPPerLevel[lv] = EditorGUILayout.FloatField(_editing.HPPerLevel[lv], GUILayout.Width(100));
+        }
+        EditorGUILayout.EndHorizontal();
+
+        GUILayout.Space(8);
+
+        // Stat bars: hiện cột level hiện tại
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Space(16);
         EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
         {
-            StatBar("DMG", _editing.Damage, 1000f, COrange);
-            GUILayout.Space(6);
-            StatBar("HP ", _editing.HP, 2000f, CGreen);
+            float maxDmg = _editing.DamagePerLevel.Length == 5 ? _editing.DamagePerLevel[4] : 1f;
+            float maxHp  = _editing.HPPerLevel.Length     == 5 ? _editing.HPPerLevel[4]     : 1f;
+            if (maxDmg < 1f) maxDmg = 1f;
+            if (maxHp  < 1f) maxHp  = 1f;
+
+            for (int lv = 0; lv < 5; lv++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                Color lvCol = CLevelColors[lv];
+                GUI.color = (lv + 1) == _editing.Level ? lvCol : new Color(lvCol.r * 0.6f, lvCol.g * 0.6f, lvCol.b * 0.6f);
+                GUILayout.Label("Lv" + (lv + 1), GUILayout.Width(28));
+                GUI.color = Color.white;
+
+                float dRatio = Mathf.Clamp01(_editing.DamagePerLevel[lv] / maxDmg);
+                float hRatio = Mathf.Clamp01(_editing.HPPerLevel[lv] / maxHp);
+
+                var dRect = GUILayoutUtility.GetRect(0, 10, GUILayout.Width(150));
+                EditorGUI.DrawRect(dRect, new Color(0.08f, 0.08f, 0.12f));
+                EditorGUI.DrawRect(new Rect(dRect.x, dRect.y, dRect.width * dRatio, dRect.height), COrange);
+
+                GUILayout.Space(4);
+
+                var hRect = GUILayoutUtility.GetRect(0, 10, GUILayout.Width(150));
+                EditorGUI.DrawRect(hRect, new Color(0.08f, 0.08f, 0.12f));
+                EditorGUI.DrawRect(new Rect(hRect.x, hRect.y, hRect.width * hRatio, hRect.height), CGreen);
+
+                GUI.color = new Color(0.8f, 0.8f, 0.8f);
+                GUILayout.Label($"{_editing.DamagePerLevel[lv]:0} / {_editing.HPPerLevel[lv]:0}",
+                    new GUIStyle(EditorStyles.miniLabel), GUILayout.Width(100));
+                GUI.color = Color.white;
+                EditorGUILayout.EndHorizontal();
+            }
         }
         EditorGUILayout.EndVertical();
-        GUILayout.Space(12);
+        EditorGUILayout.EndHorizontal();
+
+        GUILayout.Space(8);
+
+        // Auto-fill button
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Space(16);
+        GUI.color = new Color(0.5f, 0.7f, 1f);
+        if (GUILayout.Button("⚡ Auto-fill Lv2-5 từ Lv1 (×1.25 / ×1.55 / ×1.90 / ×2.30)", GUILayout.Height(24)))
+        {
+            float[] dmgM = { 1.00f, 1.25f, 1.55f, 1.90f, 2.30f };
+            float[] hpM  = { 1.00f, 1.30f, 1.65f, 2.05f, 2.50f };
+            float   baseDmg = _editing.DamagePerLevel[0];
+            float   baseHp  = _editing.HPPerLevel[0];
+            for (int lv = 0; lv < 5; lv++)
+            {
+                _editing.DamagePerLevel[lv] = Mathf.Round(baseDmg * dmgM[lv]);
+                _editing.HPPerLevel[lv]     = Mathf.Round(baseHp  * hpM[lv]);
+            }
+        }
+        GUI.color = Color.white;
         EditorGUILayout.EndHorizontal();
 
         GUILayout.Space(12);
@@ -586,7 +694,7 @@ public class WeaponEditorWindow : EditorWindow
             GUILayout.Space(8);
             for (int s = 0; s < 5; s++)
             {
-                GUI.color = s < _editing.Level ? CGold : Color.gray;
+                GUI.color = s < _editing.Level ? CLevelColors[s] : Color.gray;
                 GUILayout.Label("★", GUILayout.Width(18));
             }
             GUI.color = Color.white;
@@ -594,10 +702,10 @@ public class WeaponEditorWindow : EditorWindow
 
             GUILayout.Space(4);
             FieldRow("XP hiện tại", () => _editing.XP = Mathf.Max(0, EditorGUILayout.IntField(_editing.XP, GUILayout.Width(120))));
-            FieldRow("XP lên Lv tiếp", () => _editing.XPToNextLevel = Mathf.Max(1, EditorGUILayout.IntField(_editing.XPToNextLevel, GUILayout.Width(120))));
+            FieldRow("XP lên Lv tiếp", () => _editing.XPToNextLevel = Mathf.Max(0, EditorGUILayout.IntField(_editing.XPToNextLevel, GUILayout.Width(120))));
 
             GUILayout.Space(6);
-            float xpR  = _editing.XPToNextLevel > 0 ? Mathf.Clamp01((float)_editing.XP / _editing.XPToNextLevel) : 0f;
+            float xpR  = _editing.XPToNextLevel > 0 ? Mathf.Clamp01((float)_editing.XP / _editing.XPToNextLevel) : 1f;
             var   xpBR = GUILayoutUtility.GetRect(0, 18, GUILayout.ExpandWidth(true));
             xpBR = new Rect(xpBR.x + 4, xpBR.y, xpBR.width - 8, xpBR.height);
             EditorGUI.DrawRect(xpBR, new Color(0.08f, 0.08f, 0.12f));
@@ -611,6 +719,11 @@ public class WeaponEditorWindow : EditorWindow
                 GUI.color     = CGold;
                 _editing.Coin = Mathf.Max(0, EditorGUILayout.IntField(_editing.Coin, GUILayout.Width(120)));
                 GUI.color     = Color.white;
+            });
+            FieldRow("TimeDelay spawn (s)", () =>
+            {
+                _editing.TimeDelay = EditorGUILayout.FloatField(_editing.TimeDelay, GUILayout.Width(120));
+                _editing.TimeDelay = Mathf.Max(0f, _editing.TimeDelay);
             });
         }
         EditorGUILayout.EndVertical();
@@ -634,8 +747,8 @@ public class WeaponEditorWindow : EditorWindow
 
             GUILayout.Space(8);
             GUI.color = CCyan;
-            if (GUILayout.Button("↑ Max Level", GUILayout.Width(110), GUILayout.Height(28)))
-            { _editing.Level = 5; _editing.XP = _editing.XPToNextLevel; }
+            if (GUILayout.Button("↑ Max Level (5)", GUILayout.Width(120), GUILayout.Height(28)))
+            { _editing.Level = 5; _editing.XP = 0; _editing.XPToNextLevel = 0; }
             GUI.color = Color.white;
 
             GUILayout.Space(8);
@@ -651,30 +764,9 @@ public class WeaponEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         GUILayout.Space(28);
-
-        // ══ NEXT LEVEL PREVIEW ═════════════════════════════════
-        if (!_editing.IsLocked && _editing.Level < 5)
-        {
-            DrawDividerH();
-            GUILayout.Space(8);
-            SectionLabel("🔮  Dự Đoán Chỉ Số Lv " + (_editing.Level + 1));
-            GUILayout.Space(4);
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            float nDmg  = _editing.Damage * 1.15f;
-            float nHP   = _editing.HP * 1.10f;
-            int   nCoin = Mathf.RoundToInt(_editing.Coin * 1.5f);
-            GUI.color = new Color(0.7f, 0.9f, 1f);
-            GUILayout.Label($"DMG: {_editing.Damage:0} → {nDmg:0}  (+{(nDmg - _editing.Damage):0})", GUILayout.Width(200));
-            GUILayout.Label($"HP: {_editing.HP:0} → {nHP:0}  (+{(nHP - _editing.HP):0})", GUILayout.Width(200));
-            GUILayout.Label($"Coin cost: {nCoin} 💰", GUILayout.Width(130));
-            GUI.color = Color.white;
-            EditorGUILayout.EndHorizontal();
-            GUILayout.Space(16);
-        }
     }
 
-    // Slot vẽ từng Tier sprite (0-3) hoặc Shape (4)
+    // Slot vẽ từng Tier sprite
     private void DrawSpriteSlot(string label, ref Sprite spriteRef, int targetIdx)
     {
         EditorGUILayout.BeginVertical(GUILayout.Width(95));
@@ -895,10 +987,10 @@ public class WeaponEditorWindow : EditorWindow
 
     private void SelectWeapon(int idx)
     {
-        _selectedIndex      = idx;
-        _editing            = (idx >= 0 && idx < _list.Count) ? CloneEntry(_list[idx]) : null;
-        _showIconPicker     = false;
-        _showConfirmDelete  = false;
+        _selectedIndex     = idx;
+        _editing           = (idx >= 0 && idx < _list.Count) ? CloneEntry(_list[idx]) : null;
+        _showIconPicker    = false;
+        _showConfirmDelete = false;
     }
 
     private void AddNewWeapon()
@@ -906,17 +998,17 @@ public class WeaponEditorWindow : EditorWindow
         if (_db == null) return;
         var entry = new WeaponEntry
         {
-            ID            = GenerateFreeID(-1),
-            Name          = "New Weapon",
-            Level         = 1,
-            XP            = 0,
-            XPToNextLevel = 100,
-            Damage        = 50f,
-            HP            = 200f,
-            Coin          = 300,
-            IsLocked      = true,
-            TimeDelay     = 0f,
-            GridCells     = Array.Empty<WeaponGridCell>(),
+            ID              = GenerateFreeID(-1),
+            Name            = "New Weapon",
+            Level           = 1,
+            XP              = 0,
+            XPToNextLevel   = 100,
+            DamagePerLevel  = new float[]{ 50f, 62f, 78f, 95f, 115f },
+            HPPerLevel      = new float[]{ 200f, 260f, 330f, 410f, 500f },
+            Coin            = 300,
+            IsLocked        = true,
+            TimeDelay       = 0f,
+            GridCells       = Array.Empty<WeaponGridCell>(),
         };
         _list.Add(entry);
         _isDirty = true;
@@ -987,21 +1079,21 @@ public class WeaponEditorWindow : EditorWindow
     {
         var e = new WeaponEntry
         {
-            ID            = s.ID,
-            Name          = s.Name,
-            SpriteTier1   = s.SpriteTier1,
-            SpriteTier2   = s.SpriteTier2,
-            SpriteTier3   = s.SpriteTier3,
-            SpriteTier4   = s.SpriteTier4,
-            ShapeSprite   = s.ShapeSprite,
-            Level         = s.Level,
-            XP            = s.XP,
-            XPToNextLevel = s.XPToNextLevel,
-            Damage        = s.Damage,
-            HP            = s.HP,
-            Coin          = s.Coin,
-            IsLocked      = s.IsLocked,
-            TimeDelay     = s.TimeDelay,
+            ID              = s.ID,
+            Name            = s.Name,
+            SpriteTier1     = s.SpriteTier1,
+            SpriteTier2     = s.SpriteTier2,
+            SpriteTier3     = s.SpriteTier3,
+            SpriteTier4     = s.SpriteTier4,
+            ShapeSprite     = s.ShapeSprite,
+            Level           = s.Level,
+            XP              = s.XP,
+            XPToNextLevel   = s.XPToNextLevel,
+            DamagePerLevel  = s.DamagePerLevel != null ? (float[])s.DamagePerLevel.Clone() : new float[5],
+            HPPerLevel      = s.HPPerLevel     != null ? (float[])s.HPPerLevel.Clone()     : new float[5],
+            Coin            = s.Coin,
+            IsLocked        = s.IsLocked,
+            TimeDelay       = s.TimeDelay,
         };
         if (s.GridCells != null)
         {
@@ -1016,21 +1108,21 @@ public class WeaponEditorWindow : EditorWindow
 
     private void CopyEntry(WeaponEntry s, WeaponEntry d)
     {
-        d.ID            = s.ID;
-        d.Name          = s.Name;
-        d.SpriteTier1   = s.SpriteTier1;
-        d.SpriteTier2   = s.SpriteTier2;
-        d.SpriteTier3   = s.SpriteTier3;
-        d.SpriteTier4   = s.SpriteTier4;
-        d.ShapeSprite   = s.ShapeSprite;
-        d.Level         = s.Level;
-        d.XP            = s.XP;
-        d.XPToNextLevel = s.XPToNextLevel;
-        d.Damage        = s.Damage;
-        d.HP            = s.HP;
-        d.Coin          = s.Coin;
-        d.IsLocked      = s.IsLocked;
-        d.TimeDelay     = s.TimeDelay;
+        d.ID              = s.ID;
+        d.Name            = s.Name;
+        d.SpriteTier1     = s.SpriteTier1;
+        d.SpriteTier2     = s.SpriteTier2;
+        d.SpriteTier3     = s.SpriteTier3;
+        d.SpriteTier4     = s.SpriteTier4;
+        d.ShapeSprite     = s.ShapeSprite;
+        d.Level           = s.Level;
+        d.XP              = s.XP;
+        d.XPToNextLevel   = s.XPToNextLevel;
+        d.DamagePerLevel  = s.DamagePerLevel != null ? (float[])s.DamagePerLevel.Clone() : new float[5];
+        d.HPPerLevel      = s.HPPerLevel     != null ? (float[])s.HPPerLevel.Clone()     : new float[5];
+        d.Coin            = s.Coin;
+        d.IsLocked        = s.IsLocked;
+        d.TimeDelay       = s.TimeDelay;
         if (s.GridCells != null)
         {
             d.GridCells = new WeaponGridCell[s.GridCells.Length];
@@ -1086,26 +1178,6 @@ public class WeaponEditorWindow : EditorWindow
         GUILayout.Space(2);
     }
 
-    private void SliderHint(ref float v, float min, float max)
-    {
-        float nv = GUILayout.HorizontalSlider(v, min, max, GUILayout.Width(100));
-        if (Mathf.Abs(nv - v) > 0.5f) v = Mathf.Round(nv);
-    }
-
-    private void StatBar(string lbl, float val, float max, Color color)
-    {
-        float ratio = max > 0 ? Mathf.Clamp01(val / max) : 0f;
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.Space(4);
-        GUILayout.Label(lbl, GUILayout.Width(32));
-        var r = GUILayoutUtility.GetRect(0, 14, GUILayout.ExpandWidth(true));
-        EditorGUI.DrawRect(r, new Color(0.08f, 0.08f, 0.12f));
-        if (ratio > 0) EditorGUI.DrawRect(new Rect(r.x, r.y, r.width * ratio, r.height), color);
-        GUILayout.Label($"{val:0}", GUILayout.Width(50));
-        GUILayout.Space(4);
-        EditorGUILayout.EndHorizontal();
-    }
-
     private void HandleKeys()
     {
         var e = Event.current;
@@ -1115,13 +1187,13 @@ public class WeaponEditorWindow : EditorWindow
         if (e.control && e.keyCode == KeyCode.Return) { ApplyEditing(); e.Use(); }
         if (e.keyCode == KeyCode.Escape)
         {
-            if (_showIconPicker)    { _showIconPicker    = false; e.Use(); }
+            if (_showIconPicker)         { _showIconPicker    = false; e.Use(); }
             else if (_showConfirmDelete) { _showConfirmDelete = false; e.Use(); }
         }
         if (!_showIconPicker && !_showConfirmDelete)
         {
-            if (e.keyCode == KeyCode.UpArrow   && _selectedIndex > 0)              { SelectWeapon(_selectedIndex - 1); e.Use(); Repaint(); }
-            if (e.keyCode == KeyCode.DownArrow && _selectedIndex < _list.Count - 1){ SelectWeapon(_selectedIndex + 1); e.Use(); Repaint(); }
+            if (e.keyCode == KeyCode.UpArrow   && _selectedIndex > 0)               { SelectWeapon(_selectedIndex - 1); e.Use(); Repaint(); }
+            if (e.keyCode == KeyCode.DownArrow && _selectedIndex < _list.Count - 1) { SelectWeapon(_selectedIndex + 1); e.Use(); Repaint(); }
         }
     }
 

@@ -59,8 +59,8 @@ public class WeaponSlotUI : MonoBehaviour
         // --- Text info ---
         if (nameText)   nameText.text   = data.Name;
         if (levelText)  levelText.text  = unlocked ? $"Lv.{data.Level}" : "???";
-        if (damageText) damageText.text = unlocked ? $"{data.Damage:0}" : "-";
-        if (hpText)     hpText.text     = unlocked ? $"{data.HP:0}" : "-";
+        if (damageText) damageText.text = unlocked ? $"{data.GetCurrentDamage():0}" : "-";
+        if (hpText)     hpText.text     = unlocked ? $"{data.GetCurrentHP():0}" : "-";
         if (coinText)   coinText.text   = unlocked ? $"{data.Coin}" : "-";
 
         // --- XP Bar ---

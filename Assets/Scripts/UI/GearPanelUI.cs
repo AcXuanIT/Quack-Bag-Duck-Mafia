@@ -101,7 +101,7 @@ public class GearPanelUI : MonoBehaviour
         if (lvTxtT != null)
         {
             var lvTxt = lvTxtT.GetComponent<TextMeshProUGUI>();
-            if (lvTxt != null) lvTxt.text = data.IsLocked ? "Mở khóa ở cấp độ " : ("Cấp " + data.Level);
+            if (lvTxt != null) lvTxt.text = data.IsLocked ? "Mở khóa ở cấp độ " + data.LevelLock : ("Cấp " + data.Level);
         }
 
         var btn = go.GetComponent<Button>();

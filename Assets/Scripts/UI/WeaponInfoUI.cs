@@ -106,13 +106,12 @@ public class WeaponInfoUI : MonoBehaviour
         SetBar(levelSlice, _levelSliceFullWidth, (float)data.Level / MAX_LEVEL);
 
         // Damage
-        if (damageCurrent != null) damageCurrent.text  = data.Damage.ToString("0");
-        if (damageUpgrade != null) damageUpgrade.text  = (data.Damage * 1.15f).ToString("0");
+        if (damageCurrent != null) damageCurrent.text  = data.GetCurrentDamage().ToString("0");
+        if (damageUpgrade != null) damageUpgrade.text  = "+" + (data.GetNextLevelDamage()-data.GetCurrentDamage()).ToString("0");
 
         // HP
-        if (hpCurrent != null) hpCurrent.text = data.HP.ToString("0");
-        if (hpUpgrade != null) hpUpgrade.text = (data.HP * 1.10f).ToString("0");
-
+        if (hpCurrent != null) hpCurrent.text =data.GetCurrentHP().ToString("0");
+        if (hpUpgrade != null) hpUpgrade.text = "+" + (data.GetNextLevelHP()-data.GetCurrentHP()).ToString("0");
         // XP Bar
         float xpPct = data.XPToNextLevel > 0 ? (float)data.XP / data.XPToNextLevel : 0f;
         SetBar(xpSlice, _xpSliceFullWidth, xpPct);
