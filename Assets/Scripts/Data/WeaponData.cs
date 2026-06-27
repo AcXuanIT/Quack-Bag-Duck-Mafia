@@ -17,90 +17,101 @@ public class WeaponGridCell
 public class WeaponEntry
 {
     [Header("=== Identity ===")]
-    public int ID;
+    public int    ID;
     public string Name;
 
-    [Header("=== Sprites (Level 1 → 4) ===")]
-    [Tooltip("Icon hiển thị ở Level 1")]
-    public Sprite IconLevel1;
+    // ─── Tier sprites (dùng trong chiến đấu) ─────────────────
+    // Không liên quan đến Level upgrade của weapon.
+    // Tier thể hiện độ hiếm / sức mạnh cơ bản của vũ khí.
+    // Tier1 là mặc định, cũng là sprite hiển thị trên UI Gear.
+    [Header("=== Tier Sprites (chiến đấu, tier 1-4) ===")]
+    [Tooltip("Sprite dùng khi tier 1 — cũng là icon mặc định trên UIGear")]
+    public Sprite SpriteTier1;
 
-    [Tooltip("Icon hiển thị ở Level 2")]
-    public Sprite IconLevel2;
+    [Tooltip("Sprite dùng khi tier 2")]
+    public Sprite SpriteTier2;
 
-    [Tooltip("Icon hiển thị ở Level 3")]
-    public Sprite IconLevel3;
+    [Tooltip("Sprite dùng khi tier 3")]
+    public Sprite SpriteTier3;
 
-    [Tooltip("Icon hiển thị ở Level 4")]
-    public Sprite IconLevel4;
+    [Tooltip("Sprite dùng khi tier 4")]
+    public Sprite SpriteTier4;
 
+    // ─── Shape / Grid ─────────────────────────────────────────
     [Header("=== Shape (UI Frame) ===")]
-    [Tooltip("Sprite khung hình dạng của weapon hiển thị bên ngoài UI (shape frame)")]
+    [Tooltip("Sprite khung hình dạng của weapon (shape frame)")]
     public Sprite ShapeSprite;
 
     [Tooltip("Danh sách các ô grid mà weapon này chiếm khi gắn vào lưới")]
     public WeaponGridCell[] GridCells;
 
+    // ─── Level (1-5, upgrade trong UIGear) ───────────────────
+    [Header("=== Level (upgrade 1-5) ===")]
+    [Range(1, 5)]
+    public int Level = 1;
+
+    [Tooltip("XP hiện tại (số quái đã tiêu diệt bằng weapon)")]
+    public int XP;
+
+    [Tooltip("XP cần để đạt level tiếp theo")]
+    public int XPToNextLevel;
+
+    // ─── Stats ───────────────────────────────────────────────
     [Header("=== Stats ===")]
-    [Range(1, 5)] public int Level = 1;
-    public int XP;              // số quái giết được bằng vũ khí này
-    public int XPToNextLevel;   // XP cần để lên level tiếp theo
     public float Damage;
     public float HP;
-    public int Coin;            // coin cần để nâng level khi XP đầy
-    public bool IsLocked;       // true = chưa mở khóa
 
+    [Tooltip("Coin cần để nâng level khi XP đầy")]
+    public int Coin;
+
+    public bool IsLocked;   // true = chưa mở khoá
+
+    // ─── Spawn ───────────────────────────────────────────────
     [Header("=== Spawn ===")]
     [Tooltip("Thời gian delay (giây) trước khi weapon được spawn vào scene")]
     public float TimeDelay;
 
+    // ─── Helpers ─────────────────────────────────────────────
+
     /// <summary>
-    /// Trả về sprite icon tương ứng với level hiện tại.
+    /// Trả về sprite theo tier (1-4).
+    /// Dùng trong chiến đấu để hiển thị sprite tương ứng với tier của weapon.
     /// </summary>
-    public Sprite GetCurrentIcon()
+    public Sprite GetSpriteByTier(int tier)
     {
-        return Level switch
+        switch (tier)
         {
-            1 => IconLevel1,
-            2 => IconLevel2,
-            3 => IconLevel3,
-            4 => IconLevel4,
-            _ => IconLevel1
-        };
+            case 2:  return SpriteTier2 != null ? SpriteTier2 : SpriteTier1;
+            case 3:  return SpriteTier3 != null ? SpriteTier3 : SpriteTier1;
+            case 4:  return SpriteTier4 != null ? SpriteTier4 : SpriteTier1;
+            default: return SpriteTier1;  // tier 1 hoặc fallback
+        }
     }
 
     /// <summary>
-    /// Kiểm tra xem một vị trí grid có bị weapon này chiếm hay không.
+    /// Sprite mặc định hiển thị trên UIGear (luôn là Tier 1).
     /// </summary>
+    public Sprite GetUIIcon() => SpriteTier1;
+
+    /// <summary>Kiểm tra vị trí grid có bị weapon chiếm không.</summary>
     public bool IsGridPositionOccupied(Vector2Int position)
     {
         if (GridCells == null) return false;
         foreach (var cell in GridCells)
-        {
             if (cell.isOccupied && cell.gridPosition == position)
                 return true;
-        }
         return false;
     }
 
-    /// <summary>
-    /// Đánh dấu một ô grid là đang bị chiếm.
-    /// </summary>
+    /// <summary>Đánh dấu ô grid là đang bị chiếm.</summary>
     public void OccupyCell(Vector2Int position)
     {
         if (GridCells == null) return;
         foreach (var cell in GridCells)
-        {
-            if (cell.gridPosition == position)
-            {
-                cell.isOccupied = true;
-                return;
-            }
-        }
+            if (cell.gridPosition == position) { cell.isOccupied = true; return; }
     }
 
-    /// <summary>
-    /// Giải phóng tất cả các ô grid mà weapon này đang chiếm.
-    /// </summary>
+    /// <summary>Giải phóng tất cả các ô grid weapon đang chiếm.</summary>
     public void ReleaseAllCells()
     {
         if (GridCells == null) return;

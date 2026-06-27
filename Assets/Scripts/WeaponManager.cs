@@ -17,7 +17,6 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] private WeaponData weaponDatabase;
 
     // ── Runtime cache ────────────────────────────────────────
-    // Key = WeaponEntry.ID
     private Dictionary<int, WeaponEntry> _cache = new Dictionary<int, WeaponEntry>();
 
     // ── Events ───────────────────────────────────────────────
@@ -67,119 +66,90 @@ public class WeaponManager : MonoBehaviour
 
     public WeaponData Database => weaponDatabase;
 
-    /// <summary>Trả về tất cả weapons (copy list, không ref trực tiếp).</summary>
-    public List<WeaponEntry> GetAllWeapons()
-    {
-        return new List<WeaponEntry>(weaponDatabase.Weapons);
-    }
+    public List<WeaponEntry> GetAllWeapons()      => new List<WeaponEntry>(weaponDatabase.Weapons);
 
-    /// <summary>Tất cả vũ khí đã mở khoá.</summary>
     public List<WeaponEntry> GetUnlockedWeapons()
     {
-        var result = new List<WeaponEntry>();
-        foreach (var w in weaponDatabase.Weapons)
-            if (!w.IsLocked) result.Add(w);
-        return result;
+        var r = new List<WeaponEntry>();
+        foreach (var w in weaponDatabase.Weapons) if (!w.IsLocked) r.Add(w);
+        return r;
     }
 
-    /// <summary>Tất cả vũ khí chưa mở khoá.</summary>
     public List<WeaponEntry> GetLockedWeapons()
     {
-        var result = new List<WeaponEntry>();
-        foreach (var w in weaponDatabase.Weapons)
-            if (w.IsLocked) result.Add(w);
-        return result;
+        var r = new List<WeaponEntry>();
+        foreach (var w in weaponDatabase.Weapons) if (w.IsLocked) r.Add(w);
+        return r;
     }
 
-    /// <summary>Lấy weapon theo ID. Trả null nếu không tìm thấy.</summary>
-    public WeaponEntry GetWeapon(int id)
-    {
-        _cache.TryGetValue(id, out var entry);
-        return entry;
-    }
-
-    /// <summary>Có weapon ID này không?</summary>
-    public bool HasWeapon(int id) => _cache.ContainsKey(id);
+    public WeaponEntry GetWeapon(int id) { _cache.TryGetValue(id, out var e); return e; }
+    public bool        HasWeapon(int id) => _cache.ContainsKey(id);
 
     #endregion
 
     // ─────────────────────────────────────────────────────────
-    #region Write API (Runtime mutations – fire events + dirty SO)
+    #region Write API
 
-    /// <summary>Mở khoá vũ khí theo ID.</summary>
     public bool UnlockWeapon(int id)
     {
         var w = GetWeapon(id);
-        if (w == null) { Debug.LogWarning($"[WeaponManager] UnlockWeapon: ID {id} not found."); return false; }
-        if (!w.IsLocked) return false;
+        if (w == null || !w.IsLocked) return false;
         w.IsLocked = false;
-        Dirty();
-        OnWeaponChanged?.Invoke(w);
+        Dirty(); OnWeaponChanged?.Invoke(w);
         Debug.Log($"[WeaponManager] Unlocked: {w.Name}");
         return true;
     }
 
-    /// <summary>Khoá lại vũ khí theo ID.</summary>
     public bool LockWeapon(int id)
     {
         var w = GetWeapon(id);
         if (w == null) return false;
         w.IsLocked = true;
-        Dirty();
-        OnWeaponChanged?.Invoke(w);
+        Dirty(); OnWeaponChanged?.Invoke(w);
         return true;
     }
 
-    /// <summary>Thêm XP cho vũ khí. Tự động kiểm tra đủ XP để level up.</summary>
     public void AddXP(int id, int amount)
     {
         var w = GetWeapon(id);
         if (w == null || w.IsLocked) return;
         w.XP = Mathf.Max(0, w.XP + amount);
-        Dirty();
-        OnWeaponChanged?.Invoke(w);
+        Dirty(); OnWeaponChanged?.Invoke(w);
         Debug.Log($"[WeaponManager] {w.Name} XP → {w.XP}/{w.XPToNextLevel}");
     }
 
-    /// <summary>
-    /// Nâng level nếu XP đủ và có đủ coin.
-    /// Trả về true nếu level up thành công.
-    /// </summary>
     public bool TryLevelUp(int id, ref int playerCoin)
     {
         var w = GetWeapon(id);
-        if (w == null || w.IsLocked) return false;
-        if (w.Level >= 5) { Debug.Log($"[WeaponManager] {w.Name} đã max level!"); return false; }
-        if (w.XP < w.XPToNextLevel) { Debug.Log($"[WeaponManager] {w.Name} chưa đủ XP."); return false; }
-        if (playerCoin < w.Coin) { Debug.Log($"[WeaponManager] Không đủ coin để nâng {w.Name}."); return false; }
+        if (w == null || w.IsLocked)              return false;
+        if (w.Level >= 5)                          { Debug.Log($"[WeaponManager] {w.Name} đã max level!"); return false; }
+        if (w.XP < w.XPToNextLevel)               { Debug.Log($"[WeaponManager] {w.Name} chưa đủ XP."); return false; }
+        if (playerCoin < w.Coin)                   { Debug.Log($"[WeaponManager] Không đủ coin."); return false; }
 
-        playerCoin -= w.Coin;
-        w.XP -= w.XPToNextLevel;
-        w.Level = Mathf.Clamp(w.Level + 1, 1, 5);
-        // Scale stats khi lên level
-        w.Damage   *= 1.15f;
-        w.HP       *= 1.10f;
-        w.Coin      = Mathf.RoundToInt(w.Coin * 1.5f);
-        w.XPToNextLevel = Mathf.RoundToInt(w.XPToNextLevel * 1.3f);
+        playerCoin      -= w.Coin;
+        w.XP            -= w.XPToNextLevel;
+        w.Level          = Mathf.Clamp(w.Level + 1, 1, 5);
+        w.Damage        *= 1.15f;
+        w.HP            *= 1.10f;
+        w.Coin           = Mathf.RoundToInt(w.Coin * 1.5f);
+        w.XPToNextLevel  = Mathf.RoundToInt(w.XPToNextLevel * 1.3f);
 
-        Dirty();
-        OnWeaponChanged?.Invoke(w);
+        Dirty(); OnWeaponChanged?.Invoke(w);
         Debug.Log($"[WeaponManager] {w.Name} leveled up → Lv{w.Level}!");
         return true;
     }
 
-    /// <summary>Cập nhật toàn bộ field của một weapon (dùng từ Editor tool).</summary>
     public void UpdateWeapon(WeaponEntry updated)
     {
         var w = GetWeapon(updated.ID);
         if (w == null) { Debug.LogWarning($"[WeaponManager] UpdateWeapon: ID {updated.ID} not found."); return; }
 
         w.Name          = updated.Name;
-        w.IconLevel1      = updated.IconLevel1;
-        w.IconLevel2      = updated.IconLevel2;
-        w.IconLevel3      = updated.IconLevel3;
-        w.IconLevel4      = updated.IconLevel4;
-        w.ShapeSprite     = updated.ShapeSprite;
+        w.SpriteTier1   = updated.SpriteTier1;
+        w.SpriteTier2   = updated.SpriteTier2;
+        w.SpriteTier3   = updated.SpriteTier3;
+        w.SpriteTier4   = updated.SpriteTier4;
+        w.ShapeSprite   = updated.ShapeSprite;
         w.Level         = Mathf.Clamp(updated.Level, 1, 5);
         w.XP            = updated.XP;
         w.XPToNextLevel = updated.XPToNextLevel;
@@ -188,14 +158,9 @@ public class WeaponManager : MonoBehaviour
         w.Coin          = updated.Coin;
         w.IsLocked      = updated.IsLocked;
 
-        Dirty();
-        OnWeaponChanged?.Invoke(w);
+        Dirty(); OnWeaponChanged?.Invoke(w);
     }
 
-    /// <summary>
-    /// Thêm weapon mới vào database.
-    /// ID phải unique; nếu trùng sẽ trả về false.
-    /// </summary>
     public bool AddWeapon(WeaponEntry newWeapon)
     {
         if (weaponDatabase == null) return false;
@@ -204,17 +169,13 @@ public class WeaponManager : MonoBehaviour
             Debug.LogWarning($"[WeaponManager] AddWeapon: ID {newWeapon.ID} đã tồn tại.");
             return false;
         }
-
-        // Extend array
         var list = new List<WeaponEntry>(weaponDatabase.Weapons) { newWeapon };
         weaponDatabase.Weapons = list.ToArray();
         _cache[newWeapon.ID] = newWeapon;
-        Dirty();
-        OnDatabaseReloaded?.Invoke();
+        Dirty(); OnDatabaseReloaded?.Invoke();
         return true;
     }
 
-    /// <summary>Xoá weapon theo ID.</summary>
     public bool RemoveWeapon(int id)
     {
         if (!_cache.ContainsKey(id)) return false;
@@ -222,12 +183,10 @@ public class WeaponManager : MonoBehaviour
         var list = new List<WeaponEntry>(weaponDatabase.Weapons);
         list.RemoveAll(w => w.ID == id);
         weaponDatabase.Weapons = list.ToArray();
-        Dirty();
-        OnDatabaseReloaded?.Invoke();
+        Dirty(); OnDatabaseReloaded?.Invoke();
         return true;
     }
 
-    /// <summary>Sinh ID mới chưa tồn tại trong database.</summary>
     public int GenerateNewID()
     {
         int next = 1;

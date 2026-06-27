@@ -14,122 +14,362 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Weapons:
   - ID: 1
-    Name: Pistol
-    Icon: {fileID: 21300000, guid: a1e6accfb529ece4e84da3e5fcf9fdf8, type: 2}
-    Level: 3
-    XP: 120
-    XPToNextLevel: 200
-    Damage: 85
-    HP: 300
-    Coin: 500
-    IsLocked: 0
-  - ID: 2
-    Name: Shotgun
-    Icon: {fileID: 21300000, guid: 95a4ec639e2065441a3f4b0ba5edec7b, type: 2}
-    Level: 2
-    XP: 60
-    XPToNextLevel: 150
-    Damage: 140
-    HP: 250
-    Coin: 400
-    IsLocked: 0
-  - ID: 3
-    Name: Assault Rifle
-    Icon: {fileID: 21300000, guid: 08483385fb472154eb26af514131526c, type: 2}
-    Level: 4
-    XP: 180
-    XPToNextLevel: 300
-    Damage: 110
-    HP: 320
-    Coin: 800
-    IsLocked: 0
-  - ID: 4
-    Name: Sniper Rifle
-    Icon: {fileID: 21300000, guid: 922ae00b27d113544a0f1edde503b496, type: 2}
+    Name: Pistol Mk1
+    SpriteTier1: {fileID: 21300000, guid: 68907b0616b16314bb021a434a47cf49, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 1d40604d6c9f54d4d8f6f9709db066bd, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 2f1db271bb3a66a438078a07de737674, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 65133635f4dfee44db8b40ba88796d98, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 7b2f66d60fd70b944b244e49ad9ac638, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
-    XP: 30
+    XP: 0
     XPToNextLevel: 100
-    Damage: 250
+    Damage: 50
     HP: 200
-    Coin: 300
+    Coin: 100
     IsLocked: 0
-  - ID: 5
-    Name: RPG
-    Icon: {fileID: 21300000, guid: d92d5d5343d665a4b815c74fad14f4aa, type: 2}
-    Level: 5
-    XP: 400
-    XPToNextLevel: 500
-    Damage: 350
-    HP: 280
-    Coin: 1500
+    TimeDelay: 0.5
+  - ID: 2
+    Name: Rifle Alpha
+    SpriteTier1: {fileID: 21300000, guid: 0335f14d9344ad54fa790d0e231a3802, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 8ba20fd6b090bf54d8e2d72d03e19d45, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 3838701b9b9d5f742abe352b73276180, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 4e020ade2396b2844bda0e85046b64b8, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 16be7ea89bc37c7429b5064b245a95b8, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 80
+    HP: 180
+    Coin: 150
     IsLocked: 0
-  - ID: 6
-    Name: Minigun
-    Icon: {fileID: 21300000, guid: de490bd2dcefd3446b0b01f6d7683efe, type: 2}
-    Level: 2
-    XP: 80
-    XPToNextLevel: 200
-    Damage: 95
-    HP: 350
-    Coin: 600
-    IsLocked: 0
-  - ID: 7
-    Name: Flamethrower
-    Icon: {fileID: 21300000, guid: 8a767dcbad0e0454d81b621108c46ca4, type: 2}
+    TimeDelay: 0.8
+  - ID: 3
+    Name: Shotgun Blast
+    SpriteTier1: {fileID: 21300000, guid: e29b4fc6a5484a44992d470f12b36de4, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: d910ec98d88f1874db726e9d3810618b, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: acc79191582924c478ea3555079a719e, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 916110ca4fdef9d47a48628199d5f621, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 7ed7181a2dd579543b311883913dd046, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
     XP: 0
     XPToNextLevel: 100
     Damage: 120
-    HP: 260
-    Coin: 350
-    IsLocked: 1
-  - ID: 8
-    Name: Laser Cannon
-    Icon: {fileID: 21300000, guid: e50fad99e0f118942b5d4156dc36fc96, type: 2}
+    HP: 220
+    Coin: 200
+    IsLocked: 0
+    TimeDelay: 1
+  - ID: 4
+    Name: Sniper SR-1
+    SpriteTier1: {fileID: 21300000, guid: f976d78aafac9604e852061b1de9c6dd, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 48718461427948e4db6d007de88e3e15, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 5799dbb3034017a4dab957bbea12d6dd, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 59a2c3d981436594f88436557642e069, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: a70310b07a647424e9199ac7715c79b7, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
     XP: 0
     XPToNextLevel: 100
     Damage: 200
-    HP: 220
-    Coin: 600
-    IsLocked: 1
-  - ID: 9
-    Name: Plasma Rifle
-    Icon: {fileID: 21300000, guid: fca6b85aaa71dad4fbc0a1e3740db352, type: 2}
+    HP: 150
+    Coin: 250
+    IsLocked: 0
+    TimeDelay: 1.5
+  - ID: 5
+    Name: SMG Rush
+    SpriteTier1: {fileID: 21300000, guid: 7216ef482af38a44d8fdbe67f9975d22, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 5aa620f86522d1048822b4b7db5e2e77, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 32e38a87719de5e4bbc2ec2bb38c1819, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 93b49ec3d61a70146947be0f9bf06545, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: aadd9e3ac45d73845a1de48345542736, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 175
-    HP: 240
-    Coin: 500
-    IsLocked: 1
-  - ID: 10
-    Name: Rail Gun
-    Icon: {fileID: 21300000, guid: a3f141bd54b365443bda317d4a4c422a, type: 2}
+    Damage: 60
+    HP: 250
+    Coin: 180
+    IsLocked: 0
+    TimeDelay: 0.6
+  - ID: 6
+    Name: Laser Cutter
+    SpriteTier1: {fileID: 21300000, guid: e8620715c131c054d8344c93fe6334e1, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: ee76e51b26556324395579d1284b5767, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 50f9e4c4a43d7c0479c16f131e8f5f57, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: afbd929ad612aea4b9c65356681cb9fc, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 9cede710630888e4ba76ec653fb613eb, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 150
+    HP: 170
+    Coin: 300
+    IsLocked: 0
+    TimeDelay: 1.2
+  - ID: 7
+    Name: RPG Launch
+    SpriteTier1: {fileID: 21300000, guid: 5f0f0df25ea098b4da347aa42c7473fd, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 0a401b5acf634eb4183ddd4510193ef3, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: bd1ebb66954770b46a0516e0345a6144, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 7404679c91f508d43b28516f254b84fb, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: d76f5a0f5b9ad5840ac61c76c969c746, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
     XP: 0
     XPToNextLevel: 100
     Damage: 300
-    HP: 180
-    Coin: 900
-    IsLocked: 1
+    HP: 300
+    Coin: 400
+    IsLocked: 0
+    TimeDelay: 2
+  - ID: 8
+    Name: Grenade Toss
+    SpriteTier1: {fileID: 21300000, guid: cf0cfe4fdd3427d4eac7323b0802a50d, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: e561b04dc658c684b945a484ca6c0669, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 554a1bf78da34b74f9fa2b737748d87a, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 66581650ccc85ad48bd3d6fa4ad86aee, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 38eb3cdc372a5dd4e853014c461b0bd3, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 250
+    HP: 280
+    Coin: 350
+    IsLocked: 0
+    TimeDelay: 1.8
+  - ID: 9
+    Name: Plasma Gun
+    SpriteTier1: {fileID: 21300000, guid: 85a012188f8bf7d4eaa5a8ba3b420e6b, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: e2e6e2ce88f665740bafa961f7f80624, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 608ef102373c72b499f506ab9da3b227, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 7a8143f85e6ece144968473a7bb2a96d, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 5b7ddf87fdce5ee498e9822468b0405c, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 180
+    HP: 210
+    Coin: 320
+    IsLocked: 0
+    TimeDelay: 1.3
+  - ID: 10
+    Name: Rail Driver
+    SpriteTier1: {fileID: 21300000, guid: 9e465033521661a4394fed777aaa3558, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 565a90dff09950c4eb517d2133f26a5f, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 4aedaa19e53eeff4bbdee0ee09e295e0, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: e9720fe01e818f643b95b5693390c6c0, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: fd1308584822022428fcfd86b3e99665, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 220
+    HP: 190
+    Coin: 380
+    IsLocked: 0
+    TimeDelay: 1.6
   - ID: 11
-    Name: Grenade Launcher
-    Icon: {fileID: 21300000, guid: ab04c75dc608d48448842a8a22d0e718, type: 2}
+    Name: Arc Cannon
+    SpriteTier1: {fileID: 21300000, guid: bd5cba237c00e0640b0624b30debfe57, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 81ed029d9f9ffaa4ea89c659308a550b, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 7e69c7c095c1ec64a8a094337a84b1c1, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 64e70a3c83ab61a41b589eed11a9aecf, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 7b2f66d60fd70b944b244e49ad9ac638, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
     XP: 0
     XPToNextLevel: 100
     Damage: 160
-    HP: 300
-    Coin: 700
-    IsLocked: 1
+    HP: 230
+    Coin: 280
+    IsLocked: 0
+    TimeDelay: 1.1
   - ID: 12
     Name: Missile Pod
-    Icon: {fileID: 21300000, guid: 40689a58b83b7c3488a6f9a21d82af00, type: 2}
+    SpriteTier1: {fileID: 21300000, guid: 05e0241a92f7a5c499859916e479414c, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 6b4d32cba0ed1474dbfeb8a3165b3535, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 55aa69ccf24819c4c9310a6397aa1395, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 23c73bfae9489b24aa202cdc28b9a7ee, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 16be7ea89bc37c7429b5064b245a95b8, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     Level: 1
     XP: 0
     XPToNextLevel: 100
     Damage: 280
-    HP: 200
+    HP: 260
+    Coin: 420
+    IsLocked: 0
+    TimeDelay: 1.9
+  - ID: 13
+    Name: Shadow Blade
+    SpriteTier1: {fileID: 21300000, guid: 0dbef0dc0f367254db97fde900944f92, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: b2504b0f43db6364d8a073af2da87657, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: c15a59b700b662944830db1c1e02b8c5, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: b4556ed9e414e8f4d9c25aabf864d0cd, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 7ed7181a2dd579543b311883913dd046, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 350
+    HP: 350
+    Coin: 500
+    IsLocked: 1
+    TimeDelay: 2.5
+  - ID: 14
+    Name: Void Cannon
+    SpriteTier1: {fileID: 21300000, guid: 68907b0616b16314bb021a434a47cf49, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 1d40604d6c9f54d4d8f6f9709db066bd, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 2f1db271bb3a66a438078a07de737674, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 65133635f4dfee44db8b40ba88796d98, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: a70310b07a647424e9199ac7715c79b7, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 400
+    HP: 320
+    Coin: 600
+    IsLocked: 1
+    TimeDelay: 2.8
+  - ID: 15
+    Name: Thunder Rail
+    SpriteTier1: {fileID: 21300000, guid: 0335f14d9344ad54fa790d0e231a3802, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 8ba20fd6b090bf54d8e2d72d03e19d45, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 3838701b9b9d5f742abe352b73276180, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 4e020ade2396b2844bda0e85046b64b8, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: aadd9e3ac45d73845a1de48345542736, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 320
+    HP: 380
+    Coin: 550
+    IsLocked: 1
+    TimeDelay: 2.3
+  - ID: 16
+    Name: Cryo Lance
+    SpriteTier1: {fileID: 21300000, guid: e29b4fc6a5484a44992d470f12b36de4, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: d910ec98d88f1874db726e9d3810618b, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: acc79191582924c478ea3555079a719e, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 916110ca4fdef9d47a48628199d5f621, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 9cede710630888e4ba76ec653fb613eb, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 280
+    HP: 400
+    Coin: 480
+    IsLocked: 1
+    TimeDelay: 2.1
+  - ID: 17
+    Name: Bio Sprayer
+    SpriteTier1: {fileID: 21300000, guid: f976d78aafac9604e852061b1de9c6dd, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 48718461427948e4db6d007de88e3e15, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 5799dbb3034017a4dab957bbea12d6dd, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 59a2c3d981436594f88436557642e069, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: d76f5a0f5b9ad5840ac61c76c969c746, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 260
+    HP: 420
+    Coin: 460
+    IsLocked: 1
+    TimeDelay: 2
+  - ID: 18
+    Name: Inferno Burst
+    SpriteTier1: {fileID: 21300000, guid: 7216ef482af38a44d8fdbe67f9975d22, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 5aa620f86522d1048822b4b7db5e2e77, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 32e38a87719de5e4bbc2ec2bb38c1819, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 93b49ec3d61a70146947be0f9bf06545, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 38eb3cdc372a5dd4e853014c461b0bd3, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 380
+    HP: 360
+    Coin: 580
+    IsLocked: 1
+    TimeDelay: 2.6
+  - ID: 19
+    Name: Quantum Pulse
+    SpriteTier1: {fileID: 21300000, guid: e8620715c131c054d8344c93fe6334e1, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: ee76e51b26556324395579d1284b5767, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 50f9e4c4a43d7c0479c16f131e8f5f57, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: afbd929ad612aea4b9c65356681cb9fc, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: 5b7ddf87fdce5ee498e9822468b0405c, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 420
+    HP: 340
+    Coin: 620
+    IsLocked: 1
+    TimeDelay: 2.9
+  - ID: 20
+    Name: Omega Strike
+    SpriteTier1: {fileID: 21300000, guid: 5f0f0df25ea098b4da347aa42c7473fd, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 0a401b5acf634eb4183ddd4510193ef3, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: bd1ebb66954770b46a0516e0345a6144, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 7404679c91f508d43b28516f254b84fb, type: 2}
+    ShapeSprite: {fileID: 21300000, guid: fd1308584822022428fcfd86b3e99665, type: 2}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    Damage: 500
+    HP: 500
     Coin: 800
     IsLocked: 1
+    TimeDelay: 3.5
