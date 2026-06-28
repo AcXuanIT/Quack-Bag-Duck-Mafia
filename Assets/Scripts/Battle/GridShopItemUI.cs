@@ -127,7 +127,7 @@ public class GridShopItemUI : MonoBehaviour,
     }
 
     // ─── Drag ────────────────────────────────────────────────
-    public void OnBeginDrag(PointerEventData eventData)
+public void OnBeginDrag(PointerEventData eventData)
     {
         if (data == null || data.itemType != ShopItemData.ItemType.Grid) return;
 
@@ -141,6 +141,8 @@ public class GridShopItemUI : MonoBehaviour,
 
         _canvasGroup.alpha          = 0.8f;
         _canvasGroup.blocksRaycasts = false;
+
+        ShowAllLockedCells();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -150,16 +152,22 @@ public class GridShopItemUI : MonoBehaviour,
         UpdateHoverHighlight(GetCellUnderPointer(eventData));
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+public void OnEndDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
         _isDragging = false;
 
-        ClearHighlight();
+        // 1. Lay anchor TRUOC khi restore blocksRaycasts
+        //    (blocksRaycasts=false nen raycast xuyen qua GridItem xuong cell ben duoi)
+        var anchor = GetCellUnderPointer(eventData);
+
+        // 2. Restore UI
+        ClearHighlight(hideLocked: true);
+        HideAllLockedCells();
         _canvasGroup.alpha          = 1f;
         _canvasGroup.blocksRaycasts = true;
 
-        var anchor = GetCellUnderPointer(eventData);
+        // 3. Thu dat item
         bool placed = TryUnlockOnGrid(anchor);
 
         if (!placed)
@@ -167,7 +175,7 @@ public class GridShopItemUI : MonoBehaviour,
             transform.SetParent(_originalParent, true);
             transform.SetSiblingIndex(_originalSiblingIndex);
             _rt.anchoredPosition = _originalAnchoredPos;
-            Debug.Log("[GridShopItemUI] Drag cancelled — invalid placement.");
+            Debug.Log("[GridShopItemUI] Drag cancelled — anchor=" + (anchor != null ? anchor.Row + "," + anchor.Col : "null"));
         }
         else
         {
@@ -218,13 +226,24 @@ public class GridShopItemUI : MonoBehaviour,
         }
     }
 
-    private void ClearHighlight()
+private void ClearHighlight(bool hideLocked = false)
     {
         if (_hoveredAnchor == null || data?.gridCells == null) return;
         foreach (var offset in data.gridCells)
         {
             var cell = _gridManager.GetCell(_hoveredAnchor.Row + offset.x, _hoveredAnchor.Col + offset.y);
-            cell?.RestoreVisual();   // trả lại màu đúng theo state
+            if (cell != null)
+            {
+                if (cell.State == BattleGridCell.CellState.Locked)
+                {
+                    if (hideLocked)
+                        cell.HideLockedPreview(); // chi an khi EndDrag
+                    else
+                        cell.SetHighlightColor(new Color(1f, 1f, 1f, 0.25f)); // tra ve mau hint mac dinh
+                }
+                else
+                    cell.RestoreVisual();
+            }
         }
         _hoveredAnchor = null;
     }
@@ -235,5 +254,31 @@ public class GridShopItemUI : MonoBehaviour,
         if (!CanUnlock(anchorCell)) return false;
         _gridManager.UnlockShape(anchorCell.Row, anchorCell.Col, data.gridCells);
         return true;
+    }
+
+
+private void ShowAllLockedCells()
+    {
+        if (_gridManager == null) return;
+        Color hint = new Color(1f, 1f, 1f, 0.25f);
+        for (int r = 0; r < _gridManager.Rows; r++)
+        for (int c = 0; c < _gridManager.Cols; c++)
+        {
+            var cell = _gridManager.GetCell(r, c);
+            if (cell != null && cell.State == BattleGridCell.CellState.Locked)
+                cell.SetHighlightColor(hint);
+        }
+    }
+
+    private void HideAllLockedCells()
+    {
+        if (_gridManager == null) return;
+        for (int r = 0; r < _gridManager.Rows; r++)
+        for (int c = 0; c < _gridManager.Cols; c++)
+        {
+            var cell = _gridManager.GetCell(r, c);
+            if (cell != null && cell.State == BattleGridCell.CellState.Locked)
+                cell.HideLockedPreview();
+        }
     }
 }

@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Tạo và quản lý Battle Grid (mặc định 5 cột x 7 hàng).
-/// - Mặc định unlock vùng 3x3 chính giữa.
-/// - GridItem chỉ được đặt vào ô Locked kề với ô đã Unlocked.
+/// Tao va quan ly Battle Grid (mac dinh 5 cot x 7 hang).
+/// - Mac dinh unlock vung 3x3 chinh giua.
+/// - Cau truc cell don gian: moi cell chi co 1 GameObject voi 1 Image (bgImage).
+///   Locked        → sprite spriteLocked   (grid_base), an hoan toan binh thuong.
+///   UnlockedEmpty → sprite spriteUnlocked (grid_gear_shape_solo).
+///   UnlockedFull  → sprite spriteUnlocked (grid_gear_shape_solo).
 /// </summary>
 public class BattleGridManager : MonoBehaviour
 {
@@ -18,8 +21,8 @@ public class BattleGridManager : MonoBehaviour
     [SerializeField] private int defaultUnlockRows = 3;
 
     [Header("Sprites")]
-    [SerializeField] private Sprite spriteGridBase;
-    [SerializeField] private Sprite spriteGearIcon;
+    [SerializeField] private Sprite spriteLocked;   // grid_base
+    [SerializeField] private Sprite spriteUnlocked; // grid_gear_shape_solo
 
     [Header("Cell Prefab (auto-built if null)")]
     [SerializeField] private GameObject cellPrefab;
@@ -35,7 +38,7 @@ public class BattleGridManager : MonoBehaviour
 
     // ── Build ────────────────────────────────────────────────
 
-    [ContextMenu("Rebuild Grid")]
+[ContextMenu("Rebuild Grid")]
     public void BuildGrid()
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
@@ -72,40 +75,18 @@ public class BattleGridManager : MonoBehaviour
                    -(border + spacing.y * r + cellH * r));
 
                 var bgImg = cellGO.AddComponent<Image>();
-                bgImg.sprite = spriteGridBase;
+                bgImg.preserveAspect = false;
 
-                // Lock Overlay
-                var lockGO  = new GameObject("LockOverlay");
-                lockGO.transform.SetParent(cellGO.transform, false);
-                var lockRT  = lockGO.AddComponent<RectTransform>();
-                lockRT.anchorMin = Vector2.zero; lockRT.anchorMax = Vector2.one;
-                lockRT.offsetMin = Vector2.zero; lockRT.offsetMax = Vector2.zero;
-                var lockImg = lockGO.AddComponent<Image>();
-                lockImg.color = new Color(0f, 0f, 0f, 0.45f);
-
-                // Item Icon
-                var iconGO  = new GameObject("ItemIcon");
-                iconGO.transform.SetParent(cellGO.transform, false);
-                var iconRT  = iconGO.AddComponent<RectTransform>();
-                iconRT.anchorMin = Vector2.zero; iconRT.anchorMax = Vector2.one;
-                iconRT.offsetMin = Vector2.zero; iconRT.offsetMax = Vector2.zero;
-                var iconImg = iconGO.AddComponent<Image>();
-                iconImg.sprite = spriteGearIcon;
-                iconImg.preserveAspect = false;
-                iconGO.SetActive(false);
-
+                // Gan component va truyen sprite truc tiep — khong dung reflection
                 var cell = cellGO.AddComponent<BattleGridCell>();
-                SetField(cell, "bgImage",        bgImg);
-                SetField(cell, "lockOverlay",     lockImg);
-                SetField(cell, "itemIcon",        iconImg);
-                SetField(cell, "spriteUnlocked",  spriteGridBase);
-                SetField(cell, "spriteLocked",    spriteGridBase);
 
                 bool inZone = (r >= startRow && r <= endRow && c >= startCol && c <= endCol);
-                cell.Init(r, c);
-                cell.SetState(inZone
+                var initState = inZone
                     ? BattleGridCell.CellState.UnlockedEmpty
-                    : BattleGridCell.CellState.Locked);
+                    : BattleGridCell.CellState.Locked;
+
+                cell.Init(r, c, bgImg, spriteLocked, spriteUnlocked);
+                cell.SetState(initState);
 
                 _cells[r, c] = cell;
             }
@@ -113,7 +94,9 @@ public class BattleGridManager : MonoBehaviour
 
         CellWidth  = cellW;
         CellHeight = cellH;
-        Debug.Log("[BattleGridManager] Grid " + columns + "x" + rows + " built. CellSize=" + cellW.ToString("F1") + "x" + cellH.ToString("F1") + ".");
+        Debug.Log("[BattleGridManager] Grid " + columns + "x" + rows + " built."
+            + " spriteLocked=" + (spriteLocked   != null ? spriteLocked.name   : "NULL")
+            + " spriteUnlocked=" + (spriteUnlocked != null ? spriteUnlocked.name : "NULL"));
     }
 
     // ── Public API ───────────────────────────────────────────
@@ -124,31 +107,29 @@ public class BattleGridManager : MonoBehaviour
         return _cells[row, col];
     }
 
-    /// <summary>Unlock một ô (Locked → UnlockedEmpty).</summary>
+    /// <summary>Unlock mot o (Locked → UnlockedEmpty).</summary>
     public void UnlockCell(int row, int col) => GetCell(row, col)?.Unlock();
 
-    /// <summary>Đặt item vào ô đã unlock (UnlockedEmpty → UnlockedFull).</summary>
+    /// <summary>Dat item vao o da unlock (UnlockedEmpty → UnlockedFull).</summary>
     public void PlaceItem(int row, int col) => GetCell(row, col)?.PlaceItem();
 
     public void RemoveItem(int row, int col) => GetCell(row, col)?.RemoveItem();
 
     /// <summary>
-    /// Kiểm tra shape (anchorRow/Col + offsets) có hợp lệ để unlock không:
-    /// 1. Tất cả ô trong shape phải là Locked.
-    /// 2. Ít nhất 1 ô trong shape phải kề (4 hướng) với ô UnlockedEmpty hoặc UnlockedFull.
+    /// Kiem tra shape co hop le de unlock khong:
+    /// 1. Tat ca o trong shape phai la Locked.
+    /// 2. It nhat 1 o phai ke (4 huong) voi o da Unlocked.
     /// </summary>
     public bool CanUnlock(int anchorRow, int anchorCol, Vector2Int[] offsets)
     {
         if (offsets == null || offsets.Length == 0) return false;
 
-        // Rule 1: tất cả ô đích phải là Locked
         foreach (var o in offsets)
         {
             var cell = GetCell(anchorRow + o.x, anchorCol + o.y);
             if (cell == null || cell.State != BattleGridCell.CellState.Locked) return false;
         }
 
-        // Rule 2: ít nhất 1 ô đích kề với ô đã Unlocked
         int[] dr = { -1, 1, 0, 0 };
         int[] dc = {  0, 0,-1, 1 };
 
@@ -166,7 +147,7 @@ public class BattleGridManager : MonoBehaviour
         return false;
     }
 
-    /// <summary>Unlock tất cả ô trong shape (không kiểm tra — gọi CanUnlock trước).</summary>
+    /// <summary>Unlock tat ca o trong shape.</summary>
     public void UnlockShape(int anchorRow, int anchorCol, Vector2Int[] offsets)
     {
         foreach (var o in offsets)
@@ -175,10 +156,5 @@ public class BattleGridManager : MonoBehaviour
 
     // ── Helpers ──────────────────────────────────────────────
 
-    private void SetField(object obj, string name, object value)
-    {
-        var f = obj.GetType().GetField(name,
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        f?.SetValue(obj, value);
-    }
+
 }
