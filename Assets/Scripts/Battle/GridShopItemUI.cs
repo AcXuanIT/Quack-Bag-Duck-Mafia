@@ -44,7 +44,15 @@ public class GridShopItemUI : MonoBehaviour,
     [Header("Rarity Frames")]
     [SerializeField] private Sprite[] rarityFrames;
 
-    [Header("Highlight Colors")]
+    [Header("Trash Zone")]
+    [SerializeField] private RectTransform trashZone;   // Close GO trong UIBatteMap
+    [SerializeField] private Image         trashImage;  // Image cua Close de highlight
+    [SerializeField] private Color         colorTrash   = new Color(1f, 0.3f, 0.3f, 0.9f);
+    private Color _trashOriginalColor;
+    private bool  _overTrash;
+
+    
+[Header("Highlight Colors")]
     [SerializeField] private Color colorValid   = new Color(0.2f, 1f,   0.3f, 0.9f);
     [SerializeField] private Color colorInvalid = new Color(1f,   0.2f, 0.2f, 0.9f);
 
@@ -72,10 +80,13 @@ public class GridShopItemUI : MonoBehaviour,
             _rootCanvas = _rootCanvas.rootCanvas;
     }
 
-    public void Setup(ShopItemData itemData, BattleGridManager gridManager)
+public void Setup(ShopItemData itemData, BattleGridManager gridManager,
+                         RectTransform trash = null, Image trashImg = null)
     {
         data         = itemData;
         _gridManager = gridManager;
+        if (trash    != null) trashZone  = trash;
+        if (trashImg != null) trashImage = trashImg;
         if (data == null) return;
 
         if (iconImage  != null && data.icon != null)             iconImage.sprite  = data.icon;
@@ -142,14 +153,29 @@ public void OnBeginDrag(PointerEventData eventData)
         _canvasGroup.alpha          = 0.8f;
         _canvasGroup.blocksRaycasts = false;
 
+        if (trashImage != null) _trashOriginalColor = trashImage.color;
+        _overTrash = false;
+
         ShowAllLockedCells();
     }
 
-    public void OnDrag(PointerEventData eventData)
+public void OnDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
         _rt.anchoredPosition += eventData.delta / _rootCanvas.scaleFactor;
-        UpdateHoverHighlight(GetCellUnderPointer(eventData));
+
+        bool nowOverTrash = IsPointerOverTrash(eventData);
+        if (nowOverTrash != _overTrash)
+        {
+            _overTrash = nowOverTrash;
+            if (trashImage != null)
+                trashImage.color = _overTrash ? colorTrash : _trashOriginalColor;
+        }
+
+        if (!_overTrash)
+            UpdateHoverHighlight(GetCellUnderPointer(eventData));
+        else
+            ClearHighlight();
     }
 
 public void OnEndDrag(PointerEventData eventData)
@@ -157,25 +183,29 @@ public void OnEndDrag(PointerEventData eventData)
         if (!_isDragging) return;
         _isDragging = false;
 
-        // 1. Lay anchor TRUOC khi restore blocksRaycasts
-        //    (blocksRaycasts=false nen raycast xuyen qua GridItem xuong cell ben duoi)
+        if (trashImage != null) trashImage.color = _trashOriginalColor;
+
         var anchor = GetCellUnderPointer(eventData);
 
-        // 2. Restore UI
         ClearHighlight(hideLocked: true);
         HideAllLockedCells();
         _canvasGroup.alpha          = 1f;
         _canvasGroup.blocksRaycasts = true;
 
-        // 3. Thu dat item
-        bool placed = TryUnlockOnGrid(anchor);
+        if (_overTrash || IsPointerOverTrash(eventData))
+        {
+            Debug.Log("[GridShopItemUI] Discarded '" + data.itemName + "' vao trash.");
+            Destroy(gameObject);
+            return;
+        }
 
+        bool placed = TryUnlockOnGrid(anchor);
         if (!placed)
         {
             transform.SetParent(_originalParent, true);
             transform.SetSiblingIndex(_originalSiblingIndex);
             _rt.anchoredPosition = _originalAnchoredPos;
-            Debug.Log("[GridShopItemUI] Drag cancelled — anchor=" + (anchor != null ? anchor.Row + "," + anchor.Col : "null"));
+            Debug.Log("[GridShopItemUI] Drag cancelled.");
         }
         else
         {
@@ -281,4 +311,12 @@ private void ShowAllLockedCells()
                 cell.HideLockedPreview();
         }
     }
+
+private bool IsPointerOverTrash(PointerEventData eventData)
+    {
+        if (trashZone == null) return false;
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            trashZone, eventData.position, eventData.pressEventCamera);
+    }
+
 }

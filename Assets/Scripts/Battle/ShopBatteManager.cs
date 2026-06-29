@@ -15,6 +15,9 @@ public class ShopBatteManager : MonoBehaviour
     [SerializeField] private int buyPrice = 100;
 
     [Header("References")]
+    [SerializeField] private RectTransform trashZone;
+    [SerializeField] private Image         trashImage;
+
     [SerializeField] private Button          btnBuy;
     [SerializeField] private Transform       componentContainer;
     [SerializeField] private TextMeshProUGUI priceText;
@@ -87,32 +90,22 @@ private void RebuildPool()
     // ── Spawn ────────────────────────────────────────────────
 private void SpawnFromPool(List<ShopItemData> pool)
     {
-        if (pool == null || pool.Count == 0) { Debug.LogWarning("[Shop] Pool rỗng!"); return; }
-        if (componentContainer == null)      { Debug.LogWarning("[Shop] Thiếu componentContainer!"); return; }
+        if (pool == null || pool.Count == 0) { Debug.LogWarning("[Shop] Pool rong!"); return; }
+        if (componentContainer == null)      { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
 
-        // Chỉ lấy Grid items
         var gridPool = pool.FindAll(d => d != null && d.itemType == ShopItemData.ItemType.Grid);
-        if (gridPool.Count == 0) { Debug.LogWarning("[Shop] Không có Grid item!"); return; }
+        if (gridPool.Count == 0) { Debug.LogWarning("[Shop] Khong co Grid item!"); return; }
 
         ShopItemData data = gridPool[Random.Range(0, gridPool.Count)];
-
-        // Chọn prefab theo loại item
-        GameObject prefabToUse = (data.itemType == ShopItemData.ItemType.Grid)
-            ? gridItemPrefab
-            : shopItemPrefab;
-
-        if (prefabToUse == null)
-        {
-            Debug.LogWarning("[Shop] Thiếu prefab cho loại: " + data.itemType);
-            return;
-        }
+        GameObject prefabToUse = (data.itemType == ShopItemData.ItemType.Grid) ? gridItemPrefab : shopItemPrefab;
+        if (prefabToUse == null) { Debug.LogWarning("[Shop] Thieu prefab: " + data.itemType); return; }
 
         var go = Instantiate(prefabToUse, componentContainer);
         go.SetActive(true);
 
         var gridUI = go.GetComponent<GridShopItemUI>();
         if (gridUI != null)
-            gridUI.Setup(data, _gridManager);
+            gridUI.Setup(data, _gridManager, trashZone, trashImage);
         else
             go.GetComponent<ShopItemUI>()?.Setup(data);
 

@@ -4957,6 +4957,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buyPrice: 100
+  trashZone: {fileID: 0}
+  trashImage: {fileID: 0}
   btnBuy: {fileID: 1023324715}
   componentContainer: {fileID: 2049431648}
   priceText: {fileID: 0}
@@ -12766,7 +12768,7 @@ GameObject:
   - component: {fileID: 1098468449}
   - component: {fileID: 1098468448}
   m_Layer: 5
-  m_Name: Clean
+  m_Name: 'Close '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,11 +1,9 @@
 fileFormatVersion: 2
 guid: ddc3b036ba13c604ab69cd5224e78449
-timeCreated: 1782362629
-licenseType: Free
 TextureImporter:
-  serializedVersion: 13
   internalIDToNameTable: []
   externalObjects: {}
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -82,45 +80,457 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 346
+        width: 166
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a471fd5841b6164f822e1a11c43ccf2
+      internalID: 1920945088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_1
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 346
+        width: 166
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2392e6dce829abb40ba28db7e68a96c7
+      internalID: -1674374950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_2
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 336
+        width: 160
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd2ea2d2d33937d4e850df1fad303297
+      internalID: -407654931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_3
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 348
+        width: 80
+        height: 156
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ade81d834a573ef47b5333b623c7a10d
+      internalID: 912006727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_4
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 348
+        width: 160
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9041b92c5d3e3943b42673b0c87b3f8
+      internalID: -1134958867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 174
+        width: 166
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d36c45fa9c65594c87f39588c8a4ccd
+      internalID: 2003240521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_6
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 174
+        width: 166
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92eec543a4ed8964c84680a671c720e2
+      internalID: -600517820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_7
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 328
+        width: 5
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7544d22785714ea489d3faa5c05a51cb
+      internalID: 586971983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_8
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 256
+        width: 170
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe5feb51ee60ffe48bacb0d3c9970bd5
+      internalID: 982554497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_9
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 263
+        width: 78
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc8db83c9d8d47d4da904baa26ad992b
+      internalID: 341642910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_10
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 2
+        width: 165
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3905c4df344eca143ac04d3c79d8f3e0
+      internalID: -388773172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_11
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 2
+        width: 164
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b317e9771f60b27498cdb03a1f4dbbdd
+      internalID: 1445632706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_12
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 165
+        width: 161
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33a258a14ba7bb6459de4ffb58d8e1fb
+      internalID: -1902993233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_13
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 2
+        width: 84
+        height: 246
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a802cbe31d8d0474e9493c9dac29db3a
+      internalID: 976153055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_14
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 92
+        width: 82
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 234a2ab7a151ba345ad4c29239001a1f
+      internalID: -1956613790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_15
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 2
+        width: 82
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08a92de7333cab74f906e76cebd7bc44
+      internalID: -730190378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_16
+      rect:
+        serializedVersion: 2
+        x: 603
+        y: 2
+        width: 246
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 125102a97b3ba184598e1323830c203c
+      internalID: -1198421213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_17
+      rect:
+        serializedVersion: 2
+        x: 857
+        y: 2
+        width: 82
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a94453e84f0208d4d8aaab95cbd01d87
+      internalID: -1392332229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
-    spriteID:
+    spriteID: bf06f260c4fc1014e9269ddadd862d45
     internalID: 0
     vertices: []
-    indices:
+    indices: 
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
-  mipmapLimitGroupName:
-  output:
-    textureImportInstructions:
-      compressedFormat: 0
-      uncompressedFormat: 0
-      desiredFormat: 0
-      usageMode: 0
-      colorSpace: 0
-      androidETC2FallbackFormat: 0
-      width: 0
-      height: 0
-      depth: 0
-      cubeIntermediateSize: 0
-      cubeMode: 0
-      cubeLayout: 0
-      compressionQuality: 0
-      androidETC2FallbackDownscale: 0
-      vtOnly: 0
-    sourceTextureInformation:
-      width: 0
-      height: 0
-      doesTextureContainAlpha: 0
-      sourceWasHDR: 0
-    importInspectorWarnings:
+    nameFileIdTable:
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_0: 1920945088
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_1: -1674374950
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_10: -388773172
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_11: 1445632706
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_12: -1902993233
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_13: 976153055
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_14: -1956613790
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_15: -730190378
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_16: -1198421213
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_17: -1392332229
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_2: -407654931
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_3: 912006727
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_4: -1134958867
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_5: 2003240521
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_6: -600517820
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_7: 586971983
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_8: 982554497
+      sactx-0-1024x512-ETC2-atlas_button_shape-1c33b1eb_9: 341642910
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
