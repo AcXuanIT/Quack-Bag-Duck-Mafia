@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using DG.Tweening;
 
@@ -25,15 +26,22 @@ public class BattleMapUI : MonoBehaviour
 
     /// <summary>
     /// Mở BattleMap UI. Gọi từ UIGameManager sau LoadMap animation.
+    /// onComplete được gọi khi hiệu ứng fade-in (Intro) kết thúc.
     /// </summary>
-    public void Show()
+    public void Show(Action onComplete = null)
     {
         gameObject.SetActive(true);
 
         if (useFadeIn && canvasGroup != null)
         {
             canvasGroup.alpha = 0f;
-            canvasGroup.DOFade(1f, fadeInDuration).SetEase(Ease.OutQuad);
+            canvasGroup.DOFade(1f, fadeInDuration)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() => onComplete?.Invoke());
+        }
+        else
+        {
+            onComplete?.Invoke();
         }
     }
 

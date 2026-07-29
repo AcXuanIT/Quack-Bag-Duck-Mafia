@@ -6,7 +6,7 @@ using DG.Tweening;
 /// Moi buoc deu di tu (1,1) nen khong bao gio nhat scale.
 /// Delta +- 0.05 so voi base.
 /// </summary>
-public class UnitMoveAnimation : MonoBehaviour
+public class DuckMoveAnimation : MonoBehaviour
 {
     [Header("Timing")]
     public float stepDuration = 0.22f;

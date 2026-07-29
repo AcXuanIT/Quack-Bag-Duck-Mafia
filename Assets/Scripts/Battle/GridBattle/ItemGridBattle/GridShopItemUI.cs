@@ -22,6 +22,7 @@ using TMPro;
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
 public class GridShopItemUI : MonoBehaviour,
+    IShopItem,
     IPointerClickHandler,
     IBeginDragHandler,
     IDragHandler,
@@ -58,6 +59,16 @@ public class GridShopItemUI : MonoBehaviour,
 
     // ─── Runtime ─────────────────────────────────────────────
     [HideInInspector] public ShopItemData data;
+
+        // ─── IShopItem ───────────────────────────────────────────
+        public ShopItemData ShopData    => data;
+        public string       DisplayName => data != null ? data.itemName : string.Empty;
+        public Sprite       DisplayIcon => data != null ? data.icon : null;
+        public int          Rarity      => data != null ? data.rarity : 0;
+        public int          SellPrice   => data != null ? data.sellPrice : 0;
+
+        public void Discard() => Destroy(gameObject);
+
 
     private CanvasGroup   _canvasGroup;
     private Canvas        _rootCanvas;

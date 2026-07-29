@@ -3,13 +3,13 @@ using UnityEngine.UI;
 using DG.Tweening;
 
 /// <summary>
-/// HP Bar cho unit dung Canvas Image (fillAmount).
-/// Gan vao GO HPBar (child cua unit).
+/// HP Bar cho duck dung Canvas Image (fillAmount).
+/// Gan vao GO HPBar (child cua duck).
 /// - FillGreen : tut tuc thi khi nhan damage
 /// - FillWhite : tut tu tu ve vi tri cua Green (delay roi chase)
 /// - An toan bo khi HP = 100%, hien khi HP < 100%
 /// </summary>
-public class UnitHPBar : MonoBehaviour
+public class DuckHPBar : MonoBehaviour
 {
     [Header("Fill Images (dung fillAmount de fill)")]
     [SerializeField] private Image fillGreen;   // tut tuc thi
@@ -31,7 +31,7 @@ public class UnitHPBar : MonoBehaviour
     }
 
     /// <summary>
-    /// Goi khi unit nhan damage.
+    /// Goi khi duck nhan damage.
     /// hpRatio: gia tri HP moi, 0..1
     /// </summary>
     public void SetHP(float hpRatio)

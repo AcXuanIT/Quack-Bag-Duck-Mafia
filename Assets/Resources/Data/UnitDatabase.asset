@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dec47ba36ab73584f8b4d815c1f85dfb, type: 3}
+  m_Name: UnitDatabase
+  m_EditorClassIdentifier: 
+  Units:
+  - ID: 1
+    Name: "V\u1ECBt L\xEDnh"
+    BaseHP_Tier1: 80
+    BaseHP_Tier2: 160
+    BaseHP_Tier3: 280
+    BaseHP_Tier4: 420
+    SpriteTier1: {fileID: 21300000, guid: 7d6b3920435b1144aab0141445b5a98e, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 4e6fa7cb407a8a94daea2e7dfe93bfac, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 1bbe19025d8862d44a9516a86e19eb35, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 778ed8c9840081143808387942546c11, type: 2}
+  - ID: 2
+    Name: "V\u1ECBt Cung Th\u1EE7"
+    BaseHP_Tier1: 70
+    BaseHP_Tier2: 140
+    BaseHP_Tier3: 260
+    BaseHP_Tier4: 400
+    SpriteTier1: {fileID: 21300000, guid: ccc00a452214910418bbf76d63470d61, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 8efd3b09f1937a843b2ba049aaf48c1d, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 550851d73c07032428b8f7b8703fb9e4, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 7f234e212fbb82d4892ca3e38f2929c9, type: 2}
+  - ID: 3
+    Name: "V\u1ECBt Ph\xE1p S\u01B0"
+    BaseHP_Tier1: 60
+    BaseHP_Tier2: 120
+    BaseHP_Tier3: 240
+    BaseHP_Tier4: 380
+    SpriteTier1: {fileID: 21300000, guid: f3d434c90118cb94b940f4918d62f40a, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 15b3a576f14a2c94fb58f45acbc551b0, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 2b156bba68d73d943bb57255425a5ceb, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: a342458066b8aeb428af67174bb48c93, type: 2}
+  - ID: 4
+    Name: "V\u1ECBt Chi\u1EBFn Binh"
+    BaseHP_Tier1: 0
+    BaseHP_Tier2: 0
+    BaseHP_Tier3: 350
+    BaseHP_Tier4: 550
+    SpriteTier1: {fileID: 0}
+    SpriteTier2: {fileID: 0}
+    SpriteTier3: {fileID: 21300000, guid: 9238c297a087fa34fa77048aeae512f4, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 58018bdceb1b8e84d81e449317510731, type: 2}
+  - ID: 5
+    Name: "V\u1ECBt S\xE1t Th\u1EE7"
+    BaseHP_Tier1: 0
+    BaseHP_Tier2: 0
+    BaseHP_Tier3: 320
+    BaseHP_Tier4: 500
+    SpriteTier1: {fileID: 0}
+    SpriteTier2: {fileID: 0}
+    SpriteTier3: {fileID: 21300000, guid: 2b07aa0d99645f64cb9da4aee22462ca, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: b089c8c1f9bcde34b81082075dfa7beb, type: 2}
+  - ID: 6
+    Name: "V\u1ECBt Th\u1EE7 L\u0129nh"
+    BaseHP_Tier1: 0
+    BaseHP_Tier2: 0
+    BaseHP_Tier3: 400
+    BaseHP_Tier4: 650
+    SpriteTier1: {fileID: 0}
+    SpriteTier2: {fileID: 0}
+    SpriteTier3: {fileID: 21300000, guid: 46e6a87bbf3045e4f9a3f901ecce3b94, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: ba3595dafd6d864438561e3b3802e9c8, type: 2}

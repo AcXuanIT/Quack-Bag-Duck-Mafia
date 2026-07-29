@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
     [Tooltip("WeaponManager child — quản lý toàn bộ dữ liệu vũ khí")]
     [SerializeField] public WeaponManager weaponManager;
 
+    [Tooltip("BattleManager child — quản lý state machine trận đấu (Intro/TurnSetup/TurnBattle/Win/Lose)")]
+    [SerializeField] public BattleManager battleManager;
+
     [Header("=== Non-UI GameObjects ===")]
     [Tooltip("GameObject BatteMap chứa logic game, được bật khi vào Battle")]
     [SerializeField] private GameObject batteMapObject;

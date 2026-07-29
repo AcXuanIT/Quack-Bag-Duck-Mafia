@@ -156,5 +156,15 @@ public class BattleGridManager : MonoBehaviour
 
     // ── Helpers ──────────────────────────────────────────────
 
+    public int CountUnlockedEmpty()
+    {
+        if (_cells == null) return 0;
+        int count = 0;
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < columns; c++)
+                if (_cells[r, c] != null && _cells[r, c].State == BattleGridCell.CellState.UnlockedEmpty)
+                    count++;
+        return count;
+    }
 
 }

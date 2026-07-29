@@ -32,7 +32,7 @@ public class UIGameManager : MonoBehaviour
     [SerializeField] private BattleMapUI battleMapUI;
 
     [Header("=== Game Manager (Non-UI) ===")]
-    [Tooltip("GameManager quản lý các GameObject không phải UI")]
+    [Tooltip("GameManager quản lý các GameObject không phải UI. BattleManager được truy cập qua gameManager.battleManager")]
     [SerializeField] private GameManager gameManager;
 
     private void Start()
@@ -70,18 +70,37 @@ public class UIGameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Bật UI BattleMap và GameObject BatteMap qua GameManager.
+    /// Bật UI BattleMap và GameObject BatteMap qua GameManager,
+    /// đồng thời bắt đầu trận đấu (BattleManager.StartBattle → state Intro).
+    /// Khi hiệu ứng fade-in (Intro) của BattleMapUI hoàn tất, gọi BattleManager.FinishIntro()
+    /// để chuyển sang TurnSetup.
     /// </summary>
     private void OpenBattleMap()
     {
-        if (battleMapUI != null)
-            battleMapUI.Show();
-        else
-            Debug.LogWarning("[UIGameManager] BattleMapUI chưa được gán!");
-
         if (gameManager != null)
             gameManager.EnableBatteMap();
         else
             Debug.LogWarning("[UIGameManager] GameManager chưa được gán!");
+
+        BattleManager battleManager = gameManager != null ? gameManager.battleManager : null;
+
+        if (battleManager != null)
+            battleManager.StartBattle();
+        else
+            Debug.LogWarning("[UIGameManager] GameManager.battleManager chưa được gán!");
+
+        if (battleMapUI != null)
+        {
+            battleMapUI.Show(onComplete: () =>
+            {
+                battleManager?.FinishIntro();
+            });
+        }
+        else
+        {
+            Debug.LogWarning("[UIGameManager] BattleMapUI chưa được gán!");
+            // Không có UI để báo Intro xong, gọi thẳng FinishIntro để không kẹt state
+            battleManager?.FinishIntro();
+        }
     }
 }

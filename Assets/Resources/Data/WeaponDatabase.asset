@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: WeaponDatabase
   m_EditorClassIdentifier: 
   Weapons:
-  - ID: 1
-    Name: Pistol Mk1
+  - ID: 9001
+    Name: Test Sword Cui
     SpriteTier1: {fileID: 21300000, guid: 68907b0616b16314bb021a434a47cf49, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 1d40604d6c9f54d4d8f6f9709db066bd, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 2f1db271bb3a66a438078a07de737674, type: 2}
@@ -26,8 +26,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 50
-    HP: 200
     DamagePerLevel:
     - 50
     - 62
@@ -40,11 +38,12 @@ MonoBehaviour:
     - 330
     - 410
     - 500
+    LevelLock: 0
     Coin: 100
     IsLocked: 0
     TimeDelay: 0.5
-  - ID: 2
-    Name: Rifle Alpha
+  - ID: 9002
+    Name: Test Bow Ban Cung
     SpriteTier1: {fileID: 21300000, guid: 0335f14d9344ad54fa790d0e231a3802, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 8ba20fd6b090bf54d8e2d72d03e19d45, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 3838701b9b9d5f742abe352b73276180, type: 2}
@@ -58,8 +57,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 80
-    HP: 180
     DamagePerLevel:
     - 80
     - 100
@@ -72,6 +69,7 @@ MonoBehaviour:
     - 297
     - 369
     - 450
+    LevelLock: 0
     Coin: 150
     IsLocked: 0
     TimeDelay: 0.8
@@ -92,8 +90,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 120
-    HP: 220
     DamagePerLevel:
     - 120
     - 150
@@ -106,6 +102,7 @@ MonoBehaviour:
     - 363
     - 451
     - 550
+    LevelLock: 0
     Coin: 200
     IsLocked: 0
     TimeDelay: 1
@@ -124,8 +121,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 200
-    HP: 150
     DamagePerLevel:
     - 200
     - 250
@@ -138,6 +133,7 @@ MonoBehaviour:
     - 248
     - 308
     - 375
+    LevelLock: 0
     Coin: 250
     IsLocked: 0
     TimeDelay: 1.5
@@ -158,8 +154,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 60
-    HP: 250
     DamagePerLevel:
     - 60
     - 75
@@ -172,6 +166,7 @@ MonoBehaviour:
     - 412
     - 512
     - 625
+    LevelLock: 0
     Coin: 180
     IsLocked: 0
     TimeDelay: 0.6
@@ -194,8 +189,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 150
-    HP: 170
     DamagePerLevel:
     - 150
     - 188
@@ -208,6 +201,7 @@ MonoBehaviour:
     - 280
     - 348
     - 425
+    LevelLock: 0
     Coin: 300
     IsLocked: 0
     TimeDelay: 1.2
@@ -228,8 +222,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 300
-    HP: 300
     DamagePerLevel:
     - 300
     - 375
@@ -242,6 +234,7 @@ MonoBehaviour:
     - 495
     - 615
     - 750
+    LevelLock: 0
     Coin: 400
     IsLocked: 0
     TimeDelay: 2
@@ -262,8 +255,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 250
-    HP: 280
     DamagePerLevel:
     - 250
     - 312
@@ -276,6 +267,7 @@ MonoBehaviour:
     - 462
     - 574
     - 700
+    LevelLock: 0
     Coin: 350
     IsLocked: 0
     TimeDelay: 1.8
@@ -298,8 +290,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 180
-    HP: 210
     DamagePerLevel:
     - 180
     - 225
@@ -312,6 +302,7 @@ MonoBehaviour:
     - 346
     - 430
     - 525
+    LevelLock: 0
     Coin: 320
     IsLocked: 0
     TimeDelay: 1.3
@@ -334,8 +325,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 220
-    HP: 190
     DamagePerLevel:
     - 220
     - 275
@@ -348,6 +337,7 @@ MonoBehaviour:
     - 314
     - 390
     - 475
+    LevelLock: 0
     Coin: 380
     IsLocked: 0
     TimeDelay: 1.6
@@ -370,8 +360,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 160
-    HP: 230
     DamagePerLevel:
     - 160
     - 200
@@ -384,6 +372,7 @@ MonoBehaviour:
     - 380
     - 472
     - 575
+    LevelLock: 0
     Coin: 280
     IsLocked: 0
     TimeDelay: 1.1
@@ -402,8 +391,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 280
-    HP: 260
     DamagePerLevel:
     - 280
     - 350
@@ -416,6 +403,7 @@ MonoBehaviour:
     - 429
     - 533
     - 650
+    LevelLock: 0
     Coin: 420
     IsLocked: 0
     TimeDelay: 1.9
@@ -436,8 +424,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 350
-    HP: 350
     DamagePerLevel:
     - 350
     - 438
@@ -450,6 +436,7 @@ MonoBehaviour:
     - 578
     - 718
     - 875
+    LevelLock: 0
     Coin: 500
     IsLocked: 1
     TimeDelay: 2.5
@@ -472,8 +459,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 400
-    HP: 320
     DamagePerLevel:
     - 400
     - 500
@@ -486,6 +471,7 @@ MonoBehaviour:
     - 528
     - 656
     - 800
+    LevelLock: 0
     Coin: 600
     IsLocked: 1
     TimeDelay: 2.8
@@ -504,8 +490,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 320
-    HP: 380
     DamagePerLevel:
     - 320
     - 400
@@ -518,6 +502,7 @@ MonoBehaviour:
     - 627
     - 779
     - 950
+    LevelLock: 0
     Coin: 550
     IsLocked: 1
     TimeDelay: 2.3
@@ -538,8 +523,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 280
-    HP: 400
     DamagePerLevel:
     - 280
     - 350
@@ -552,6 +535,7 @@ MonoBehaviour:
     - 660
     - 820
     - 1000
+    LevelLock: 0
     Coin: 480
     IsLocked: 1
     TimeDelay: 2.1
@@ -572,8 +556,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 260
-    HP: 420
     DamagePerLevel:
     - 260
     - 325
@@ -586,6 +568,7 @@ MonoBehaviour:
     - 693
     - 861
     - 1050
+    LevelLock: 0
     Coin: 460
     IsLocked: 1
     TimeDelay: 2
@@ -606,8 +589,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 380
-    HP: 360
     DamagePerLevel:
     - 380
     - 475
@@ -620,6 +601,7 @@ MonoBehaviour:
     - 594
     - 738
     - 900
+    LevelLock: 0
     Coin: 580
     IsLocked: 1
     TimeDelay: 2.6
@@ -642,8 +624,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 420
-    HP: 340
     DamagePerLevel:
     - 420
     - 525
@@ -656,6 +636,7 @@ MonoBehaviour:
     - 561
     - 697
     - 850
+    LevelLock: 0
     Coin: 620
     IsLocked: 1
     TimeDelay: 2.9
@@ -678,8 +659,6 @@ MonoBehaviour:
     Level: 1
     XP: 0
     XPToNextLevel: 100
-    Damage: 500
-    HP: 500
     DamagePerLevel:
     - 500
     - 625
@@ -692,6 +671,7 @@ MonoBehaviour:
     - 825
     - 1025
     - 1250
+    LevelLock: 0
     Coin: 800
     IsLocked: 1
     TimeDelay: 3.5

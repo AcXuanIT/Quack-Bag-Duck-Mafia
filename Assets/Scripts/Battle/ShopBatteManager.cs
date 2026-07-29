@@ -24,7 +24,8 @@ public class ShopBatteManager : MonoBehaviour
 
     [Header("Prefabs")]
     [SerializeField] private GameObject gridItemPrefab;   // GridItem.prefab — dùng cho ItemType.Grid
-    [SerializeField] private GameObject shopItemPrefab;   // ShopItem.prefab — dùng cho Gear / UnitDuck
+        [SerializeField] private GameObject gearItemPrefab;   // GearItem.prefab — dùng cho ItemType.Gear (GearItemUI)
+        [SerializeField] private GameObject unitItemPrefab;   // UnitItem.prefab — dùng cho ItemType.UnitDuck (UnitPlayerItemUI)
 
     [Header("Spawn Config")]
     [SerializeField] private int defaultSpawnCount = 3;
@@ -69,51 +70,54 @@ private void RebuildPool()
     public void OnBuyPressed()
     {
         SyncSpawnedList();
-        int currentCount = _spawnedItems.Count;
-        int freeSlots    = maxSlots - currentCount;
+        int freeSlots = maxSlots - _spawnedItems.Count;
 
-        if (freeSlots <= 0) { Debug.Log("[Shop] Component đầy."); return; }
+        if (freeSlots < 2) { Debug.Log("[Shop] Không đủ slot (cần ít nhất 2)."); return; }
         if (_playerGold < buyPrice) { Debug.Log($"[Shop] Thiếu vàng ({_playerGold}/{buyPrice})."); return; }
-
-        int toSpawn = (currentCount == 2) ? 2 : defaultSpawnCount;
-        toSpawn = Mathf.Clamp(toSpawn, 0, freeSlots);
-        if (toSpawn <= 0) return;
 
         _playerGold -= buyPrice;
         RefreshUI();
 
-        for (int i = 0; i < toSpawn; i++) SpawnFromPool(_allPool);
+        // TEST: luôn spawn 1 UnitItem + 1 GridItem
+        SpawnItemOfType(ShopItemData.ItemType.UnitDuck);
+        SpawnItemOfType(ShopItemData.ItemType.Grid);
 
-        Debug.Log($"[Shop] Spawn {toSpawn}. Gold={_playerGold}. Slots={_spawnedItems.Count}/{maxSlots}");
+        Debug.Log($"[Shop] Spawn 1 Unit + 1 Grid. Gold={_playerGold}. Slots={_spawnedItems.Count}/{maxSlots}");
     }
 
     // ── Spawn ────────────────────────────────────────────────
 private void SpawnFromPool(List<ShopItemData> pool)
-    {
-        if (pool == null || pool.Count == 0) { Debug.LogWarning("[Shop] Pool rong!"); return; }
-        if (componentContainer == null)      { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
+        {
+            if (pool == null || pool.Count == 0) { Debug.LogWarning("[Shop] Pool rong!"); return; }
+            if (componentContainer == null)      { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
 
-        var gridPool = pool.FindAll(d => d != null && d.itemType == ShopItemData.ItemType.Grid);
-        if (gridPool.Count == 0) { Debug.LogWarning("[Shop] Khong co Grid item!"); return; }
+            System.Collections.Generic.List<ShopItemData> activePool = (pool == _allPool || pool == gridItems) ? GetEligibleGridItems() : pool;
+            if (activePool == null || activePool.Count == 0) { Debug.LogWarning("[Shop] Pool rong sau filter!"); return; }
+            ShopItemData data = activePool[Random.Range(0, activePool.Count)];
 
-        ShopItemData data = gridPool[Random.Range(0, gridPool.Count)];
-        GameObject prefabToUse = (data.itemType == ShopItemData.ItemType.Grid) ? gridItemPrefab : shopItemPrefab;
-        if (prefabToUse == null) { Debug.LogWarning("[Shop] Thieu prefab: " + data.itemType); return; }
+            GameObject prefabToUse = data.itemType switch
+            {
+                ShopItemData.ItemType.Grid     => gridItemPrefab,
+                ShopItemData.ItemType.Gear     => gearItemPrefab,
+                ShopItemData.ItemType.UnitDuck => unitItemPrefab,
+                _                               => null,
+            };
+            if (prefabToUse == null) { Debug.LogWarning("[Shop] Thieu prefab: " + data.itemType); return; }
 
-        var go = Instantiate(prefabToUse, componentContainer);
-        go.SetActive(true);
+            var go = Instantiate(prefabToUse, componentContainer);
+            go.SetActive(true);
 
-        var gridUI = go.GetComponent<GridShopItemUI>();
-        if (gridUI != null)
-            gridUI.Setup(data, _gridManager, trashZone, trashImage);
-        else
-            go.GetComponent<ShopItemUI>()?.Setup(data);
+            var shopItem = go.GetComponent<IShopItem>();
+            if (shopItem != null)
+                shopItem.Setup(data, _gridManager, trashZone, trashImage);
+            else
+                Debug.LogWarning("[Shop] Prefab cho " + data.itemType + " thieu component IShopItem!");
 
-        _spawnedItems.Add(go);
+            _spawnedItems.Add(go);
 
-        var rt = componentContainer.GetComponent<RectTransform>();
-        if (rt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
-    }
+            var rt = componentContainer.GetComponent<RectTransform>();
+            if (rt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+        }
 
     public void SpawnItemOfType(ShopItemData.ItemType type)
     {
@@ -150,6 +154,26 @@ private void SpawnFromPool(List<ShopItemData> pool)
     {
         if (priceText != null) priceText.text = buyPrice.ToString();
         if (btnBuy    != null) btnBuy.interactable = (_playerGold >= buyPrice);
+    }
+
+    private System.Collections.Generic.List<ShopItemData> GetEligibleGridItems()
+    {
+        int free = _gridManager != null ? _gridManager.CountUnlockedEmpty() : int.MaxValue;
+        var ok = new System.Collections.Generic.List<ShopItemData>();
+        int minSz = int.MaxValue; ShopItemData smallest = null;
+        foreach (var it in gridItems)
+        {
+            if (it == null) continue;
+            int sz = (it.gridCells != null && it.gridCells.Length > 0) ? it.gridCells.Length : 1;
+            if (sz <= free) ok.Add(it);
+            if (sz < minSz) { minSz = sz; smallest = it; }
+        }
+        if (ok.Count == 0 && smallest != null)
+        {
+            Debug.LogWarning("[Shop] Khong co GridItem nao vua (" + free + " o trong). Fallback: " + smallest.itemName);
+            ok.Add(smallest);
+        }
+        return ok;
     }
 
 #if UNITY_EDITOR
