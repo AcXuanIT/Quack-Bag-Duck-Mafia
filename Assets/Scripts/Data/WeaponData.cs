@@ -62,6 +62,11 @@ public class WeaponEntry
     [Tooltip("HP tại mỗi Level — index 0=Lv1, 1=Lv2, 2=Lv3, 3=Lv4, 4=Lv5")]
     public float[] HPPerLevel = new float[5];
 
+    // ─── Combat ────────────────────────────────────────────────
+    [Header("=== Combat ===")]
+    [Tooltip("Phạm vi tấn công của weapon (khoảng cách/bán kính có thể đánh trúng mục tiêu)")]
+    public float AttackRange = 1f;
+
     // ─── Unlock Requirement ───────────────────────────────────
     [Header("=== Unlock ===")]
     [Tooltip("Level Player tối thiểu để mở khóa weapon này (0 = không yêu cầu)")]
@@ -114,6 +119,9 @@ public class WeaponEntry
         if (Level >= 5) return GetCurrentHP();
         return GetHP(Level + 1);
     }
+
+    /// <summary>Phạm vi tấn công hiện tại của weapon.</summary>
+    public float GetAttackRange() => AttackRange;
 
     /// <summary>Sprite theo tier (1-4), fallback về Tier1.</summary>
     public Sprite GetSpriteByTier(int tier)

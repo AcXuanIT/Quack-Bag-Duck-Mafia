@@ -8,6 +8,20 @@ using UnityEngine.UI;
 ///   Locked        → sprite spriteLocked   (grid_base), an hoan toan binh thuong.
 ///   UnlockedEmpty → sprite spriteUnlocked (grid_gear_shape_solo).
 ///   UnlockedFull  → sprite spriteUnlocked (grid_gear_shape_solo).
+///
+/// Hai khai niem "Grid" trong project va cach chung lien ket:
+///   1. Battle Grid (lop nay + BattleGridCell) — la "ban co": quan ly Locked/Unlocked
+///      cua tung o. Grid ShopItem (loai item hinh khoi trong Shop) chi dung de UNLOCK
+///      o (Locked → UnlockedEmpty), khong chiem giu vinh vien.
+///   2. Gear Shape (WeaponEntry.GridCells trong WeaponData) — la hinh dang cua 1 vu khi
+///      khi no THUC SU duoc dat len ban co, chiem nhieu o cung luc.
+///   PlaceGear()/RemoveGear() la cau noi giua 2 khai niem: dat 1 WeaponEntry len ban co
+///   se danh dau cac BattleGridCell tuong ung la UnlockedFull (OccupyingWeapon = weapon)
+///   DONG THOI goi weapon.OccupyCell() de WeaponEntry cung tu biet cac o no dang chiem.
+///
+/// Pooling: cac o (BattleGridCell) duoc lay/tra ve qua PoolingManager (Scripts/Tool)
+/// thay vi Instantiate/Destroy moi lan BuildGrid()/ResetGrid() — tranh GC spike khi
+/// lien tuc build lai luoi (VD moi tran dau moi qua ResetGrid()).
 /// </summary>
 public class BattleGridManager : MonoBehaviour
 {
@@ -29,6 +43,10 @@ public class BattleGridManager : MonoBehaviour
 
     private BattleGridCell[,] _cells;
 
+    // Template (component) dùng làm "prefab" nguồn cho PoolingManager.Spawn<BattleGridCell>()
+    // (GameObject của nó không parent vào transform của grid, để không bị BuildGrid() dọn nhầm).
+    private BattleGridCell _cellTemplate;
+
     public int   Rows       => rows;
     public int   Cols       => columns;
     public float CellWidth  { get; private set; }
@@ -38,13 +56,40 @@ public class BattleGridManager : MonoBehaviour
 
     // ── Build ────────────────────────────────────────────────
 
+    /// <summary>Lấy (hoặc tạo lần đầu) component BattleGridCell trên template GameObject dùng làm nguồn Pool.</summary>
+    private BattleGridCell GetCellTemplate()
+    {
+        if (_cellTemplate != null) return _cellTemplate;
+
+        var go = new GameObject("~BattleGridCell_Template (Pool Source)");
+        go.SetActive(false);
+        go.AddComponent<RectTransform>();
+        var img = go.AddComponent<Image>();
+        img.preserveAspect = false;
+        _cellTemplate = go.AddComponent<BattleGridCell>();
+        return _cellTemplate;
+    }
+
 [ContextMenu("Rebuild Grid")]
     public void BuildGrid()
     {
+        // Trả toàn bộ cell cũ về Pool thay vì Destroy (nếu đã từng build trước đó)
+        if (_cells != null)
+        {
+            foreach (var oldCell in _cells)
+                if (oldCell != null) PoolingManager.Despawn(oldCell.gameObject);
+        }
+
+        // Dọn mọi child còn sót lại không phải cell pool (đề phòng thay đổi thủ công trong Editor)
         for (int i = transform.childCount - 1; i >= 0; i--)
-            DestroyImmediate(transform.GetChild(i).gameObject);
+        {
+            var child = transform.GetChild(i);
+            if (child.GetComponent<BattleGridCell>() == null)
+                DestroyImmediate(child.gameObject);
+        }
 
         _cells = new BattleGridCell[rows, columns];
+        var template = GetCellTemplate();
 
         RectTransform parentRT = GetComponent<RectTransform>();
         float totalW = parentRT.rect.width;
@@ -62,10 +107,16 @@ public class BattleGridManager : MonoBehaviour
         {
             for (int c = 0; c < columns; c++)
             {
-                var cellGO = new GameObject("Cell_" + r + "_" + c);
-                cellGO.transform.SetParent(transform, false);
+                // Lấy (hoặc tạo mới nếu pool rỗng) 1 cell từ PoolingManager
+                var cell = PoolingManager.Spawn<BattleGridCell>(template, Vector3.zero, Quaternion.identity, transform);
+                var cellGO = cell.gameObject;
+                cellGO.name = "Cell_" + r + "_" + c;
 
-                var rt = cellGO.AddComponent<RectTransform>();
+                // Template nguồn đang SetActive(false); Instantiate lần đầu (chưa từng
+                // Despawn để có sẵn trong pool) sẽ giữ nguyên trạng thái inactive đó — ép về true.
+                if (!cellGO.activeSelf) cellGO.SetActive(true);
+
+                var rt = cellGO.GetComponent<RectTransform>();
                 rt.sizeDelta        = new Vector2(cellW, cellH);
                 rt.anchorMin        = new Vector2(0f, 1f);
                 rt.anchorMax        = new Vector2(0f, 1f);
@@ -74,11 +125,8 @@ public class BattleGridManager : MonoBehaviour
                     border + spacing.x * c + cellW * c,
                    -(border + spacing.y * r + cellH * r));
 
-                var bgImg = cellGO.AddComponent<Image>();
+                var bgImg = cellGO.GetComponent<Image>();
                 bgImg.preserveAspect = false;
-
-                // Gan component va truyen sprite truc tiep — khong dung reflection
-                var cell = cellGO.AddComponent<BattleGridCell>();
 
                 bool inZone = (r >= startRow && r <= endRow && c >= startCol && c <= endCol);
                 var initState = inZone
@@ -94,10 +142,18 @@ public class BattleGridManager : MonoBehaviour
 
         CellWidth  = cellW;
         CellHeight = cellH;
-        Debug.Log("[BattleGridManager] Grid " + columns + "x" + rows + " built."
+        Debug.Log("[BattleGridManager] Grid " + columns + "x" + rows + " built (pooled)."
             + " spriteLocked=" + (spriteLocked   != null ? spriteLocked.name   : "NULL")
             + " spriteUnlocked=" + (spriteUnlocked != null ? spriteUnlocked.name : "NULL"));
     }
+
+    /// <summary>
+    /// Reset lưới về trạng thái ban đầu (chỉ 3x3 giữa Unlocked, phần còn lại Locked,
+    /// không còn ô nào UnlockedFull). Gọi khi bắt đầu 1 trận đấu mới
+    /// (VD: BattleManager.StartBattle()) để tránh giữ lại trạng thái lưới của trận trước.
+    /// Thực chất chỉ là alias của BuildGrid() — build lại từ đầu (qua Pool, không GC-spike).
+    /// </summary>
+    public void ResetGrid() => BuildGrid();
 
     // ── Public API ───────────────────────────────────────────
 
@@ -110,7 +166,7 @@ public class BattleGridManager : MonoBehaviour
     /// <summary>Unlock mot o (Locked → UnlockedEmpty).</summary>
     public void UnlockCell(int row, int col) => GetCell(row, col)?.Unlock();
 
-    /// <summary>Dat item vao o da unlock (UnlockedEmpty → UnlockedFull).</summary>
+    /// <summary>Dat item vao o da unlock (UnlockedEmpty → UnlockedFull). Khong gan weapon nao (Grid item thuan).</summary>
     public void PlaceItem(int row, int col) => GetCell(row, col)?.PlaceItem();
 
     public void RemoveItem(int row, int col) => GetCell(row, col)?.RemoveItem();
@@ -152,6 +208,64 @@ public class BattleGridManager : MonoBehaviour
     {
         foreach (var o in offsets)
             UnlockCell(anchorRow + o.x, anchorCol + o.y);
+    }
+
+    // ── Gear Placement (lien ket voi WeaponEntry) ───────────────
+
+    /// <summary>
+    /// Kiem tra 1 WeaponEntry co the dat len ban co tai vi tri anchor khong:
+    /// tat ca o trong shape cua weapon phai dang UnlockedEmpty (da mo khoa san,
+    /// khac voi CanUnlock() von yeu cau Locked).
+    /// </summary>
+    public bool CanPlaceGear(int anchorRow, int anchorCol, WeaponEntry weapon)
+    {
+        if (weapon == null || weapon.GridCells == null || weapon.GridCells.Length == 0) return false;
+
+        foreach (var wc in weapon.GridCells)
+        {
+            var cell = GetCell(anchorRow + wc.gridPosition.x, anchorCol + wc.gridPosition.y);
+            if (cell == null || cell.State != BattleGridCell.CellState.UnlockedEmpty) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Dat 1 WeaponEntry len ban co tai vi tri anchor: danh dau cac BattleGridCell
+    /// tuong ung la UnlockedFull (OccupyingWeapon = weapon) VA goi weapon.OccupyCell()
+    /// de WeaponEntry tu biet minh dang chiem nhung o nao.
+    /// Goi CanPlaceGear() truoc de dam bao hop le.
+    /// </summary>
+    public void PlaceGear(int anchorRow, int anchorCol, WeaponEntry weapon)
+    {
+        if (weapon == null || weapon.GridCells == null) return;
+
+        foreach (var wc in weapon.GridCells)
+        {
+            int r = anchorRow + wc.gridPosition.x;
+            int c = anchorCol + wc.gridPosition.y;
+
+            GetCell(r, c)?.PlaceItem(weapon);
+            weapon.OccupyCell(wc.gridPosition);
+        }
+    }
+
+    /// <summary>
+    /// Go 1 WeaponEntry khoi ban co tai vi tri anchor: cac BattleGridCell tuong ung
+    /// tro ve UnlockedEmpty (OccupyingWeapon = null) VA goi weapon.ReleaseAllCells()
+    /// de WeaponEntry giai phong toan bo trang thai chiem o cua no.
+    /// </summary>
+    public void RemoveGear(int anchorRow, int anchorCol, WeaponEntry weapon)
+    {
+        if (weapon == null || weapon.GridCells == null) return;
+
+        foreach (var wc in weapon.GridCells)
+        {
+            int r = anchorRow + wc.gridPosition.x;
+            int c = anchorCol + wc.gridPosition.y;
+            GetCell(r, c)?.RemoveItem();
+        }
+
+        weapon.ReleaseAllCells();
     }
 
     // ── Helpers ──────────────────────────────────────────────

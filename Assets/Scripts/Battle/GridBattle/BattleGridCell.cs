@@ -8,6 +8,11 @@ using UnityEngine.UI;
 ///   UnlockedEmpty — o da mo, hien sprite grid_gear_shape_solo.
 ///   UnlockedFull  — o da mo va co item chiem, hien sprite grid_gear_shape_solo.
 /// LockOverlay va ItemIcon da bi xoa: khong can thiet vi sprite da the hien du trang thai.
+///
+/// Lien ket voi Gear (WeaponEntry):
+///   Khi 1 o UnlockedFull la do 1 Gear (WeaponEntry) chiem — chu khong phai do
+///   1 Grid ShopItem unlock don thuan — cell se giu tham chieu OccupyingWeapon
+///   de biet "o nay dang thuoc ve weapon nao". Dung boi BattleGridManager.PlaceGear/RemoveGear.
 /// </summary>
 public class BattleGridCell : MonoBehaviour
 {
@@ -26,6 +31,9 @@ public class BattleGridCell : MonoBehaviour
     public int       Row   { get; private set; }
     public int       Col   { get; private set; }
     public CellState State => _state;
+
+    /// <summary>Weapon (Gear) dang chiem o nay, null neu o trong hoac chi la Grid item.</summary>
+    public WeaponEntry OccupyingWeapon { get; private set; }
 
 public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
     {
@@ -84,18 +92,28 @@ public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
             SetState(CellState.UnlockedEmpty);
     }
 
-    /// <summary>Dat item vao o da mo (UnlockedEmpty → UnlockedFull).</summary>
-    public void PlaceItem()
+    /// <summary>
+    /// Dat item vao o da mo (UnlockedEmpty → UnlockedFull).
+    /// Truyen weapon (tuy chon) neu o nay dang bi 1 Gear chiem —
+    /// dung khi Gear duoc dat len grid (khac voi Grid ShopItem chi unlock don thuan).
+    /// </summary>
+    public void PlaceItem(WeaponEntry weapon = null)
     {
         if (_state == CellState.UnlockedEmpty)
+        {
+            OccupyingWeapon = weapon;
             SetState(CellState.UnlockedFull);
+        }
     }
 
-    /// <summary>Xoa item (UnlockedFull → UnlockedEmpty).</summary>
+    /// <summary>Xoa item (UnlockedFull → UnlockedEmpty), giai phong luon tham chieu weapon (neu co).</summary>
     public void RemoveItem()
     {
         if (_state == CellState.UnlockedFull)
+        {
+            OccupyingWeapon = null;
             SetState(CellState.UnlockedEmpty);
+        }
     }
 
     // ── Highlight helpers (dung boi GridShopItemUI khi drag) ─

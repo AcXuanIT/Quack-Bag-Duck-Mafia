@@ -8,6 +8,7 @@ using TMPro;
 /// - 3 loại item spawn: Grid, Gear, UnitDuck
 /// - Component GO chứa tối đa 4 item
 /// - btnBuy spawn 2 hoặc 3 item; nếu Component đang có đúng 2 item thì spawn 2
+/// - Tự động refresh Shop mỗi khi 1 Turn mới bắt đầu (BattleManager.OnTurnSetupStart)
 /// </summary>
 public class ShopBatteManager : MonoBehaviour
 {
@@ -21,6 +22,10 @@ public class ShopBatteManager : MonoBehaviour
     [SerializeField] private Button          btnBuy;
     [SerializeField] private Transform       componentContainer;
     [SerializeField] private TextMeshProUGUI priceText;
+
+    [Header("Battle Manager")]
+    [Tooltip("Lắng nghe OnTurnSetupStart để tự động refresh Shop mỗi khi turn mới bắt đầu")]
+    [SerializeField] private BattleManager battleManager;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject gridItemPrefab;   // GridItem.prefab — dùng cho ItemType.Grid
@@ -45,8 +50,12 @@ public class ShopBatteManager : MonoBehaviour
     private int _playerGold = 9999;
     private BattleGridManager _gridManager;
 
-    void Awake()
+    void Start()
     {
+        // Dùng Start() thay vì Awake() để đảm bảo BattleGridManager.Awake()
+        // (nơi gọi BuildGrid()) đã chạy xong — Unity luôn chạy hết toàn bộ
+        // Awake() của mọi component trước khi bắt đầu gọi Start() bất kỳ,
+        // nên không cần phụ thuộc vào Script Execution Order thủ công.
         _gridManager = FindObjectOfType<BattleGridManager>();
         RebuildPool();
         if (btnBuy != null) btnBuy.onClick.AddListener(OnBuyPressed);
@@ -54,9 +63,54 @@ public class ShopBatteManager : MonoBehaviour
         SyncSpawnedList();
     }
 
+    void OnEnable()
+    {
+        if (battleManager != null)
+            battleManager.OnTurnSetupStart += HandleTurnSetupStart;
+    }
+
+    void OnDisable()
+    {
+        if (battleManager != null)
+            battleManager.OnTurnSetupStart -= HandleTurnSetupStart;
+    }
+
     void OnDestroy()
     {
         if (btnBuy != null) btnBuy.onClick.RemoveListener(OnBuyPressed);
+    }
+
+    // ── Turn Sync ────────────────────────────────────────────
+
+    /// <summary>Gọi tự động khi BattleManager bắt đầu 1 Turn Setup mới.</summary>
+    private void HandleTurnSetupStart(int turnIndex)
+    {
+        RefreshShop();
+    }
+
+    /// <summary>
+    /// Xoá toàn bộ item đang hiển thị trong Shop và spawn lại defaultSpawnCount
+    /// item mới (random đều 3 loại Grid/Gear/UnitDuck). Gọi mỗi khi turn mới bắt đầu,
+    /// hoặc có thể gọi thủ công (VD nút Reroll) nếu cần sau này.
+    /// </summary>
+    public void RefreshShop()
+    {
+        ClearAllItems();
+        for (int i = 0; i < defaultSpawnCount; i++)
+        {
+            var type = (ShopItemData.ItemType)Random.Range(0, System.Enum.GetValues(typeof(ShopItemData.ItemType)).Length);
+            SpawnItemOfType(type);
+        }
+        Debug.Log($"[Shop] RefreshShop: spawned {defaultSpawnCount} item moi cho turn.");
+    }
+
+    /// <summary>Xoá toàn bộ item đang có trong componentContainer.</summary>
+    private void ClearAllItems()
+    {
+        SyncSpawnedList();
+        foreach (var g in new List<GameObject>(_spawnedItems))
+            Destroy(g);
+        _spawnedItems.Clear();
     }
 
 private void RebuildPool()
@@ -187,5 +241,7 @@ private void SpawnFromPool(List<ShopItemData> pool)
         SyncSpawnedList();
         foreach (var g in new List<GameObject>(_spawnedItems)) { _spawnedItems.Remove(g); DestroyImmediate(g); }
     }
+    [ContextMenu("Test: Refresh Shop (Turn Setup)")]
+    void EditorRefreshShop() => RefreshShop();
 #endif
 }

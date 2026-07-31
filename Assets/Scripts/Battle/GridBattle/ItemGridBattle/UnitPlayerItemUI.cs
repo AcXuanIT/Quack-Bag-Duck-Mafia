@@ -6,7 +6,7 @@ using TMPro;
 /// <summary>
 /// UI của một UnitDuck ShopItem trong Shop.
 /// Không tự giữ data riêng — toàn bộ icon/tên/rarity/stats được lấy từ
-/// UnitEntry (qua ShopItemData.GetUnitEntry()), shop chỉ cần biết unitID.
+/// MyDuckData (qua ShopItemData.GetUnitDuckData()).
 /// BG đổi màu theo tier (0=Default, 1=Blue, 2=Purple, 3=Gold) dựa trên rarity.
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
@@ -38,7 +38,7 @@ public class UnitPlayerItemUI : MonoBehaviour, IShopItem,
 
     // ─── Runtime ─────────────────────────────────────────────
     [HideInInspector] public ShopItemData data;
-    private UnitEntry _unit;
+    private MyDuckData _unit;
 
     private CanvasGroup   _canvasGroup;
     private Canvas        _rootCanvas;
@@ -73,7 +73,7 @@ public class UnitPlayerItemUI : MonoBehaviour, IShopItem,
         if (trashImg != null) trashImage = trashImg;
         if (data == null) return;
 
-        _unit = data.GetUnitEntry();
+        _unit = data.GetUnitDuckData();
 
         Sprite icon = _unit != null ? _unit.GetDefaultIcon() : null;
         string name = _unit != null ? _unit.Name : data.itemName;

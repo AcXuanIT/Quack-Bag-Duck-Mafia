@@ -9,7 +9,9 @@ using UnityEngine;
 /// - Gear     : KHÔNG còn lưu data trùng lặp (icon/name/rarity/stats) nữa.
 ///              Toàn bộ data thật được lấy từ WeaponEntry trong WeaponData,
 ///              asset này chỉ giữ reference (weaponDatabase + weaponID).
-/// - UnitDuck : tương tự Gear nhưng lấy từ UnitEntry trong UnitData.
+/// - UnitDuck : dữ liệu vịt được lưu trực tiếp bằng MyDuckData (hệ Duck mới),
+///              vì MyDuckData là 1 class thuần (không phải ScriptableObject
+///              database như Weapon), nên không cần reference + ID như Gear.
 /// </summary>
 [CreateAssetMenu(fileName = "ShopItemData", menuName = "BatteShop/Item Data")]
 public class ShopItemData : ScriptableObject
@@ -43,11 +45,11 @@ public class ShopItemData : ScriptableObject
     public WeaponData weaponDatabase;
     public int        weaponID;
 
-    // ─── UnitDuck reference ─────────────────────────────────
-    // Chỉ dùng khi itemType == UnitDuck. Data thật nằm trong UnitEntry.
-    [Header("UnitDuck Reference (chỉ dùng khi itemType == UnitDuck)")]
-    public UnitData unitDatabase;
-    public int      unitID;
+    // ─── UnitDuck data (hệ Duck mới) ────────────────────────
+    // Chỉ dùng khi itemType == UnitDuck. MyDuckData là data thuần,
+    // được lưu trực tiếp trong asset này (không qua database + ID).
+    [Header("UnitDuck Data (chỉ dùng khi itemType == UnitDuck)")]
+    public MyDuckData unitDuckData;
 
     // ─── Resolvers ──────────────────────────────────────────
 
@@ -60,10 +62,10 @@ public class ShopItemData : ScriptableObject
         return null;
     }
 
-    /// <summary>Lấy UnitEntry tương ứng (null nếu không phải UnitDuck hoặc thiếu reference).</summary>
-    public UnitEntry GetUnitEntry()
+    /// <summary>Lấy MyDuckData tương ứng (null nếu không phải UnitDuck hoặc chưa gán data).</summary>
+    public MyDuckData GetUnitDuckData()
     {
-        if (itemType != ItemType.UnitDuck || unitDatabase == null) return null;
-        return unitDatabase.GetByID(unitID);
+        if (itemType != ItemType.UnitDuck) return null;
+        return unitDuckData;
     }
 }

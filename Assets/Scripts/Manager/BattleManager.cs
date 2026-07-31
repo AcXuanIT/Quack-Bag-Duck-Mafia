@@ -19,6 +19,11 @@ using UnityEngine;
 /// Spawn Enemy (BattleSpawnEnemy):
 ///   - Khi vào TurnBattle: gọi battleSpawnEnemy.SpawnWave(currentWavesIndex)
 ///     để spawn enemy theo đúng Wave data tương ứng.
+///
+/// Grid Reset (BattleGridManager):
+///   - Khi StartBattle(): gọi battleGridManager.ResetGrid() để đảm bảo
+///     mỗi trận đấu mới luôn bắt đầu với lưới sạch (3x3 giữa Unlocked,
+///     phần còn lại Locked), không giữ trạng thái unlock của trận trước.
 /// </summary>
 public class BattleManager : MonoBehaviour
 {
@@ -53,6 +58,10 @@ public class BattleManager : MonoBehaviour
     [Tooltip("Spawner enemy theo Wave, gọi khi vào Turn Battle")]
     [SerializeField] private BattleSpawnEnemy battleSpawnEnemy;
 
+    [Header("=== Grid ===")]
+    [Tooltip("BattleGridManager — được Reset mỗi khi StartBattle() để đảm bảo lưới sạch cho trận mới")]
+    [SerializeField] private BattleGridManager battleGridManager;
+
     // State được lưu lại trước khi Pause, để Resume() quay lại đúng chỗ
     private BattleState _stateBeforePause;
     private bool _isPaused;
@@ -75,6 +84,11 @@ public class BattleManager : MonoBehaviour
         currentTurn = 0;
         currentWavesIndex = 1;
         _isPaused = false;
+
+        // Đảm bảo lưới sạch cho trận mới (không giữ trạng thái unlock của trận trước)
+        if (battleGridManager != null)
+            battleGridManager.ResetGrid();
+
         SetState(BattleState.Intro);
     }
 
