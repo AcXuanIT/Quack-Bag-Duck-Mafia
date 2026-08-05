@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e0c6d6c5aeef9345944edefee5e91cd, type: 3}
+  m_Name: MyDuck_01_VitThuong
+  m_EditorClassIdentifier: 
+  Data:
+    ID: 1
+    Name: Vit Thuong
+    Tier: 1
+    BaseHP: 100
+    BaseDamage: 10
+    SpriteTier1: {fileID: 21300000, guid: 7d6b3920435b1144aab0141445b5a98e, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 4e6fa7cb407a8a94daea2e7dfe93bfac, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 1bbe19025d8862d44a9516a86e19eb35, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 778ed8c9840081143808387942546c11, type: 2}
+    GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+    ColorBase: {r: 1, g: 1, b: 1, a: 1}
+    ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+    ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+    ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    Level: 1
+    XP: 0
+    XPToNextLevel: 100
+    UpgradeCoin: 50
+    LevelLock: 0
+    IsLocked: 0

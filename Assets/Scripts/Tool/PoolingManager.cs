@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class PoolingManager
@@ -42,26 +42,42 @@ public static class PoolingManager
 
     public static void Despawn(GameObject prefab)
     {
+        if (prefab == null) return;
         if (!prefab.activeSelf) // Kiemr tra xem prefab được despawn có đang được active không nếu như không thì return
         {
             return;
         }
+
         Pool p = null; // Khởi tạo một Pool dùng kiểm tra xem Pool đó có tồn tại của Prefab nó có tồn tại không
-        foreach (var pool in _pools.Values) // Dùng foreach duyệt qua tất cả value của dic Pool 
+        // _pools có thể là null nếu chưa từng Spawn() qua PoolingManager trong domain hiện tại
+        // (VD: sau khi Unity recompile script / domain reload, hoặc gọi Despawn() ở Edit Mode
+        // trước khi bất kỳ Spawn() nào chạy). Không guard chỗ này sẽ ném NullReferenceException
+        // ngay tại foreach bên dưới.
+        if (_pools != null)
         {
-            if (pool.IDObjects.Contains(prefab.GetInstanceID())) // Kiểm tra pool trong Dic và ID của prefab nó có tồn tại trong danh sách ID của Pool không, nếu có thì p = pool đó rồi thoát vòng lặp
+            foreach (var pool in _pools.Values) // Dùng foreach duyệt qua tất cả value của dic Pool 
             {
-                p = pool;
-                break;
+                if (pool.IDObjects.Contains(prefab.GetInstanceID())) // Kiểm tra pool trong Dic và ID của prefab nó có tồn tại trong danh sách ID của Pool không, nếu có thì p = pool đó rồi thoát vòng lặp
+                {
+                    p = pool;
+                    break;
+                }
             }
         }
+
         if (p != null) // p tồn tại thì despawn game object
         {
             p.Despawn(prefab);
         }
         else
         {
-            Object.Destroy(prefab); // nếu p không tồn tại thì Destroy GameObject
+            // Không tìm thấy Pool sở hữu (hoặc _pools chưa khởi tạo) → Destroy thẳng.
+            // Object.Destroy() không hợp lệ ở Edit Mode (ném lỗi "Destroy may not be
+            // called in Edit mode"), nên phải dùng DestroyImmediate() khi không Playing.
+            if (Application.isPlaying)
+                Object.Destroy(prefab);
+            else
+                Object.DestroyImmediate(prefab);
         }
     }
 

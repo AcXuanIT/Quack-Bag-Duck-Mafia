@@ -13,6 +13,10 @@ using UnityEngine.UI;
 ///   Khi 1 o UnlockedFull la do 1 Gear (WeaponEntry) chiem — chu khong phai do
 ///   1 Grid ShopItem unlock don thuan — cell se giu tham chieu OccupyingWeapon
 ///   de biet "o nay dang thuoc ve weapon nao". Dung boi BattleGridManager.PlaceGear/RemoveGear.
+///
+/// Lien ket voi Unit (MyDuckData):
+///   Tuong tu Gear, khi 1 o UnlockedFull la do 1 UnitPlayerItemUI (MyDuckData) chiem,
+///   cell se giu tham chieu OccupyingUnit. Dung boi BattleGridManager.PlaceUnit/RemoveUnit.
 /// </summary>
 public class BattleGridCell : MonoBehaviour
 {
@@ -34,6 +38,9 @@ public class BattleGridCell : MonoBehaviour
 
     /// <summary>Weapon (Gear) dang chiem o nay, null neu o trong hoac chi la Grid item.</summary>
     public WeaponEntry OccupyingWeapon { get; private set; }
+
+    /// <summary>Unit (UnitPlayerItemUI) dang chiem o nay, null neu o trong hoac chi la Grid item/Gear.</summary>
+    public MyDuckData OccupyingUnit { get; private set; }
 
 public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
     {
@@ -106,12 +113,26 @@ public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
         }
     }
 
-    /// <summary>Xoa item (UnlockedFull → UnlockedEmpty), giai phong luon tham chieu weapon (neu co).</summary>
+    /// <summary>
+    /// Dat 1 Unit (MyDuckData) vao o da mo (UnlockedEmpty → UnlockedFull).
+    /// Dung khi UnitPlayerItemUI duoc dat len grid (tuong tu PlaceItem(WeaponEntry) cho Gear).
+    /// </summary>
+    public void PlaceItem(MyDuckData unit)
+    {
+        if (_state == CellState.UnlockedEmpty)
+        {
+            OccupyingUnit = unit;
+            SetState(CellState.UnlockedFull);
+        }
+    }
+
+    /// <summary>Xoa item (UnlockedFull → UnlockedEmpty), giai phong luon tham chieu weapon/unit (neu co).</summary>
     public void RemoveItem()
     {
         if (_state == CellState.UnlockedFull)
         {
             OccupyingWeapon = null;
+            OccupyingUnit   = null;
             SetState(CellState.UnlockedEmpty);
         }
     }

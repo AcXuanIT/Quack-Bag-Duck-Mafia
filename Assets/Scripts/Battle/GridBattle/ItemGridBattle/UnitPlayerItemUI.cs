@@ -1,171 +1,86 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
-/// UI của một UnitDuck ShopItem trong Shop.
-/// Không tự giữ data riêng — toàn bộ icon/tên/rarity/stats được lấy từ
-/// MyDuckData (qua ShopItemData.GetUnitDuckData()).
-/// BG đổi màu theo tier (0=Default, 1=Blue, 2=Purple, 3=Gold) dựa trên rarity.
+/// UI của một UnitDuck (nhân vật vịt) trong Shop.
+/// KHÔNG còn dùng ShopItemData — MyDuckData là nguồn dữ liệu DUY NHẤT cho UnitDuck.
+/// Setup() nhận thẳng MyDuckData (do ShopBatteManager lấy qua DataManager.GetMyDuckData()).
+///
+/// SHAPE / SIZING:
+///   - TẤT CẢ Unit dùng CHUNG 1 shape cố định: 1 cột (width) x 2 hàng (height) —
+///     không phụ thuộc data riêng của từng Unit (khác với Gear, mỗi Weapon 1 shape riêng).
+///   - Kích thước thật áp qua ShopItemSizing (kế thừa từ TierShopItemUI.ApplyShapeSize),
+///     dùng chung CellSize/CellGap với GridItem/GearItem để 1 ô luôn cùng kích thước vật lý.
+///
+/// ĐẶT (PLACE) LÊN GRID:
+///   - Ngoài hành vi unlock 1 ô Locked (kế thừa từ TierShopItemUI, shape 1 ô), Unit còn
+///     có thể được kéo đè lên các ô ĐÃ Unlock (UnlockedEmpty) để thực sự đặt Unit vào
+///     bàn cờ theo ĐÚNG shape 1x2 cố định của nó — xem CanPlaceShapeAt()/PlaceShapeAt(),
+///     dùng BattleGridManager.CanPlaceUnit()/PlaceUnit() (đánh dấu BattleGridCell.OccupyingUnit).
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class UnitPlayerItemUI : MonoBehaviour, IShopItem,
-    IPointerClickHandler,
-    IBeginDragHandler,
-    IDragHandler,
-    IEndDragHandler
+public class UnitPlayerItemUI : TierShopItemUI
 {
-    // ─── Inspector ───────────────────────────────────────────
-    [Header("Base UI")]
-    [SerializeField] public Image           bgImage;
-    [SerializeField] public Image           iconImage;
-    [SerializeField] public TextMeshProUGUI nameText;
-    [SerializeField] public TextMeshProUGUI levelText;
+    /// <summary>Shape cố định 1w x 2h (offset dạng [row,col]) dùng chung cho MỌI Unit.</summary>
+    private static readonly Vector2Int[] UnitShapeCells =
+    {
+        new Vector2Int(0, 0),
+        new Vector2Int(1, 0),
+    };
 
-    [Header("Tier Colors")]
-    [SerializeField] private Color colorDefault = new Color(0.55f, 0.55f, 0.55f, 1f);
-    [SerializeField] private Color colorBlue    = new Color(0.25f, 0.55f, 1.00f, 1f);
-    [SerializeField] private Color colorPurple  = new Color(0.65f, 0.25f, 1.00f, 1f);
-    [SerializeField] private Color colorGold    = new Color(1.00f, 0.78f, 0.10f, 1f);
-
-    [Header("Trash Zone")]
-    [SerializeField] private RectTransform trashZone;
-    [SerializeField] private Image         trashImage;
-    [SerializeField] private Color         colorTrash = new Color(1f, 0.3f, 0.3f, 0.9f);
-    private Color _trashOriginalColor;
-    private bool  _overTrash;
-
-    // ─── Runtime ─────────────────────────────────────────────
-    [HideInInspector] public ShopItemData data;
     private MyDuckData _unit;
+    public  MyDuckData Unit => _unit;
 
-    private CanvasGroup   _canvasGroup;
-    private Canvas        _rootCanvas;
-    private RectTransform _rt;
-    private Transform     _originalParent;
-    private int           _originalSiblingIndex;
-    private Vector2       _originalAnchoredPos;
-    private bool          _isDragging;
+    // ─── Display ────────────────────────────────────────────
+    public override string DisplayName => _unit != null ? _unit.Name : string.Empty;
+    public override Sprite DisplayIcon => _unit != null ? _unit.GetDefaultIcon() : null;
 
-    // ─── IShopItem ───────────────────────────────────────────
-    public ShopItemData ShopData    => data;
-    public string       DisplayName => _unit != null ? _unit.Name : (data != null ? data.itemName : string.Empty);
-    public Sprite       DisplayIcon => _unit != null ? _unit.GetDefaultIcon() : null;
-    public int          Rarity      => data != null ? data.rarity : 0;
-    public int          SellPrice   => data != null ? data.sellPrice : 0;
+    /// <summary>HP hiện tại của Duck này (chỉ số gốc từ MyDuckData).</summary>
+    public float CurrentHP => _unit != null ? _unit.BaseHP : 0f;
 
-    // ─── Init ────────────────────────────────────────────────
-    private void Awake()
+    /// <summary>Setup trực tiếp từ MyDuckData — nguồn dữ liệu duy nhất cho UnitDuck.</summary>
+    public void Setup(MyDuckData unit, BattleGridManager gridManager, RectTransform trash = null, Image trashImg = null)
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _rt          = GetComponent<RectTransform>();
-        _rootCanvas  = GetComponentInParent<Canvas>();
-        if (_rootCanvas != null && !_rootCanvas.isRootCanvas)
-            _rootCanvas = _rootCanvas.rootCanvas;
+        _unit = unit;
+        InitCommon(gridManager, trash, trashImg);
+
+        if (_unit == null)
+            Debug.LogWarning("[UnitPlayerItemUI] Setup() nhan MyDuckData NULL!");
+
+        ApplyShapeSize(UnitShapeCells);
+        RefreshVisual();
     }
 
-    public void Setup(ShopItemData itemData, BattleGridManager gridManager,
-                       RectTransform trash = null, Image trashImg = null)
+    // ─── Place lên grid (đè lên các ô đã Unlock) ─────────────
+
+    /// <summary>Unit có thể đặt tại anchor nếu toàn bộ shape 1x2 cố định của nó đang là UnlockedEmpty.</summary>
+    protected override bool CanPlaceShapeAt(BattleGridCell anchorCell)
     {
-        data = itemData;
-        if (trash    != null) trashZone  = trash;
-        if (trashImg != null) trashImage = trashImg;
-        if (data == null) return;
-
-        _unit = data.GetUnitDuckData();
-
-        Sprite icon = _unit != null ? _unit.GetDefaultIcon() : null;
-        string name = _unit != null ? _unit.Name : data.itemName;
-        int tier = data.rarity + 1; // rarity 0-3 → tier 1-4
-        if (iconImage != null) { iconImage.sprite = _unit != null ? _unit.GetSprite(tier) : icon; iconImage.enabled = icon != null || _unit != null; }
-        if (nameText  != null) nameText.text  = name;
-        if (levelText != null) levelText.text = "T" + tier;
-
-        SetTierColor(data.rarity);
+        if (anchorCell == null || _gridManager == null) return false;
+        return _gridManager.CanPlaceUnit(anchorCell.Row, anchorCell.Col, UnitShapeCells);
     }
 
-    private void SetTierColor(int rarity)
+    /// <summary>Đặt Unit lên grid tại anchor — các ô trong shape 1x2 chuyển UnlockedFull, OccupyingUnit = _unit.</summary>
+    protected override void PlaceShapeAt(BattleGridCell anchorCell)
     {
-        if (bgImage == null) return;
-        bgImage.color = rarity switch
-        {
-            1 => colorBlue,
-            2 => colorPurple,
-            3 => colorGold,
-            _ => colorDefault,
-        };
+        _gridManager.PlaceUnit(anchorCell.Row, anchorCell.Col, _unit, UnitShapeCells);
     }
 
-    public void Discard() => Destroy(gameObject);
-
-    // ─── Click ───────────────────────────────────────────────
-    public void OnPointerClick(PointerEventData eventData)
+    protected override void RefreshVisual()
     {
-        if (_isDragging) return;
-        Debug.Log("[UnitPlayerItemUI] Clicked: " + DisplayName);
+        Sprite icon = _unit != null ? _unit.GetSprite(CurrentTier) : null;
+        if (icon == null && _unit != null) icon = _unit.GetDefaultIcon();
+
+        if (iconImage != null) { iconImage.sprite = icon; iconImage.enabled = icon != null; }
+        if (nameText  != null) nameText.text  = DisplayName;
+        if (levelText != null) levelText.text = "T" + CurrentTier;
+
+        ApplyTierColor();
     }
 
-    // ─── Drag (kéo vào trash để bỏ) ────────────────────────────
-    public void OnBeginDrag(PointerEventData eventData)
+    /// <summary>2 UnitPlayerItemUI được coi là cùng loại nếu cùng MyDuckData.ID.</summary>
+    protected override bool IsSameKind(TierShopItemUI other)
     {
-        if (trashZone == null) return;
-
-        _isDragging           = true;
-        _originalParent       = transform.parent;
-        _originalSiblingIndex = transform.GetSiblingIndex();
-        _originalAnchoredPos  = _rt.anchoredPosition;
-
-        transform.SetParent(_rootCanvas.transform, true);
-        transform.SetAsLastSibling();
-
-        _canvasGroup.alpha          = 0.8f;
-        _canvasGroup.blocksRaycasts = false;
-
-        if (trashImage != null) _trashOriginalColor = trashImage.color;
-        _overTrash = false;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!_isDragging) return;
-        _rt.anchoredPosition += eventData.delta / _rootCanvas.scaleFactor;
-
-        bool nowOverTrash = IsPointerOverTrash(eventData);
-        if (nowOverTrash != _overTrash)
-        {
-            _overTrash = nowOverTrash;
-            if (trashImage != null)
-                trashImage.color = _overTrash ? colorTrash : _trashOriginalColor;
-        }
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (!_isDragging) return;
-        _isDragging = false;
-
-        if (trashImage != null) trashImage.color = _trashOriginalColor;
-
-        if (_overTrash || IsPointerOverTrash(eventData))
-        {
-            Debug.Log("[UnitPlayerItemUI] Discarded '" + DisplayName + "' vao trash.");
-            Discard();
-            return;
-        }
-
-        transform.SetParent(_originalParent, true);
-        transform.SetSiblingIndex(_originalSiblingIndex);
-        _rt.anchoredPosition = _originalAnchoredPos;
-
-        _canvasGroup.alpha          = 1f;
-        _canvasGroup.blocksRaycasts = true;
-    }
-
-    private bool IsPointerOverTrash(PointerEventData eventData)
-    {
-        if (trashZone == null) return false;
-        return RectTransformUtility.RectangleContainsScreenPoint(
-            trashZone, eventData.position, eventData.pressEventCamera);
+        var o = other as UnitPlayerItemUI;
+        return o != null && o._unit != null && _unit != null && o._unit.ID == _unit.ID;
     }
 }

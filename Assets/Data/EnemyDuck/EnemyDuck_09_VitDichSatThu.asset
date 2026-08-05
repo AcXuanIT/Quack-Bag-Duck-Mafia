@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2726717e847897940a279ef0bbbdc053, type: 3}
+  m_Name: EnemyDuck_09_VitDichSatThu
+  m_EditorClassIdentifier: 
+  Data:
+    ID: 9
+    Name: Vit Dich Sat Thu
+    Tier: 3
+    BaseHP: 100
+    BaseDamage: 20
+    SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 29b66b29b8ec4734fb53ea63afa65568, type: 2}
+    GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+    ColorBase: {r: 1, g: 1, b: 1, a: 1}
+    ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+    ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+    ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    AttackDamage: 20
+    AttackSpeed: 1.8
+    MoveSpeed: 2.5
+    weaponData:
+      ID: 0
+      Name: 
+      SpriteTier1: {fileID: 0}
+      SpriteTier2: {fileID: 0}
+      SpriteTier3: {fileID: 0}
+      SpriteTier4: {fileID: 0}
+      ShapeSprite: {fileID: 0}
+      GridCells: []
+      Level: 1
+      XP: 0
+      XPToNextLevel: 0
+      DamagePerLevel:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      HPPerLevel:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      AttackRange: 1
+      LevelLock: 0
+      Coin: 0
+      IsLocked: 0
+      TimeDelay: 0
+    RewardCoin: 18
+    RewardExp: 18
+    SpawnWave: 5

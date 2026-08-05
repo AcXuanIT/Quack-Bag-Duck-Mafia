@@ -5,10 +5,18 @@ using TMPro;
 
 /// <summary>
 /// Quản lý Shop trong màn Battle.
-/// - 3 loại item spawn: Grid, Gear, UnitDuck
+/// - Grid  : vẫn dùng ShopItemData (List gridItems) — vì shape của Grid item không tồn tại ở đâu khác.
+/// - Gear  : KHÔNG còn ItemPool ShopItemData nữa — random trực tiếp 1 WeaponEntry từ
+///           DataManager.Instance.WeaponDatabase.Weapons (nguồn WeaponData duy nhất).
+/// - UnitDuck : KHÔNG còn ItemPool ShopItemData nữa — random trực tiếp 1 MyDuckData từ
+///           DataManager.Instance.AllMyDuckAssets (nguồn Assets/Data/MyDuck duy nhất).
+///
 /// - Component GO chứa tối đa 4 item
-/// - btnBuy spawn 2 hoặc 3 item; nếu Component đang có đúng 2 item thì spawn 2
+/// - btnBuy spawn 1 GearItem + 1 GridItem + 1 UnitItem (cần ít nhất 3 slot trống)
 /// - Tự động refresh Shop mỗi khi 1 Turn mới bắt đầu (BattleManager.OnTurnSetupStart)
+/// - GridItem spawn ra LUÔN được ràng buộc theo GridSystem: chỉ random trong số
+///   những item có ÍT NHẤT 1 vị trí đặt hợp lệ thật sự trên bàn cờ hiện tại
+///   (BattleGridManager.HasValidPlacement).
 /// </summary>
 public class ShopBatteManager : MonoBehaviour
 {
@@ -28,25 +36,18 @@ public class ShopBatteManager : MonoBehaviour
     [SerializeField] private BattleManager battleManager;
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject gridItemPrefab;   // GridItem.prefab — dùng cho ItemType.Grid
-        [SerializeField] private GameObject gearItemPrefab;   // GearItem.prefab — dùng cho ItemType.Gear (GearItemUI)
-        [SerializeField] private GameObject unitItemPrefab;   // UnitItem.prefab — dùng cho ItemType.UnitDuck (UnitPlayerItemUI)
+    [SerializeField] private GameObject gridItemPrefab;   // GridItem.prefab — dùng cho ShopItemData (GridShopItemUI)
+    [SerializeField] private GameObject gearItemPrefab;   // GearItem.prefab — dùng cho WeaponEntry   (GearItemUI)
+    [SerializeField] private GameObject unitItemPrefab;   // UnitItem.prefab — dùng cho MyDuckData    (UnitPlayerItemUI)
 
     [Header("Spawn Config")]
     [SerializeField] private int defaultSpawnCount = 3;
     [SerializeField] private int maxSlots          = 4;
 
-    [Header("Item Pool — Grid")]
-    [SerializeField] private List<ShopItemData> gridItems     = new List<ShopItemData>();
-
-    [Header("Item Pool — Gear")]
-    [SerializeField] private List<ShopItemData> gearItems     = new List<ShopItemData>();
-
-    [Header("Item Pool — Unit Duck")]
-    [SerializeField] private List<ShopItemData> unitDuckItems = new List<ShopItemData>();
+    [Header("Item Pool — Grid (vẫn dùng ShopItemData)")]
+    [SerializeField] private List<ShopItemData> gridItems = new List<ShopItemData>();
 
     private List<GameObject>  _spawnedItems = new List<GameObject>();
-    private List<ShopItemData> _allPool     = new List<ShopItemData>();
     private int _playerGold = 9999;
     private BattleGridManager _gridManager;
 
@@ -57,7 +58,6 @@ public class ShopBatteManager : MonoBehaviour
         // Awake() của mọi component trước khi bắt đầu gọi Start() bất kỳ,
         // nên không cần phụ thuộc vào Script Execution Order thủ công.
         _gridManager = FindObjectOfType<BattleGridManager>();
-        RebuildPool();
         if (btnBuy != null) btnBuy.onClick.AddListener(OnBuyPressed);
         RefreshUI();
         SyncSpawnedList();
@@ -98,7 +98,7 @@ public class ShopBatteManager : MonoBehaviour
         ClearAllItems();
         for (int i = 0; i < defaultSpawnCount; i++)
         {
-            var type = (ShopItemData.ItemType)Random.Range(0, System.Enum.GetValues(typeof(ShopItemData.ItemType)).Length);
+            var type = (ItemKind)Random.Range(0, 3);
             SpawnItemOfType(type);
         }
         Debug.Log($"[Shop] RefreshShop: spawned {defaultSpawnCount} item moi cho turn.");
@@ -113,79 +113,141 @@ public class ShopBatteManager : MonoBehaviour
         _spawnedItems.Clear();
     }
 
-private void RebuildPool()
-    {
-        // gridItems pool chỉ chứa Grid assets (Gear/UnitDuck đã loại ra)
-        _allPool.Clear();
-        _allPool.AddRange(gridItems);
-    }
+    /// <summary>Loại item trong Shop (thay cho ShopItemData.ItemType cũ — Gear/UnitDuck không còn ShopItemData nữa).</summary>
+    public enum ItemKind { Grid, Gear, UnitDuck }
 
     // ── Buy ──────────────────────────────────────────────────
+
+    /// <summary>
+    /// Nhấn Buy: spawn đúng 1 GearItem + 1 GridItem + 1 UnitItem (cần ít nhất 3 slot trống).
+    /// </summary>
     public void OnBuyPressed()
     {
         SyncSpawnedList();
         int freeSlots = maxSlots - _spawnedItems.Count;
 
-        if (freeSlots < 2) { Debug.Log("[Shop] Không đủ slot (cần ít nhất 2)."); return; }
+        if (freeSlots < 3) { Debug.Log("[Shop] Không đủ slot (cần ít nhất 3)."); return; }
         if (_playerGold < buyPrice) { Debug.Log($"[Shop] Thiếu vàng ({_playerGold}/{buyPrice})."); return; }
 
         _playerGold -= buyPrice;
         RefreshUI();
 
-        // TEST: luôn spawn 1 UnitItem + 1 GridItem
-        SpawnItemOfType(ShopItemData.ItemType.UnitDuck);
-        SpawnItemOfType(ShopItemData.ItemType.Grid);
+        // Buy: luôn spawn 1 GearItem + 1 GridItem + 1 UnitItem
+        SpawnItemOfType(ItemKind.Gear);
+        SpawnItemOfType(ItemKind.Grid);
+        SpawnItemOfType(ItemKind.UnitDuck);
 
-        Debug.Log($"[Shop] Spawn 1 Unit + 1 Grid. Gold={_playerGold}. Slots={_spawnedItems.Count}/{maxSlots}");
+        Debug.Log($"[Shop] Spawn 1 Gear + 1 Grid + 1 Unit. Gold={_playerGold}. Slots={_spawnedItems.Count}/{maxSlots}");
     }
 
     // ── Spawn ────────────────────────────────────────────────
-private void SpawnFromPool(List<ShopItemData> pool)
-        {
-            if (pool == null || pool.Count == 0) { Debug.LogWarning("[Shop] Pool rong!"); return; }
-            if (componentContainer == null)      { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
 
-            System.Collections.Generic.List<ShopItemData> activePool = (pool == _allPool || pool == gridItems) ? GetEligibleGridItems() : pool;
-            if (activePool == null || activePool.Count == 0) { Debug.LogWarning("[Shop] Pool rong sau filter!"); return; }
-            ShopItemData data = activePool[Random.Range(0, activePool.Count)];
-
-            GameObject prefabToUse = data.itemType switch
-            {
-                ShopItemData.ItemType.Grid     => gridItemPrefab,
-                ShopItemData.ItemType.Gear     => gearItemPrefab,
-                ShopItemData.ItemType.UnitDuck => unitItemPrefab,
-                _                               => null,
-            };
-            if (prefabToUse == null) { Debug.LogWarning("[Shop] Thieu prefab: " + data.itemType); return; }
-
-            var go = Instantiate(prefabToUse, componentContainer);
-            go.SetActive(true);
-
-            var shopItem = go.GetComponent<IShopItem>();
-            if (shopItem != null)
-                shopItem.Setup(data, _gridManager, trashZone, trashImage);
-            else
-                Debug.LogWarning("[Shop] Prefab cho " + data.itemType + " thieu component IShopItem!");
-
-            _spawnedItems.Add(go);
-
-            var rt = componentContainer.GetComponent<RectTransform>();
-            if (rt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
-        }
-
-    public void SpawnItemOfType(ShopItemData.ItemType type)
+    public void SpawnItemOfType(ItemKind type)
     {
         SyncSpawnedList();
         if (_spawnedItems.Count >= maxSlots) return;
-        SpawnFromPool(GetPool(type));
+
+        switch (type)
+        {
+            case ItemKind.Grid:     SpawnGridItem();  break;
+            case ItemKind.Gear:     SpawnGearItem();  break;
+            case ItemKind.UnitDuck: SpawnUnitItem();  break;
+        }
     }
 
-    private List<ShopItemData> GetPool(ShopItemData.ItemType type)
+    /// <summary>Spawn 1 GridItem — vẫn dùng ShopItemData, lọc theo GridSystem (HasValidPlacement).</summary>
+    private void SpawnGridItem()
     {
-        if (type == ShopItemData.ItemType.Grid)     return gridItems;
-        if (type == ShopItemData.ItemType.Gear)     return gearItems;
-        if (type == ShopItemData.ItemType.UnitDuck) return unitDuckItems;
-        return _allPool;
+        if (gridItemPrefab == null) { Debug.LogWarning("[Shop] Thieu gridItemPrefab!"); return; }
+        if (componentContainer == null) { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
+
+        var eligible = GetEligibleGridItems();
+        if (eligible.Count == 0)
+        {
+            Debug.LogWarning("[Shop] Khong co GridItem nao dat duoc tren ban co hien tai — bo qua lan spawn nay.");
+            return;
+        }
+
+        ShopItemData data = eligible[Random.Range(0, eligible.Count)];
+
+        var go = Instantiate(gridItemPrefab, componentContainer);
+        go.SetActive(true);
+
+        var shopItem = go.GetComponent<IShopItem>();
+        if (shopItem != null)
+            shopItem.Setup(data, _gridManager, trashZone, trashImage);
+        else
+            Debug.LogWarning("[Shop] Prefab GridItem thieu component IShopItem!");
+
+        RegisterSpawned(go);
+    }
+
+    /// <summary>Spawn 1 GearItem — random trực tiếp 1 WeaponEntry từ DataManager (WeaponData).</summary>
+    private void SpawnGearItem()
+    {
+        if (gearItemPrefab == null) { Debug.LogWarning("[Shop] Thieu gearItemPrefab!"); return; }
+        if (componentContainer == null) { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
+
+        var weaponDb = DataManager.Instance.WeaponDatabase;
+        if (weaponDb == null || weaponDb.Weapons == null || weaponDb.Weapons.Length == 0)
+        {
+            Debug.LogWarning("[Shop] DataManager.WeaponDatabase rong — khong co Gear nao de spawn!");
+            return;
+        }
+
+        WeaponEntry weapon = weaponDb.Weapons[Random.Range(0, weaponDb.Weapons.Length)];
+
+        var go = Instantiate(gearItemPrefab, componentContainer);
+        go.SetActive(true);
+
+        var gearUI = go.GetComponent<GearItemUI>();
+        if (gearUI != null)
+            gearUI.Setup(weapon, _gridManager, trashZone, trashImage);
+        else
+            Debug.LogWarning("[Shop] Prefab GearItem thieu component GearItemUI!");
+
+        RegisterSpawned(go);
+    }
+
+    /// <summary>Spawn 1 UnitItem — random trực tiếp 1 MyDuckData từ DataManager (Assets/Data/MyDuck).</summary>
+    private void SpawnUnitItem()
+    {
+        if (unitItemPrefab == null) { Debug.LogWarning("[Shop] Thieu unitItemPrefab!"); return; }
+        if (componentContainer == null) { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
+
+        var myDuckAssets = DataManager.Instance.AllMyDuckAssets;
+        if (myDuckAssets == null || myDuckAssets.Count == 0)
+        {
+            Debug.LogWarning("[Shop] DataManager.AllMyDuckAssets rong — khong co UnitDuck nao de spawn!");
+            return;
+        }
+
+        var asset = myDuckAssets[Random.Range(0, myDuckAssets.Count)];
+        MyDuckData unit = asset != null ? asset.Data : null;
+        if (unit == null)
+        {
+            Debug.LogWarning("[Shop] MyDuckDataAsset duoc chon co Data NULL!");
+            return;
+        }
+
+        var go = Instantiate(unitItemPrefab, componentContainer);
+        go.SetActive(true);
+
+        var unitUI = go.GetComponent<UnitPlayerItemUI>();
+        if (unitUI != null)
+            unitUI.Setup(unit, _gridManager, trashZone, trashImage);
+        else
+            Debug.LogWarning("[Shop] Prefab UnitItem thieu component UnitPlayerItemUI!");
+
+        RegisterSpawned(go);
+    }
+
+    private void RegisterSpawned(GameObject go)
+    {
+        _spawnedItems.Add(go);
+
+        var rt = componentContainer.GetComponent<RectTransform>();
+        if (rt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
     }
 
     // ── Helpers ──────────────────────────────────────────────
@@ -210,31 +272,39 @@ private void SpawnFromPool(List<ShopItemData> pool)
         if (btnBuy    != null) btnBuy.interactable = (_playerGold >= buyPrice);
     }
 
-    private System.Collections.Generic.List<ShopItemData> GetEligibleGridItems()
+    /// <summary>
+    /// Lọc gridItems chỉ giữ lại những item THỰC SỰ đặt được trên bàn cờ hiện tại:
+    /// dùng BattleGridManager.HasValidPlacement() để quét toàn bộ vị trí anchor
+    /// khả dĩ, kiểm tra đúng rule CanUnlock() (toàn bộ ô Locked + kề ô đã Unlocked) —
+    /// KHÔNG chỉ đếm số ô trống, vì đếm số lượng không đảm bảo các ô Locked còn lại
+    /// có nằm liền khối đúng hình dạng shape hay không.
+    /// </summary>
+    private List<ShopItemData> GetEligibleGridItems()
     {
-        int free = _gridManager != null ? _gridManager.CountUnlockedEmpty() : int.MaxValue;
-        var ok = new System.Collections.Generic.List<ShopItemData>();
-        int minSz = int.MaxValue; ShopItemData smallest = null;
+        var ok = new List<ShopItemData>();
+
+        if (_gridManager == null)
+        {
+            Debug.LogWarning("[Shop] Thieu BattleGridManager — khong the rang buoc GridItem theo GridSystem, tra ve nguyen pool.");
+            ok.AddRange(gridItems);
+            return ok;
+        }
+
         foreach (var it in gridItems)
         {
-            if (it == null) continue;
-            int sz = (it.gridCells != null && it.gridCells.Length > 0) ? it.gridCells.Length : 1;
-            if (sz <= free) ok.Add(it);
-            if (sz < minSz) { minSz = sz; smallest = it; }
+            if (it == null || it.gridCells == null || it.gridCells.Length == 0) continue;
+            if (_gridManager.HasValidPlacement(it.gridCells))
+                ok.Add(it);
         }
-        if (ok.Count == 0 && smallest != null)
-        {
-            Debug.LogWarning("[Shop] Khong co GridItem nao vua (" + free + " o trong). Fallback: " + smallest.itemName);
-            ok.Add(smallest);
-        }
+
         return ok;
     }
 
 #if UNITY_EDITOR
-    [ContextMenu("Test: Buy")]         void EditorBuy()        => OnBuyPressed();
-    [ContextMenu("Test: Spawn Grid")]  void EditorGrid()       => SpawnItemOfType(ShopItemData.ItemType.Grid);
-    [ContextMenu("Test: Spawn Gear")]  void EditorGear()       => SpawnItemOfType(ShopItemData.ItemType.Gear);
-    [ContextMenu("Test: Spawn Duck")]  void EditorDuck()       => SpawnItemOfType(ShopItemData.ItemType.UnitDuck);
+    [ContextMenu("Test: Buy")]         void EditorBuy()  => OnBuyPressed();
+    [ContextMenu("Test: Spawn Grid")]  void EditorGrid() => SpawnItemOfType(ItemKind.Grid);
+    [ContextMenu("Test: Spawn Gear")]  void EditorGear() => SpawnItemOfType(ItemKind.Gear);
+    [ContextMenu("Test: Spawn Duck")]  void EditorDuck() => SpawnItemOfType(ItemKind.UnitDuck);
     [ContextMenu("Test: Clear")]
     void EditorClear()
     {

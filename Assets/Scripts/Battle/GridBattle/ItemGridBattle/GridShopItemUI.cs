@@ -16,9 +16,8 @@ using TMPro;
 ///   - Tất cả ô trong shape chuyển Locked → UnlockedEmpty (unlock).
 ///
 /// SIZING:
-///   - width  = cols * cellSize + (cols-1) * cellGap
-///   - height = rows * cellSize + (rows-1) * cellGap
-///   - Apply vào RectTransform + LayoutElement để đồng bộ với HorizontalLayoutGroup.
+///   - Dùng chung ShopItemSizing (CellSize/CellGap) với GearItemUI/UnitPlayerItemUI
+///     để đảm bảo 1 ô luôn cùng kích thước vật lý giữa cả 3 loại item trong Shop.
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
 public class GridShopItemUI : MonoBehaviour,
@@ -37,10 +36,6 @@ public class GridShopItemUI : MonoBehaviour,
 
     [Header("Shape Preview")]
     [SerializeField] private GridShapePreview shapePreview;
-
-    [Header("Grid Item Sizing")]
-    [SerializeField] private float cellSize = 56f;
-    [SerializeField] private float cellGap  = 4f;
 
     [Header("Rarity Frames")]
     [SerializeField] private Sprite[] rarityFrames;
@@ -70,12 +65,13 @@ public class GridShopItemUI : MonoBehaviour,
         public void Discard() => Destroy(gameObject);
 
 
-    private CanvasGroup   _canvasGroup;
-    private Canvas        _rootCanvas;
-    private RectTransform _rt;
-    private Transform     _originalParent;
-    private int           _originalSiblingIndex;
-    private Vector2       _originalAnchoredPos;
+    private CanvasGroup    _canvasGroup;
+    private Canvas         _rootCanvas;
+    private RectTransform  _rt;
+    private LayoutElement  _layoutElement;
+    private Transform      _originalParent;
+    private int            _originalSiblingIndex;
+    private Vector2        _originalAnchoredPos;
 
     private BattleGridManager _gridManager;
     private BattleGridCell    _hoveredAnchor;   // anchor cell đang hover
@@ -84,9 +80,10 @@ public class GridShopItemUI : MonoBehaviour,
     // ─── Init ────────────────────────────────────────────────
     private void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _rt          = GetComponent<RectTransform>();
-        _rootCanvas  = GetComponentInParent<Canvas>();
+        _canvasGroup   = GetComponent<CanvasGroup>();
+        _rt            = GetComponent<RectTransform>();
+        _layoutElement = GetComponent<LayoutElement>();
+        _rootCanvas    = GetComponentInParent<Canvas>();
         if (_rootCanvas != null && !_rootCanvas.isRootCanvas)
             _rootCanvas = _rootCanvas.rootCanvas;
     }
@@ -105,40 +102,10 @@ public void Setup(ShopItemData itemData, BattleGridManager gridManager,
         if (nameText   != null)                                  nameText.text     = data.itemName;
         if (frameImage != null && rarityFrames != null && data.rarity < rarityFrames.Length)
             frameImage.sprite = rarityFrames[data.rarity];
-        if (shapePreview != null && data.itemType == ShopItemData.ItemType.Grid)
+        if (shapePreview != null)
             shapePreview.Draw(data.gridCells);
 
-        ApplySize(data.gridCells);
-    }
-
-    // ─── Sizing ──────────────────────────────────────────────
-    private void ApplySize(Vector2Int[] cells)
-    {
-        int cols = 1, rows = 1;
-        if (cells != null && cells.Length > 0)
-        {
-            int minC = cells[0].y, maxC = cells[0].y;
-            int minR = cells[0].x, maxR = cells[0].x;
-            foreach (var c in cells)
-            {
-                if (c.y < minC) minC = c.y; if (c.y > maxC) maxC = c.y;
-                if (c.x < minR) minR = c.x; if (c.x > maxR) maxR = c.x;
-            }
-            cols = maxC - minC + 1;
-            rows = maxR - minR + 1;
-        }
-        float w = cols * cellSize + (cols - 1) * cellGap;
-        float h = rows * cellSize + (rows - 1) * cellGap;
-
-        if (_rt == null) _rt = GetComponent<RectTransform>();
-        _rt.sizeDelta = new Vector2(w, h);
-
-        var le = GetComponent<LayoutElement>();
-        if (le != null)
-        {
-            le.minWidth = w; le.minHeight = h;
-            le.preferredWidth = w; le.preferredHeight = h;
-        }
+        ShopItemSizing.ApplySize(_rt, _layoutElement, data.gridCells);
     }
 
     // ─── Click ───────────────────────────────────────────────
@@ -151,7 +118,7 @@ public void Setup(ShopItemData itemData, BattleGridManager gridManager,
     // ─── Drag ────────────────────────────────────────────────
 public void OnBeginDrag(PointerEventData eventData)
     {
-        if (data == null || data.itemType != ShopItemData.ItemType.Grid) return;
+        if (data == null) return;
 
         _isDragging           = true;
         _originalParent       = transform.parent;

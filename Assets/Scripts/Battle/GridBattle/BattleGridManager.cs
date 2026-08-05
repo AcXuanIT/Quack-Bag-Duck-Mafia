@@ -18,6 +18,10 @@ using UnityEngine.UI;
 ///   PlaceGear()/RemoveGear() la cau noi giua 2 khai niem: dat 1 WeaponEntry len ban co
 ///   se danh dau cac BattleGridCell tuong ung la UnlockedFull (OccupyingWeapon = weapon)
 ///   DONG THOI goi weapon.OccupyCell() de WeaponEntry cung tu biet cac o no dang chiem.
+///   Tuong tu, PlaceUnit()/RemoveUnit() la cau noi cho UnitPlayerItemUI (MyDuckData):
+///   dat 1 Unit len ban co se danh dau cac BattleGridCell tuong ung la UnlockedFull
+///   (OccupyingUnit = unit). MyDuckData khong tu track o chiem (khac WeaponEntry),
+///   nen toan bo trang thai chiem o nam o BattleGridCell.OccupyingUnit.
 ///
 /// Pooling: cac o (BattleGridCell) duoc lay/tra ve qua PoolingManager (Scripts/Tool)
 /// thay vi Instantiate/Destroy moi lan BuildGrid()/ResetGrid() — tranh GC spike khi
@@ -73,19 +77,29 @@ public class BattleGridManager : MonoBehaviour
 [ContextMenu("Rebuild Grid")]
     public void BuildGrid()
     {
-        // Trả toàn bộ cell cũ về Pool thay vì Destroy (nếu đã từng build trước đó)
-        if (_cells != null)
-        {
-            foreach (var oldCell in _cells)
-                if (oldCell != null) PoolingManager.Despawn(oldCell.gameObject);
-        }
-
-        // Dọn mọi child còn sót lại không phải cell pool (đề phòng thay đổi thủ công trong Editor)
+        // Dọn TOÀN BỘ child hiện có trong hierarchy (không dựa vào _cells, vì field
+        // runtime này bị reset về null sau domain reload / khi gọi BuildGrid() ở Edit
+        // Mode ngoài Awake() — nếu chỉ dựa vào _cells, cell cũ còn sót lại trong scene
+        // sẽ không được Despawn và bị cell mới build chồng lên, tạo ra 2 lớp Cell
+        // trùng nhau trong hierarchy). Quét trực tiếp children thay vì dùng _cells
+        // đảm bảo BuildGrid() luôn idempotent dù gọi bao nhiêu lần / lúc nào.
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             var child = transform.GetChild(i);
-            if (child.GetComponent<BattleGridCell>() == null)
-                DestroyImmediate(child.gameObject);
+            var oldCell = child.GetComponent<BattleGridCell>();
+            if (oldCell != null)
+            {
+                // PoolingManager.Despawn() bỏ qua (return sớm) nếu object đang inactive —
+                // ép về active trước để đảm bảo nó LUÔN được xử lý (push vào pool hoặc
+                // Destroy nếu không thuộc pool nào), tránh sót lại cell "mồ côi" inactive
+                // vĩnh viễn trong hierarchy qua nhiều lần BuildGrid().
+                if (!child.gameObject.activeSelf) child.gameObject.SetActive(true);
+                PoolingManager.Despawn(child.gameObject);
+            }
+            else
+            {
+                DestroyImmediate(child.gameObject); // child lạ không phải cell pool (thay đổi thủ công trong Editor)
+            }
         }
 
         _cells = new BattleGridCell[rows, columns];
@@ -210,6 +224,28 @@ public class BattleGridManager : MonoBehaviour
             UnlockCell(anchorRow + o.x, anchorCol + o.y);
     }
 
+    /// <summary>
+    /// Quét TOÀN BỘ lưới để kiểm tra xem shape (offsets) có ÍT NHẤT 1 vị trí anchor
+    /// hợp lệ để unlock hay không (dùng CanUnlock() tại từng ô làm anchor).
+    /// Dùng để lọc GridItem nào thực sự "đặt được" trên bàn cờ hiện tại — khác với
+    /// chỉ đếm số ô trống (CountUnlockedEmpty), vì số ô đủ KHÔNG đảm bảo có vị trí
+    /// khớp hình dạng thật sự (ô Locked có thể rải rác không liền khối).
+    /// </summary>
+    public bool HasValidPlacement(Vector2Int[] offsets)
+    {
+        if (offsets == null || offsets.Length == 0 || _cells == null) return false;
+
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < columns; c++)
+            {
+                if (CanUnlock(r, c, offsets))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     // ── Gear Placement (lien ket voi WeaponEntry) ───────────────
 
     /// <summary>
@@ -266,6 +302,57 @@ public class BattleGridManager : MonoBehaviour
         }
 
         weapon.ReleaseAllCells();
+    }
+
+    // ── Unit Placement (lien ket voi MyDuckData / UnitPlayerItemUI) ─
+
+    /// <summary>
+    /// Kiem tra 1 Unit (shape rieng, VD 1x2 co dinh cua UnitPlayerItemUI) co the dat
+    /// len ban co tai vi tri anchor khong: tat ca o trong shape phai dang UnlockedEmpty.
+    /// </summary>
+    public bool CanPlaceUnit(int anchorRow, int anchorCol, Vector2Int[] shape)
+    {
+        if (shape == null || shape.Length == 0) return false;
+
+        foreach (var o in shape)
+        {
+            var cell = GetCell(anchorRow + o.x, anchorCol + o.y);
+            if (cell == null || cell.State != BattleGridCell.CellState.UnlockedEmpty) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Dat 1 Unit (MyDuckData) len ban co tai vi tri anchor theo shape rieng: danh dau
+    /// cac BattleGridCell tuong ung la UnlockedFull (OccupyingUnit = unit).
+    /// Goi CanPlaceUnit() truoc de dam bao hop le.
+    /// </summary>
+    public void PlaceUnit(int anchorRow, int anchorCol, MyDuckData unit, Vector2Int[] shape)
+    {
+        if (shape == null) return;
+
+        foreach (var o in shape)
+        {
+            int r = anchorRow + o.x;
+            int c = anchorCol + o.y;
+            GetCell(r, c)?.PlaceItem(unit);
+        }
+    }
+
+    /// <summary>
+    /// Go 1 Unit khoi ban co tai vi tri anchor theo shape rieng: cac BattleGridCell
+    /// tuong ung tro ve UnlockedEmpty (OccupyingUnit = null).
+    /// </summary>
+    public void RemoveUnit(int anchorRow, int anchorCol, Vector2Int[] shape)
+    {
+        if (shape == null) return;
+
+        foreach (var o in shape)
+        {
+            int r = anchorRow + o.x;
+            int c = anchorCol + o.y;
+            GetCell(r, c)?.RemoveItem();
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────
