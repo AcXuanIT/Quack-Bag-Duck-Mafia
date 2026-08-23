@@ -311,12 +311,19 @@ public class WeaponEditWindow : EditorWindow
 
             if (w.GridCells != null)
             {
+                EditorGUILayout.HelpBox(
+                    "Row = hang (truc doc), Col = cot (truc ngang). VD shape ngang 2 o: (0,0) va (0,1). VD shape doc 2 o: (0,0) va (1,0).",
+                    MessageType.Info);
+
                 for (int i = 0; i < w.GridCells.Length; i++)
                 {
                     var cell = w.GridCells[i];
                     if (cell == null) { w.GridCells[i] = new WeaponGridCell(); cell = w.GridCells[i]; }
                     EditorGUILayout.BeginHorizontal();
-                    cell.gridPosition = EditorGUILayout.Vector2IntField($"Cell {i}", cell.gridPosition);
+                    EditorGUILayout.LabelField($"Cell {i}", GUILayout.Width(50));
+                    int row = EditorGUILayout.IntField("Row", cell.gridPosition.x, GUILayout.Width(90));
+                    int col = EditorGUILayout.IntField("Col", cell.gridPosition.y, GUILayout.Width(90));
+                    cell.gridPosition = new Vector2Int(row, col);
                     cell.isOccupied   = EditorGUILayout.Toggle("Occ", cell.isOccupied, GUILayout.Width(50));
                     EditorGUILayout.EndHorizontal();
                 }

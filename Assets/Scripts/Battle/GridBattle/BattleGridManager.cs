@@ -26,6 +26,11 @@ using UnityEngine.UI;
 /// Pooling: cac o (BattleGridCell) duoc lay/tra ve qua PoolingManager (Scripts/Tool)
 /// thay vi Instantiate/Destroy moi lan BuildGrid()/ResetGrid() — tranh GC spike khi
 /// lien tuc build lai luoi (VD moi tran dau moi qua ResetGrid()).
+///
+/// SIZING: CellWidth/CellHeight/SpacingX/SpacingY (public, cap nhat moi lan BuildGrid())
+/// la NGUON DUY NHAT cho kich thuoc 1 o thuc te tren ban co — ShopItemSizing doc truc
+/// tiep tu day de dam bao Item khi spawn trong Shop co kich thuoc TRUNG KHOP voi 1 o
+/// thuc su tren Battle Grid (khong dung hang so cung).
 /// </summary>
 public class BattleGridManager : MonoBehaviour
 {
@@ -45,6 +50,11 @@ public class BattleGridManager : MonoBehaviour
     [Header("Cell Prefab (auto-built if null)")]
     [SerializeField] private GameObject cellPrefab;
 
+    [Header("Editor Preview (khong anh huong runtime/build)")]
+    [Tooltip("Bat/tat ve luoi preview trong Scene View luc Edit Mode (khong can bam Play).")]
+    [SerializeField] private bool showGridGizmos = true;
+    [SerializeField] private bool showGizmoLabels = true;
+
     private BattleGridCell[,] _cells;
 
     // Template (component) dùng làm "prefab" nguồn cho PoolingManager.Spawn<BattleGridCell>()
@@ -55,6 +65,11 @@ public class BattleGridManager : MonoBehaviour
     public int   Cols       => columns;
     public float CellWidth  { get; private set; }
     public float CellHeight { get; private set; }
+
+    /// <summary>Khoảng cách ngang (X) giữa 2 ô liền kề trên Battle Grid — dùng để ShopItemSizing tính đúng kích thước item nhiều ô.</summary>
+    public float SpacingX => spacing.x;
+    /// <summary>Khoảng cách dọc (Y) giữa 2 ô liền kề trên Battle Grid — dùng để ShopItemSizing tính đúng kích thước item nhiều ô.</summary>
+    public float SpacingY => spacing.y;
 
     void Awake() => BuildGrid();
 
@@ -168,6 +183,15 @@ public class BattleGridManager : MonoBehaviour
     /// Thực chất chỉ là alias của BuildGrid() — build lại từ đầu (qua Pool, không GC-spike).
     /// </summary>
     public void ResetGrid() => BuildGrid();
+
+    // ── Editor Preview (Gizmos) ──────────────────────────────
+    // Ve truoc luoi Grid ngay trong Scene View luc Edit Mode, dua tren CUNG cong thuc
+    // toa do/kich thuoc voi BuildGrid() (border=34, spacing, cellW/cellH tinh tu RectTransform
+    // hien tai) — KHONG spawn GameObject that, chi la Gizmos nen KHONG anh huong runtime/build
+    // (boc trong #if UNITY_EDITOR). O trong vung defaultUnlockCols x defaultUnlockRows (giua bang)
+    // to mau xanh (se Unlock san luc BuildGrid()), cac o con lai to mau nhat (Locked).
+    // Bat/tat qua showGridGizmos trong Inspector. Tu dong cap nhat khi doi columns/rows/spacing
+    // trong Inspector, khong can bam Play hay goi BuildGrid().
 
     // ── Public API ───────────────────────────────────────────
 
@@ -353,6 +377,38 @@ public class BattleGridManager : MonoBehaviour
             int c = anchorCol + o.y;
             GetCell(r, c)?.RemoveItem();
         }
+    }
+
+    // ── Adjacency Query (item nao lien ke voi item nao) ─────────
+
+    /// <summary>
+    /// Lấy danh sách các item UI (GearItemUI/UnitPlayerItemUI, qua BattleGridCell.OccupyingItemUI)
+    /// đang chiếm các ô KỀ (4 hướng: trên/dưới/trái/phải) với shape tại anchor cho trước.
+    /// Loại trừ chính "self" (item đang hỏi) và loại trùng lặp (1 item to có thể kề nhiều ô).
+    /// Dùng làm nền cho các hàm kiểm tra "item A có liền kề item B loại X nào không".
+    /// </summary>
+    public System.Collections.Generic.List<MonoBehaviour> GetAdjacentOccupants(
+        int anchorRow, int anchorCol, Vector2Int[] shape, MonoBehaviour self)
+    {
+        var result = new System.Collections.Generic.List<MonoBehaviour>();
+        if (shape == null) return result;
+
+        int[] dr = { -1, 1, 0, 0 };
+        int[] dc = {  0, 0,-1, 1 };
+
+        foreach (var offset in shape)
+        {
+            int r = anchorRow + offset.x;
+            int c = anchorCol + offset.y;
+            for (int d = 0; d < 4; d++)
+            {
+                var neighbor = GetCell(r + dr[d], c + dc[d]);
+                var occ = neighbor?.OccupyingItemUI;
+                if (occ != null && occ != self && !result.Contains(occ))
+                    result.Add(occ);
+            }
+        }
+        return result;
     }
 
     // ── Helpers ──────────────────────────────────────────────

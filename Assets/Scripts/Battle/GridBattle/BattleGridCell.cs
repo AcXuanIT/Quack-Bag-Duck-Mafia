@@ -42,6 +42,17 @@ public class BattleGridCell : MonoBehaviour
     /// <summary>Unit (UnitPlayerItemUI) dang chiem o nay, null neu o trong hoac chi la Grid item/Gear.</summary>
     public MyDuckData OccupyingUnit { get; private set; }
 
+    /// <summary>
+    /// Component UI (GearItemUI hoac UnitPlayerItemUI) THUC SU dang chiem o nay tren Grid.
+    /// Dung de biet chinh xac item nao can bi day ve Component khi 1 item KHAC duoc dat de
+    /// len (khong phai truong hop merge). Duoc GearItemUI/UnitPlayerItemUI tu goi
+    /// SetOccupyingItemUI() ngay sau khi PlaceGear()/PlaceUnit() thanh cong.
+    /// </summary>
+    public MonoBehaviour OccupyingItemUI { get; private set; }
+
+    /// <summary>Gan component UI dang chiem o nay (goi boi GearItemUI/UnitPlayerItemUI.PlaceOnGrid()).</summary>
+    public void SetOccupyingItemUI(MonoBehaviour ui) => OccupyingItemUI = ui;
+
 public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
     {
         Row            = row;
@@ -133,6 +144,7 @@ public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
         {
             OccupyingWeapon = null;
             OccupyingUnit   = null;
+            OccupyingItemUI = null;
             SetState(CellState.UnlockedEmpty);
         }
     }
@@ -155,5 +167,20 @@ public void Init(int row, int col, Image image, Sprite locked, Sprite unlocked)
     {
         if (_state == CellState.Locked)
             ApplyVisual(CellState.Locked);
+    }
+
+    /// <summary>
+    /// To mau preview len 1 o DANG Unlocked (UnlockedEmpty/UnlockedFull), GIU NGUYEN sprite Unlocked
+    /// (khac SetHighlightColor() luon ep sprite Locked — dung cho GridItem). Dung boi UnitPlayerItemUI
+    /// khi hover kiem tra vi tri dat Unit co hop le khong (Unit chi dat duoc vao o da Unlock).
+    /// </summary>
+    public void SetUnlockedHighlight(Color color)
+    {
+        if (bgImage && _state != CellState.Locked)
+        {
+            bgImage.sprite = spriteUnlocked;
+            bgImage.gameObject.SetActive(true);
+            bgImage.color = color;
+        }
     }
 }

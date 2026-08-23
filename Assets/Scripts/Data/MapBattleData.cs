@@ -48,7 +48,7 @@ public class WaveData
 /// sẽ do các DataBattle khác đảm nhiệm — chưa xử lý ở đây.
 /// </summary>
 [CreateAssetMenu(fileName = "MapBattleData", menuName = "Game/Map Battle Data")]
-public class MapBattleData : ScriptableObject
+public class MapBattsleData : ScriptableObject
 {
     [Header("=== Waves ===")]
     [Tooltip("Danh sách các Wave trong màn chơi này")]

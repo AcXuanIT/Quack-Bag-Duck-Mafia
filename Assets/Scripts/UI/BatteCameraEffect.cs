@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 
 /// <summary>
 /// BatteCameraEffect - Hiệu ứng camera "đi xuống & zoom ra" cho màn hình battle.
@@ -18,6 +19,8 @@ public class BatteCameraEffect : MonoBehaviour
     [Header("--- References (tự động tìm nếu để trống) ---")]
     [SerializeField] private RectTransform batteRect;
     [SerializeField] private Camera mainCamera;
+    [SerializeField] private Button btnStartWar;
+    [SerializeField] private GameObject compoentItem;
 
     [Header("--- Batte UI Animation ---")]
     [Tooltip("Vị trí Y đích của Batte (0 = giữa màn hình)")]
@@ -61,6 +64,8 @@ public class BatteCameraEffect : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
+        btnStartWar.onClick.AddListener(() => ToggleEffect());
+
         CacheOriginalValues();
     }
 
@@ -89,6 +94,9 @@ public class BatteCameraEffect : MonoBehaviour
             Debug.LogWarning("[BatteCameraEffect] Missing references!");
             return;
         }
+        
+        if (compoentItem != null)
+            compoentItem.SetActive(true);
 
         _seq?.Kill(true);
         _isAnimated = true;
@@ -139,6 +147,9 @@ public class BatteCameraEffect : MonoBehaviour
 
         _seq?.Kill(true);
         _isAnimated = false;
+
+        if(compoentItem != null) 
+            compoentItem.SetActive(false);
 
         _seq = DOTween.Sequence();
 

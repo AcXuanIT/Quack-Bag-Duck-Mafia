@@ -58,7 +58,9 @@ public class ShopBatteManager : MonoBehaviour
         // Awake() của mọi component trước khi bắt đầu gọi Start() bất kỳ,
         // nên không cần phụ thuộc vào Script Execution Order thủ công.
         _gridManager = FindObjectOfType<BattleGridManager>();
+
         if (btnBuy != null) btnBuy.onClick.AddListener(OnBuyPressed);
+
         RefreshUI();
         SyncSpawnedList();
     }
@@ -202,7 +204,12 @@ public class ShopBatteManager : MonoBehaviour
 
         var gearUI = go.GetComponent<GearItemUI>();
         if (gearUI != null)
-            gearUI.Setup(weapon, _gridManager, trashZone, trashImage);
+        {
+            var containerRT = componentContainer as RectTransform;
+            if (containerRT == null && componentContainer != null)
+                containerRT = componentContainer.GetComponent<RectTransform>();
+            gearUI.Setup(weapon, _gridManager, trashZone, trashImage, containerRT);
+        }
         else
             Debug.LogWarning("[Shop] Prefab GearItem thieu component GearItemUI!");
 
@@ -235,7 +242,12 @@ public class ShopBatteManager : MonoBehaviour
 
         var unitUI = go.GetComponent<UnitPlayerItemUI>();
         if (unitUI != null)
-            unitUI.Setup(unit, _gridManager, trashZone, trashImage);
+        {
+            var containerRT = componentContainer as RectTransform;
+            if (containerRT == null && componentContainer != null)
+                containerRT = componentContainer.GetComponent<RectTransform>();
+            unitUI.Setup(unit, _gridManager, trashZone, trashImage, containerRT);
+        }
         else
             Debug.LogWarning("[Shop] Prefab UnitItem thieu component UnitPlayerItemUI!");
 

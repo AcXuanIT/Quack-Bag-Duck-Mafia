@@ -13,6 +13,7 @@ public class BattleSettingController : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button btnPause;           // UIBatteMap/Top/btnPause
     [SerializeField] private Button btnContinue;        // Setting/btnContinue
+    [SerializeField] private Button btnContinue2;
     [SerializeField] private Button btnBackMenu;        // Setting/btnBackMenu
 
     [Header("Back Menu References")]
@@ -31,6 +32,7 @@ public class BattleSettingController : MonoBehaviour
         if (btnPause    != null) btnPause.onClick.AddListener(OpenSetting);
         if (btnContinue != null) btnContinue.onClick.AddListener(CloseSetting);
         if (btnBackMenu != null) btnBackMenu.onClick.AddListener(BackToMenu);
+        if (btnContinue2 != null) btnContinue2.onClick.AddListener(CloseSetting);
     }
 
     public void OpenSetting()

@@ -52,6 +52,10 @@ public class GridShopItemUI : MonoBehaviour,
     [SerializeField] private Color colorValid   = new Color(0.2f, 1f,   0.3f, 0.9f);
     [SerializeField] private Color colorInvalid = new Color(1f,   0.2f, 0.2f, 0.9f);
 
+    [Header("Drag Grab Offset")]
+    [Tooltip("Khoang cach (don vi UI local) tu goc tren-trai cua Item toi vi tri con tro chuot luc keo. VD (10,-10) = con tro cach top-left 10 sang phai, 10 xuong duoi.")]
+    [SerializeField] private Vector2 dragGrabOffset = new Vector2(10f, -10f);
+
     // ─── Runtime ─────────────────────────────────────────────
     [HideInInspector] public ShopItemData data;
 
@@ -78,19 +82,34 @@ public class GridShopItemUI : MonoBehaviour,
     private bool              _isDragging;
 
     // ─── Init ────────────────────────────────────────────────
-    private void Awake()
+    private void Awake() => EnsureCached();
+
+    /// <summary>
+    /// Dam bao cac tham chieu cache (RectTransform, LayoutElement, CanvasGroup, Canvas goc) da
+    /// san sang, KE CA khi Setup() duoc goi luc GameObject dang nam trong 1 hierarchy DANG INACTIVE
+    /// (VD panel Shop/UIBatteMap chua mo) — truong hop nay Unity TRI HOAN goi Awake() toi khi
+    /// hierarchy active, nen khong the chi dua vao Awake() de cache: neu khong co ham nay,
+    /// ApplyShapeSize()/kich thuoc se bi ShopItemSizing.ApplySize() bo qua am tham (rt/layoutElement
+    /// con null luc Setup() chay), item giu nguyen kich thuoc mac dinh cua prefab.
+    /// </summary>
+    private void EnsureCached()
     {
-        _canvasGroup   = GetComponent<CanvasGroup>();
-        _rt            = GetComponent<RectTransform>();
-        _layoutElement = GetComponent<LayoutElement>();
-        _rootCanvas    = GetComponentInParent<Canvas>();
-        if (_rootCanvas != null && !_rootCanvas.isRootCanvas)
-            _rootCanvas = _rootCanvas.rootCanvas;
+        if (_rt == null)            _rt            = GetComponent<RectTransform>();
+        if (_canvasGroup == null)   _canvasGroup   = GetComponent<CanvasGroup>();
+        if (_layoutElement == null) _layoutElement = GetComponent<LayoutElement>();
+        if (_rootCanvas == null)
+        {
+            _rootCanvas = GetComponentInParent<Canvas>(true);
+            if (_rootCanvas != null && !_rootCanvas.isRootCanvas)
+                _rootCanvas = _rootCanvas.rootCanvas;
+        }
     }
 
 public void Setup(ShopItemData itemData, BattleGridManager gridManager,
                          RectTransform trash = null, Image trashImg = null)
     {
+        EnsureCached();
+
         data         = itemData;
         _gridManager = gridManager;
         if (trash    != null) trashZone  = trash;
@@ -127,6 +146,7 @@ public void OnBeginDrag(PointerEventData eventData)
 
         transform.SetParent(_rootCanvas.transform, true);
         transform.SetAsLastSibling();
+        SnapTopLeftOffsetToPointer(eventData);
 
         _canvasGroup.alpha          = 0.8f;
         _canvasGroup.blocksRaycasts = false;
@@ -135,6 +155,35 @@ public void OnBeginDrag(PointerEventData eventData)
         _overTrash = false;
 
         ShowAllLockedCells();
+    }
+
+    /// <summary>
+    /// Dịch chuyển Item sao cho vị trí con trỏ chuột hiện tại nằm cách góc TRÊN-TRÁI của Item
+    /// đúng dragGrabOffset đơn vị (mặc định (10,-10): cách 10 sang phải, 10 xuống dưới so với
+    /// top-left) — bất kể người chơi bấm vào điểm nào bên trong Item. Gọi ngay sau khi reparent
+    /// item vào _rootCanvas lúc bắt đầu kéo (OnBeginDrag), để việc canh ô Grid lúc thả luôn nhất
+    /// quán theo đúng offset này trong suốt quá trình kéo.
+    /// </summary>
+    private void SnapTopLeftOffsetToPointer(PointerEventData eventData)
+    {
+        if (_rt == null || _rootCanvas == null) return;
+
+        var canvasRT = _rootCanvas.transform as RectTransform;
+        if (canvasRT == null) return;
+
+        Vector3[] corners = new Vector3[4];
+        _rt.GetWorldCorners(corners);
+        Vector3 topLeftWorld = corners[1]; // GetWorldCorners: 0=BL,1=TL,2=TR,3=BR
+
+        Vector2 topLeftScreen = RectTransformUtility.WorldToScreenPoint(eventData.pressEventCamera, topLeftWorld);
+
+        Vector2 topLeftLocal, pointerLocal;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, topLeftScreen, eventData.pressEventCamera, out topLeftLocal);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, eventData.position, eventData.pressEventCamera, out pointerLocal);
+
+        // Muc tieu: (topLeft + dragGrabOffset) phai trung voi pointerLocal
+        // => can dich Item them: pointerLocal - (topLeftLocal + dragGrabOffset)
+        _rt.anchoredPosition += (pointerLocal - (topLeftLocal + dragGrabOffset));
     }
 
 public void OnDrag(PointerEventData eventData)

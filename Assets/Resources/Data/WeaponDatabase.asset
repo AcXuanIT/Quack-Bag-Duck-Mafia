@@ -19,9 +19,12 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 1d40604d6c9f54d4d8f6f9709db066bd, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 2f1db271bb3a66a438078a07de737674, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 65133635f4dfee44db8b40ba88796d98, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 7b2f66d60fd70b944b244e49ad9ac638, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    - gridPosition: {x: 0, y: 1}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -49,12 +52,11 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 8ba20fd6b090bf54d8e2d72d03e19d45, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 3838701b9b9d5f742abe352b73276180, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 4e020ade2396b2844bda0e85046b64b8, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 16be7ea89bc37c7429b5064b245a95b8, type: 2}
+    ShapeSprite: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -81,13 +83,14 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: d910ec98d88f1874db726e9d3810618b, type: 2}
     SpriteTier3: {fileID: 21300000, guid: acc79191582924c478ea3555079a719e, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 916110ca4fdef9d47a48628199d5f621, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 7ed7181a2dd579543b311883913dd046, type: 2}
+    ShapeSprite: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
+    - gridPosition: {x: 1, y: 0}
       isOccupied: 0
-    - gridPosition: {x: 0, y: 2}
+    - gridPosition: {x: 0, y: 1}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -115,12 +118,11 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 48718461427948e4db6d007de88e3e15, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 5799dbb3034017a4dab957bbea12d6dd, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 59a2c3d981436594f88436557642e069, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: a70310b07a647424e9199ac7715c79b7, type: 2}
+    ShapeSprite: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -147,13 +149,12 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 5aa620f86522d1048822b4b7db5e2e77, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 32e38a87719de5e4bbc2ec2bb38c1819, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 93b49ec3d61a70146947be0f9bf06545, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: aadd9e3ac45d73845a1de48345542736, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 2, y: 0}
+    - gridPosition: {x: 0, y: 1}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -181,15 +182,12 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: ee76e51b26556324395579d1284b5767, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 50f9e4c4a43d7c0479c16f131e8f5f57, type: 2}
     SpriteTier4: {fileID: 21300000, guid: afbd929ad612aea4b9c65356681cb9fc, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 9cede710630888e4ba76ec653fb613eb, type: 2}
+    ShapeSprite: {fileID: -1392332229, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -1392332229, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
     - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -217,14 +215,13 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 0a401b5acf634eb4183ddd4510193ef3, type: 2}
     SpriteTier3: {fileID: 21300000, guid: bd1ebb66954770b46a0516e0345a6144, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 7404679c91f508d43b28516f254b84fb, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: d76f5a0f5b9ad5840ac61c76c969c746, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
+      isOccupied: 1
+    - gridPosition: {x: 0, y: 1}
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -251,13 +248,14 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: e561b04dc658c684b945a484ca6c0669, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 554a1bf78da34b74f9fa2b737748d87a, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 66581650ccc85ad48bd3d6fa4ad86aee, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 38eb3cdc372a5dd4e853014c461b0bd3, type: 2}
+    ShapeSprite: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
     - gridPosition: {x: 1, y: 0}
+      isOccupied: 0
+    - gridPosition: {x: 0, y: 1}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -285,15 +283,12 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: e2e6e2ce88f665740bafa961f7f80624, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 608ef102373c72b499f506ab9da3b227, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 7a8143f85e6ece144968473a7bb2a96d, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 5b7ddf87fdce5ee498e9822468b0405c, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 2}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -321,15 +316,12 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 565a90dff09950c4eb517d2133f26a5f, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 4aedaa19e53eeff4bbdee0ee09e295e0, type: 2}
     SpriteTier4: {fileID: 21300000, guid: e9720fe01e818f643b95b5693390c6c0, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: fd1308584822022428fcfd86b3e99665, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 2}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -357,15 +349,14 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 81ed029d9f9ffaa4ea89c659308a550b, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 7e69c7c095c1ec64a8a094337a84b1c1, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 64e70a3c83ab61a41b589eed11a9aecf, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 2cc6cfa200061914e80f5c39ba42203c, type: 2}
+    ShapeSprite: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
+    - gridPosition: {x: 1, y: 0}
+      isOccupied: 0
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 2}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -393,7 +384,8 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: 6b4d32cba0ed1474dbfeb8a3165b3535, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 55aa69ccf24819c4c9310a6397aa1395, type: 2}
     SpriteTier4: {fileID: 21300000, guid: 23c73bfae9489b24aa202cdc28b9a7ee, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 16be7ea89bc37c7429b5064b245a95b8, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
       isOccupied: 0
@@ -425,13 +417,10 @@ MonoBehaviour:
     SpriteTier2: {fileID: 21300000, guid: b2504b0f43db6364d8a073af2da87657, type: 2}
     SpriteTier3: {fileID: 21300000, guid: c15a59b700b662944830db1c1e02b8c5, type: 2}
     SpriteTier4: {fileID: 21300000, guid: b4556ed9e414e8f4d9c25aabf864d0cd, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 7ed7181a2dd579543b311883913dd046, type: 2}
+    ShapeSprite: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 2}
       isOccupied: 0
     Level: 1
     XP: 0
@@ -453,245 +442,3 @@ MonoBehaviour:
     Coin: 500
     IsLocked: 1
     TimeDelay: 2.5
-  - ID: 14
-    Name: Void Cannon
-    SpriteTier1: {fileID: 21300000, guid: 05e0241a92f7a5c499859916e479414c, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: 6b4d32cba0ed1474dbfeb8a3165b3535, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: 55aa69ccf24819c4c9310a6397aa1395, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: 23c73bfae9489b24aa202cdc28b9a7ee, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 9cede710630888e4ba76ec653fb613eb, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 400
-    - 500
-    - 620
-    - 760
-    - 920
-    HPPerLevel:
-    - 320
-    - 416
-    - 528
-    - 656
-    - 800
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 600
-    IsLocked: 1
-    TimeDelay: 2.8
-  - ID: 15
-    Name: Thunder Rail
-    SpriteTier1: {fileID: 21300000, guid: 0dbef0dc0f367254db97fde900944f92, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: b2504b0f43db6364d8a073af2da87657, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: c15a59b700b662944830db1c1e02b8c5, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: b4556ed9e414e8f4d9c25aabf864d0cd, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: a70310b07a647424e9199ac7715c79b7, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 320
-    - 400
-    - 496
-    - 608
-    - 736
-    HPPerLevel:
-    - 380
-    - 494
-    - 627
-    - 779
-    - 950
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 550
-    IsLocked: 1
-    TimeDelay: 2.3
-  - ID: 16
-    Name: Cryo Lance
-    SpriteTier1: {fileID: 21300000, guid: 05e0241a92f7a5c499859916e479414c, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: 6b4d32cba0ed1474dbfeb8a3165b3535, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: 55aa69ccf24819c4c9310a6397aa1395, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: 23c73bfae9489b24aa202cdc28b9a7ee, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: aadd9e3ac45d73845a1de48345542736, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 2, y: 0}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 280
-    - 350
-    - 434
-    - 532
-    - 644
-    HPPerLevel:
-    - 400
-    - 520
-    - 660
-    - 820
-    - 1000
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 480
-    IsLocked: 1
-    TimeDelay: 2.1
-  - ID: 17
-    Name: Bio Sprayer
-    SpriteTier1: {fileID: 21300000, guid: 0dbef0dc0f367254db97fde900944f92, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: b2504b0f43db6364d8a073af2da87657, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: c15a59b700b662944830db1c1e02b8c5, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: b4556ed9e414e8f4d9c25aabf864d0cd, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: d76f5a0f5b9ad5840ac61c76c969c746, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 260
-    - 325
-    - 403
-    - 494
-    - 598
-    HPPerLevel:
-    - 420
-    - 546
-    - 693
-    - 861
-    - 1050
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 460
-    IsLocked: 1
-    TimeDelay: 2
-  - ID: 18
-    Name: Inferno Burst
-    SpriteTier1: {fileID: 21300000, guid: 05e0241a92f7a5c499859916e479414c, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: 6b4d32cba0ed1474dbfeb8a3165b3535, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: 55aa69ccf24819c4c9310a6397aa1395, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: 23c73bfae9489b24aa202cdc28b9a7ee, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 38eb3cdc372a5dd4e853014c461b0bd3, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 380
-    - 475
-    - 589
-    - 722
-    - 874
-    HPPerLevel:
-    - 360
-    - 468
-    - 594
-    - 738
-    - 900
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 580
-    IsLocked: 1
-    TimeDelay: 2.6
-  - ID: 19
-    Name: Quantum Pulse
-    SpriteTier1: {fileID: 21300000, guid: 0dbef0dc0f367254db97fde900944f92, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: b2504b0f43db6364d8a073af2da87657, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: c15a59b700b662944830db1c1e02b8c5, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: b4556ed9e414e8f4d9c25aabf864d0cd, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: 5b7ddf87fdce5ee498e9822468b0405c, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 0, y: 2}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 420
-    - 525
-    - 651
-    - 798
-    - 966
-    HPPerLevel:
-    - 340
-    - 442
-    - 561
-    - 697
-    - 850
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 620
-    IsLocked: 1
-    TimeDelay: 2.9
-  - ID: 20
-    Name: Omega Strike
-    SpriteTier1: {fileID: 21300000, guid: 05e0241a92f7a5c499859916e479414c, type: 2}
-    SpriteTier2: {fileID: 21300000, guid: 6b4d32cba0ed1474dbfeb8a3165b3535, type: 2}
-    SpriteTier3: {fileID: 21300000, guid: 55aa69ccf24819c4c9310a6397aa1395, type: 2}
-    SpriteTier4: {fileID: 21300000, guid: 23c73bfae9489b24aa202cdc28b9a7ee, type: 2}
-    ShapeSprite: {fileID: 21300000, guid: fd1308584822022428fcfd86b3e99665, type: 2}
-    GridCells:
-    - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 1}
-      isOccupied: 0
-    - gridPosition: {x: 1, y: 2}
-      isOccupied: 0
-    Level: 1
-    XP: 0
-    XPToNextLevel: 100
-    DamagePerLevel:
-    - 500
-    - 625
-    - 775
-    - 950
-    - 1150
-    HPPerLevel:
-    - 500
-    - 650
-    - 825
-    - 1025
-    - 1250
-    AttackRange: 1
-    LevelLock: 0
-    Coin: 800
-    IsLocked: 1
-    TimeDelay: 3.5

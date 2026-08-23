@@ -13,7 +13,7 @@ using UnityEngine.UI;
 /// </summary>
 public static class ShopItemSizing
 {
-    public const float CellSize = 56f;
+    public const float CellSize = 87.5f;
     public const float CellGap  = 4f;
 
     /// <summary>Tính kích thước (width, height) cho 1 shape gồm nhiều ô (offset dạng [row,col]).</summary>

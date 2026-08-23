@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 564555597504183310}
   - component: {fileID: 2954968793651897607}
+  - component: {fileID: 4178382153266333804}
   m_Layer: 0
   m_Name: Direction
   m_TagString: Untagged
@@ -190,6 +191,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 2.394428
+--- !u!114 &4178382153266333804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1982401536089085037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 655971c6edb66f44bb9de32cc1de3207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3136996371855095160
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,9 +450,11 @@ GameObject:
   - component: {fileID: 3634413053356950679}
   - component: {fileID: 7213698348271610182}
   - component: {fileID: 139651847571131638}
+  - component: {fileID: 7054164905858798103}
+  - component: {fileID: 3348472983260740135}
   m_Layer: 0
   m_Name: enemy_001_tier_1
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -573,6 +588,51 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.1400001, y: 1.8014816}
   m_EdgeRadius: 0
+--- !u!50 &7054164905858798103
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5535085941312086466}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &3348472983260740135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5535085941312086466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9020f39e046b544a913ba06865f43a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duckRenderer: {fileID: 3634413053356950679}
+  weaponRenderer: {fileID: 8141094047980967609}
+  weaponRangeCollider: {fileID: 2954968793651897607}
+  duckAnimation: {fileID: 7213698348271610182}
+  hpBar: {fileID: 1764138375568122646}
+  moveSpeed: 1
 --- !u!1 &8503120905449498860
 GameObject:
   m_ObjectHideFlags: 0

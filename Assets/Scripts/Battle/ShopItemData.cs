@@ -22,6 +22,7 @@ public class ShopItemData : ScriptableObject
     [Header("Grid Data")]
     public Sprite icon;                  // icon hiển thị trên card
     public Sprite backgroundSprite;      // nền card
+    public Sprite fill;
 
     [Tooltip("Mảng ô chiếm trong battle grid, dạng [row,col] relative từ origin")]
     public Vector2Int[] gridCells;       // e.g. solo={(0,0)}, hor2={(0,0),(0,1)}, ...

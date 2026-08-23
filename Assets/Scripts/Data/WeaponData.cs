@@ -40,6 +40,8 @@ public class WeaponEntry
     [Tooltip("Sprite khung hình dạng của weapon")]
     public Sprite ShapeSprite;
 
+    public Sprite ShapeFill;
+
     [Tooltip("Các ô grid mà weapon chiếm khi gắn vào lưới")]
     public WeaponGridCell[] GridCells;
 

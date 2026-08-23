@@ -31,9 +31,29 @@ using TMPro;
 ///     1 ô luôn cùng kích thước vật lý giữa cả 3 loại item trong Shop (Grid/Gear/UnitDuck).
 ///     Subclass gọi ApplyShapeSize(cells) trong Setup() SAU khi gán data riêng.
 /// </summary>
+/// <summary>
+/// Danh cho cac ShopItem co the DAT (place) len Battle Grid va bi DAY (push) ve Component
+/// khi 1 item khac duoc dat de len vi tri no dang chiem (khong phai truong hop merge).
+/// GearItemUI va UnitPlayerItemUI deu implement interface nay.
+/// </summary>
+public interface IGridPlaceable
+{
+    /// <summary>Item nay hien co dang nam tren Battle Grid (da Place) hay khong.</summary>
+    bool IsPlacedOnGrid { get; }
+
+    /// <summary>
+    /// Bi DONG (mot item khac) day ra khoi vi tri dang chiem tren Grid: tu giai phong cac o
+    /// dang chiem roi tra ve khu Component (danh sach item trong Shop). Khac voi truong hop
+    /// tu minh keo di (drag), ham nay duoc goi TU BEN NGOAI boi item khac dang danh xuong.
+    /// </summary>
+    void ForceReturnToComponentContainer();
+}
+
 [RequireComponent(typeof(CanvasGroup))]
 public abstract class TierShopItemUI : MonoBehaviour,
     IPointerClickHandler,
+    IPointerDownHandler,
+    IPointerUpHandler,
     IBeginDragHandler,
     IDragHandler,
     IEndDragHandler
@@ -46,40 +66,38 @@ public abstract class TierShopItemUI : MonoBehaviour,
 
     // ─── Inspector: Base UI ───────────────────────────────────
     [Header("Base UI")]
-    [SerializeField] protected Image           bgImage;
+    [SerializeField] protected Image           fillImage;
     [SerializeField] protected Image           iconImage;
-    [SerializeField] protected TextMeshProUGUI nameText;
-    [SerializeField] protected TextMeshProUGUI levelText;
 
     // ─── Inspector: Tier Colors (DÙNG CHUNG cho Gear & UnitDuck) ─
-    [Header("Tier Colors (index 0=Tier1 .. 3=Tier4)")]
+    [Header("Tier")]
     [SerializeField]
     protected Color[] tierColors = new Color[4]
     {
-        new Color(0.55f, 0.55f, 0.55f, 1f), // Tier 1 - xám (mặc định)
-        new Color(0.25f, 0.55f, 1.00f, 1f), // Tier 2 - xanh dương
-        new Color(0.65f, 0.25f, 1.00f, 1f), // Tier 3 - tím
-        new Color(1.00f, 0.78f, 0.10f, 1f), // Tier 4 - vàng
+        new Color(0.55f, 0.55f, 0.55f, 0.4f), // Tier 1 - xám (mặc định)
+        new Color(0.25f, 0.55f, 1.00f, 0.4f), // Tier 2 - xanh dương
+        new Color(0.65f, 0.25f, 1.00f, 0.4f), // Tier 3 - tím
+        new Color(1.00f, 0.78f, 0.10f, 0.4f), // Tier 4 - vàng
     };
 
-    // ─── Inspector: Trash Zone ─────────────────────────────────
+    // ─── Inspector: Trash Zone ────
     [Header("Trash Zone")]
     [SerializeField] protected RectTransform trashZone;
     [SerializeField] protected Image         trashImage;
     [SerializeField] protected Color         colorTrash = new Color(1f, 0.3f, 0.3f, 0.9f);
-    private Color _trashOriginalColor;
-    private bool  _overTrash;
+    protected Color _trashOriginalColor;
+    protected bool  _overTrash;
 
-    // ─── Runtime ─────────────────────────────────────────────
+    // ─── Runtime ────────
     protected BattleGridManager _gridManager;
 
     protected CanvasGroup   _canvasGroup;
     protected Canvas        _rootCanvas;
     protected RectTransform _rt;
     protected LayoutElement _layoutElement;
-    private   Transform     _originalParent;
-    private   int           _originalSiblingIndex;
-    private   Vector2       _originalAnchoredPos;
+    protected Transform     _originalParent;
+    protected int           _originalSiblingIndex;
+    protected Vector2       _originalAnchoredPos;
     protected bool          _isDragging;
 
     private int _currentTier = 1;
@@ -129,10 +147,33 @@ public abstract class TierShopItemUI : MonoBehaviour,
     /// </summary>
     protected void InitCommon(BattleGridManager gridManager, RectTransform trash, Image trashImg)
     {
+        EnsureCached();
+
         _gridManager = gridManager;
         if (trash    != null) trashZone  = trash;
         if (trashImg != null) trashImage = trashImg;
         _currentTier = 1;
+    }
+
+    /// <summary>
+    /// Dam bao cac tham chieu cache (RectTransform, LayoutElement, CanvasGroup, Canvas goc) da
+    /// san sang, KE CA khi Setup() duoc goi luc GameObject dang nam trong 1 hierarchy DANG INACTIVE
+    /// (VD panel Shop/UIBatteMap chua mo) — truong hop nay Unity TRI HOAN goi Awake() toi khi
+    /// hierarchy active, nen khong the chi dua vao Awake() de cache: neu khong co ham nay,
+    /// ApplyShapeSize()/kich thuoc se bi ShopItemSizing.ApplySize() bo qua am tham (rt/layoutElement
+    /// con null luc Setup() chay), item giu nguyen kich thuoc mac dinh cua prefab.
+    /// </summary>
+    protected void EnsureCached()
+    {
+        if (_rt == null)            _rt            = GetComponent<RectTransform>();
+        if (_canvasGroup == null)   _canvasGroup   = GetComponent<CanvasGroup>();
+        if (_layoutElement == null) _layoutElement = GetComponent<LayoutElement>();
+        if (_rootCanvas == null)
+        {
+            _rootCanvas = GetComponentInParent<Canvas>(true);
+            if (_rootCanvas != null && !_rootCanvas.isRootCanvas)
+                _rootCanvas = _rootCanvas.rootCanvas;
+        }
     }
 
     /// <summary>
@@ -147,11 +188,11 @@ public abstract class TierShopItemUI : MonoBehaviour,
     }
 
     /// <summary>Tô màu bgImage theo tierColors[CurrentTier-1] — dùng chung cho mọi loại item con.</summary>
-    protected void ApplyTierColor()
+    protected virtual void ApplyTierColor()
     {
-        if (bgImage == null || tierColors == null || tierColors.Length == 0) return;
+        if (fillImage == null || tierColors == null || tierColors.Length == 0) return;
         int idx = Mathf.Clamp(_currentTier - 1, 0, tierColors.Length - 1);
-        bgImage.color = tierColors[idx];
+        fillImage.color = tierColors[idx];
     }
 
     /// <summary>Nâng Tier lên 1 bậc (tối đa MaxTier=4) rồi refresh hiển thị. Trả về false nếu đã Max.</summary>
@@ -166,14 +207,52 @@ public abstract class TierShopItemUI : MonoBehaviour,
     public void Discard() => Destroy(gameObject);
 
     // ─── Click ───────────────────────────────────────────────
-    public void OnPointerClick(PointerEventData eventData)
+    public virtual void OnPointerClick(PointerEventData eventData)
     {
         if (_isDragging) return;
-        Debug.Log($"[{GetType().Name}] Clicked: {DisplayName} (Tier {_currentTier})");
+    }
+
+    // ─── Info Panel (giu/tha de xem thong tin) ────────────────
+    // Mac dinh khong lam gi — subclass (GearItemUI/UnitPlayerItemUI) override de goi
+    // ItemInfoPanel.Instance.ShowInfoForGear()/ShowInfoForUnit() voi du lieu rieng cua no.
+    public virtual void OnPointerDown(PointerEventData eventData) { }
+
+    /// <summary>An Info Panel khi tha tay ra — dung chung cho ca Gear va Unit.</summary>
+    public virtual void OnPointerUp(PointerEventData eventData)
+    {
+        ItemInfoPanel.Instance.HideInfo();
+    }
+
+    /// <summary>
+    /// Dịch chuyển item (qua _rt.anchoredPosition) sao cho góc TRÊN-TRÁI (top-left) của nó
+    /// nằm đúng tại vị trí con trỏ chuột hiện tại — bất kể người chơi bấm vào điểm nào bên
+    /// trong Item (giữa, góc dưới-phải, ...). Gọi ngay sau khi reparent item vào _rootCanvas
+    /// lúc bắt đầu kéo (OnBeginDrag), để trong suốt quá trình kéo, con trỏ luôn đại diện cho
+    /// góc trên-trái của Item — hữu ích để việc canh ô Grid lúc thả luôn nhất quán, không phụ
+    /// thuộc vào việc người chơi đã bấm chính xác vào đâu trong Item.
+    /// </summary>
+    protected void SnapTopLeftToPointer(PointerEventData eventData)
+    {
+        if (_rt == null || _rootCanvas == null) return;
+
+        var canvasRT = _rootCanvas.transform as RectTransform;
+        if (canvasRT == null) return;
+
+        Vector3[] corners = new Vector3[4];
+        _rt.GetWorldCorners(corners);
+        Vector3 topLeftWorld = corners[1]; // GetWorldCorners: 0=BL,1=TL,2=TR,3=BR
+
+        Vector2 topLeftScreen = RectTransformUtility.WorldToScreenPoint(eventData.pressEventCamera, topLeftWorld);
+
+        Vector2 topLeftLocal, pointerLocal;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, topLeftScreen, eventData.pressEventCamera, out topLeftLocal);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, eventData.position, eventData.pressEventCamera, out pointerLocal);
+
+        _rt.anchoredPosition += (pointerLocal - topLeftLocal);
     }
 
     // ─── Drag ───────────────────────────────────────────────
-    public void OnBeginDrag(PointerEventData eventData)
+    public virtual void OnBeginDrag(PointerEventData eventData)
     {
         _isDragging           = true;
         _originalParent       = transform.parent;
@@ -190,7 +269,7 @@ public abstract class TierShopItemUI : MonoBehaviour,
         _overTrash = false;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public virtual void OnDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
         _rt.anchoredPosition += eventData.delta / _rootCanvas.scaleFactor;
@@ -204,7 +283,7 @@ public abstract class TierShopItemUI : MonoBehaviour,
         }
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public virtual void OnEndDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
         _isDragging = false;
@@ -261,7 +340,7 @@ public abstract class TierShopItemUI : MonoBehaviour,
         _canvasGroup.blocksRaycasts = true;
     }
 
-    private bool IsPointerOverTrash(PointerEventData eventData)
+    protected bool IsPointerOverTrash(PointerEventData eventData)
     {
         if (trashZone == null) return false;
         return RectTransformUtility.RectangleContainsScreenPoint(
