@@ -5542,7 +5542,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 398141781}
-  - component: {fileID: 398141782}
   m_Layer: 0
   m_Name: SpawnDuck
   m_TagString: Untagged
@@ -5565,22 +5564,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 444891345}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &398141782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 398141780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f6b5fb377ca9eb478982d2dca481341, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  unitDuckPrefab: {fileID: 5535085941312086466, guid: ade6c080935ba204c8643d5555c38383, type: 3}
-  gridManager: {fileID: 272815564}
-  spawnbase: {fileID: 8380774614488246664}
-  parent: {fileID: 398141781}
 --- !u!1 &406456196
 GameObject:
   m_ObjectHideFlags: 0
@@ -20173,7 +20156,6 @@ MonoBehaviour:
   cameraEffect: {fileID: 1250302838}
   battleSpawnEnemy: {fileID: 0}
   battleGridManager: {fileID: 272815564}
-  spawnDuck: {fileID: 0}
   spawnEnemy: {fileID: 0}
 --- !u!1 &1548798499
 GameObject:

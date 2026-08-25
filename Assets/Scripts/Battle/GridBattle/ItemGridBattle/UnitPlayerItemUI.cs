@@ -73,26 +73,6 @@ public class UnitPlayerItemUI : TierShopItemUI, IGridPlaceable
     /// <summary>Ô anchor hiện tại trên Grid (null nếu đang ở Shop) — dùng khi 1 Unit khác kéo đè lên để swap vị trí.</summary>
     public BattleGridCell PlacedAnchorCell => _placedAnchorCell;
 
-    /// <summary>
-    /// Danh sách các GearItemUI đang LIỀN KỀ (4 hướng: trên/dưới/trái/phải) với Unit này trên
-    /// Battle Grid. Rỗng nếu Unit chưa đặt lên Grid (còn ở Shop) hoặc không có Gear nào kề bên.
-    /// Dùng cho các cơ chế buff/synergy (VD: Unit đứng cạnh Gear được cộng thêm sát thương).
-    /// </summary>
-    public System.Collections.Generic.List<GearItemUI> GetAdjacentGears()
-    {
-        var result = new System.Collections.Generic.List<GearItemUI>();
-        if (!IsPlacedOnGrid || _gridManager == null) return result;
-
-        foreach (var occ in _gridManager.GetAdjacentOccupants(_placedAnchorCell.Row, _placedAnchorCell.Col, UnitShapeCells, this))
-        {
-            if (occ is GearItemUI gear) result.Add(gear);
-        }
-        return result;
-    }
-
-    /// <summary>Unit này (đang đặt trên Grid) có đang liền kề với ÍT NHẤT 1 GearItem nào không.</summary>
-    public bool IsAdjacentToAnyGear() => GetAdjacentGears().Count > 0;
-
     protected override void Awake()
     {
         base.Awake();
@@ -163,7 +143,7 @@ public class UnitPlayerItemUI : TierShopItemUI, IGridPlaceable
         _dragStartAnchorCell = _placedAnchorCell;
         if (_placedAnchorCell != null && _gridManager != null)
         {
-            _gridManager.RemoveUnit(_placedAnchorCell.Row, _placedAnchorCell.Col, UnitShapeCells);
+            _gridManager.RemoveUnit(_placedAnchorCell.Row, _placedAnchorCell.Col, UnitShapeCells, this);
             _placedAnchorCell = null;
         }
 
@@ -304,7 +284,7 @@ public class UnitPlayerItemUI : TierShopItemUI, IGridPlaceable
     /// <summary>Đặt Unit lên Grid tại anchor: cập nhật state BattleGridManager + di chuyển item tới đúng vị trí 2 ô.</summary>
     private void PlaceOnGrid(BattleGridCell anchor)
     {
-        _gridManager.PlaceUnit(anchor.Row, anchor.Col, _unit, UnitShapeCells);
+        _gridManager.PlaceUnit(anchor.Row, anchor.Col, _unit, UnitShapeCells, this);
         _placedAnchorCell = anchor;
 
         foreach (var offset in UnitShapeCells)
@@ -335,7 +315,7 @@ public class UnitPlayerItemUI : TierShopItemUI, IGridPlaceable
     {
         if (_placedAnchorCell != null && _gridManager != null)
         {
-            _gridManager.RemoveUnit(_placedAnchorCell.Row, _placedAnchorCell.Col, UnitShapeCells);
+            _gridManager.RemoveUnit(_placedAnchorCell.Row, _placedAnchorCell.Col, UnitShapeCells, this);
             _placedAnchorCell = null;
         }
         ReturnToComponentContainer();

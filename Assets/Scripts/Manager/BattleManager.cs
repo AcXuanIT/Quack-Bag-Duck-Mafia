@@ -63,7 +63,6 @@ public class BattleManager : Singleton<BattleManager>
     [SerializeField] private BattleGridManager battleGridManager;
 
     [Header("Spawn")]
-    [SerializeField] public BattleSpawnDuck spawnDuck;
     [SerializeField] public BattleSpawnEnemy spawnEnemy;
 
     // State được lưu lại trước khi Pause, để Resume() quay lại đúng chỗ
@@ -118,11 +117,6 @@ public class BattleManager : Singleton<BattleManager>
         // Spawn enemy theo Wave hiện tại
         if (battleSpawnEnemy != null)
             battleSpawnEnemy.SpawnWave(currentWavesIndex);
-
-        // Chốt liên kết Gear-Unit liền kề (snapshot đúng lúc chuyển Setup -> Battle),
-        // để BattleSpawnDuck tự spawn thêm UnitDuck mỗi khi weapon.TimeDelay chạy hết.
-        if (spawnDuck != null)
-            spawnDuck.BuildLinks();
 
         OnTurnBattleStart?.Invoke(currentTurn);
     }
@@ -182,11 +176,6 @@ public class BattleManager : Singleton<BattleManager>
         currentTurn++;
         currentWavesIndex = currentTurn;
         SetState(BattleState.TurnSetup);
-
-        // Quay lại Setup -> dừng mọi liên kết Gear-Unit của Turn trước (sẽ được BuildLinks()
-        // lại từ đầu khi Turn Battle kế tiếp bắt đầu, dựa theo cách sắp xếp MỚI trên Grid).
-        if (spawnDuck != null)
-            spawnDuck.ClearLinks();
 
         // Vào giao diện Setup
         if (cameraEffect != null)

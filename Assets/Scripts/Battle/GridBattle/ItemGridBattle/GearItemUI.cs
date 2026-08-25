@@ -29,10 +29,6 @@ using DG.Tweening;
 ///     gọi ngay để giải phóng các ô cũ; nếu cú kéo bị huỷ, Gear tự đặt lại đúng vị trí cũ.
 ///   - Có thể kéo thả ngược lại vào khu Component (danh sách item trong Shop) để rút Gear
 ///     ra khỏi bàn cờ, quay về Shop — không bị mất đi.
-///
-/// SPAWN LIÊN KẾT VỚI UNIT LIỀN KỀ: xử lý bởi BattleSpawnDuck (KHÔNG tự đếm giờ trong
-/// GearItemUI) — BattleSpawnDuck.BuildLinks() quét GetAdjacentUnits() của mọi Gear đã đặt
-/// khi Turn Battle bắt đầu, mỗi liên kết tự đếm ngược theo weapon.TimeDelay riêng.
 /// </summary>
 public class GearItemUI : TierShopItemUI, IGridPlaceable
 {
@@ -80,24 +76,6 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
 
     /// <summary>Ô anchor hiện tại trên Grid (offset (0,0) của shape) — null nếu đang ở Shop.</summary>
     public BattleGridCell PlacedAnchorCell => _placedAnchorCell;
-
-    /// <summary>
-    /// Danh sách các UnitPlayerItemUI đang LIỀN KỀ (4 hướng) với Gear này trên Battle Grid.
-    /// Rỗng nếu Gear chưa đặt lên Grid hoặc không có Unit nào kề bên.
-    /// Dùng cho cơ chế: Gear liền kề Unit -> mỗi khi hết TimeDelay, spawn 1 bản UnitDuck
-    /// cho Unit đó (xem BattleSpawnDuck.BuildLinks()).
-    /// </summary>
-    public System.Collections.Generic.List<UnitPlayerItemUI> GetAdjacentUnits()
-    {
-        var result = new System.Collections.Generic.List<UnitPlayerItemUI>();
-        if (!IsPlacedOnGrid || _gridManager == null) return result;
-
-        foreach (var occ in _gridManager.GetAdjacentOccupants(_placedAnchorCell.Row, _placedAnchorCell.Col, GetShapeCells(), this))
-        {
-            if (occ is UnitPlayerItemUI unit) result.Add(unit);
-        }
-        return result;
-    }
 
     protected override void Awake()
     {
@@ -307,7 +285,7 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
         _dragStartAnchorCell = _placedAnchorCell;
         if (_placedAnchorCell != null && _gridManager != null && _weapon != null)
         {
-            _gridManager.RemoveGear(_placedAnchorCell.Row, _placedAnchorCell.Col, _weapon);
+            _gridManager.RemoveGear(_placedAnchorCell.Row, _placedAnchorCell.Col, _weapon, this);
             _placedAnchorCell = null;
         }
 
@@ -431,7 +409,7 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
     /// <summary>Đặt Gear lên Grid tại anchor: cập nhật state BattleGridManager + di chuyển item tới góc trên-trái bounding box shape.</summary>
     private void PlaceOnGrid(BattleGridCell anchor)
     {
-        _gridManager.PlaceGear(anchor.Row, anchor.Col, _weapon);
+        _gridManager.PlaceGear(anchor.Row, anchor.Col, _weapon, this);
         _placedAnchorCell = anchor;
 
         var cells = GetShapeCells();
@@ -466,7 +444,7 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
     {
         if (_placedAnchorCell != null && _gridManager != null && _weapon != null)
         {
-            _gridManager.RemoveGear(_placedAnchorCell.Row, _placedAnchorCell.Col, _weapon);
+            _gridManager.RemoveGear(_placedAnchorCell.Row, _placedAnchorCell.Col, _weapon, this);
             _placedAnchorCell = null;
         }
         ReturnToComponentContainer();

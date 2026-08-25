@@ -100,6 +100,18 @@ public abstract class TierShopItemUI : MonoBehaviour,
     protected Vector2       _originalAnchoredPos;
     protected bool          _isDragging;
 
+    private static int _nextInstanceId = 1;
+
+    /// <summary>
+    /// ID duy nhất (tự tăng, không bao giờ trùng) của item này trong suốt vòng đời game —
+    /// KHÁC với WeaponEntry.ID/MyDuckData.ID (ID của LOẠI item) và CurrentTier (cấp độ).
+    /// Dùng để BattleGridManager.GridCellData phân biệt chính xác "item nào đang chiếm ô nào"
+    /// khi 2 item khác nhau (2 instance riêng biệt) trùng cả loại lẫn Tier — nếu chỉ so
+    /// sánh Type+Tier sẽ không thể biết đây là 2 item khác nhau hay chỉ 1.
+    /// Gán 1 lần duy nhất trong Awake().
+    /// </summary>
+    public int InstanceId { get; private set; }
+
     private int _currentTier = 1;
     public  int CurrentTier => _currentTier;
 
@@ -131,6 +143,7 @@ public abstract class TierShopItemUI : MonoBehaviour,
     // ─── Init ────────────────────────────────────────────────
     protected virtual void Awake()
     {
+        InstanceId     = _nextInstanceId++;
         _canvasGroup   = GetComponent<CanvasGroup>();
         _rt            = GetComponent<RectTransform>();
         _layoutElement = GetComponent<LayoutElement>();

@@ -1,5 +1,44 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
+/// <summary>
+/// Loại item đang chiếm 1 ô trong <see cref="BattleGridManager.GridItemCell"/>.
+/// </summary>
+public enum GridItemType
+{
+    None,
+    Gear,
+    Unit
+}
+
+/// <summary>
+/// 1 Ô DỮ LIỆU LOGIC trong hệ thống Cells của BattleGridManager — TÁCH BIỆT hoàn toàn với
+/// BattleGridCell (MonoBehaviour hiển thị UI/sprite). Đây là lớp "quản lý" thuần dữ liệu:
+/// biết ô này Lock hay không, và item nào (Gear/Unit) đang thực sự chiếm nó.
+///
+/// ItemID (KHÔNG PHẢI Type+Tier) là khoá định danh DUY NHẤT cho từng item INSTANCE — dùng
+/// GameObject.GetInstanceID() của chính item đó. Điều này đảm bảo 2 GearItem CÙNG WeaponID
+/// + CÙNG Tier (2 instance khác nhau, VD 2 khẩu súng giống hệt nhau đặt cạnh nhau) KHÔNG bị
+/// hệ thống nhầm là "cùng 1 item" khi ghi/xoá dữ liệu ô.
+/// </summary>
+[System.Serializable]
+public struct GridItemCell
+{
+    public bool          IsLocked;
+    public GridItemType  ItemType;
+    public int           ItemID;
+    public MonoBehaviour ItemRef;
+
+    public bool IsEmpty => ItemType == GridItemType.None;
+
+    public void Clear()
+    {
+        ItemType = GridItemType.None;
+        ItemID   = 0;
+        ItemRef  = null;
+    }
+}
 
 /// <summary>
 /// Tao va quan ly Battle Grid (mac dinh 5 cot x 7 hang).
@@ -31,6 +70,13 @@ using UnityEngine.UI;
 /// la NGUON DUY NHAT cho kich thuoc 1 o thuc te tren ban co — ShopItemSizing doc truc
 /// tiep tu day de dam bao Item khi spawn trong Shop co kich thuoc TRUNG KHOP voi 1 o
 /// thuc su tren Battle Grid (khong dung hang so cung).
+///
+/// HỆ THỐNG CELLS (GridItemCell[,]): lớp dữ liệu logic độc lập, song song với BattleGridCell,
+/// quản lý CHÍNH XÁC item nào (Gear hay Unit, phân biệt theo ItemID duy nhất) đang chiếm từng
+/// ô. Mỗi khi PlaceGear/RemoveGear/PlaceUnit/RemoveUnit chạy (thêm hoặc xoá item khỏi Grid),
+/// hệ thống tự động ghi/xoá dữ liệu tương ứng trong Cells, rồi gọi RefreshGearUnitLinks() để
+/// quét lại toàn bộ Cells và cập nhật trạng thái "liên kết" giữa GearItem và UnitItem liền kề
+/// (hiện hiệu ứng OnConnect() trên các Gear đang liền kề ít nhất 1 Unit).
 /// </summary>
 public class BattleGridManager : MonoBehaviour
 {
@@ -56,6 +102,12 @@ public class BattleGridManager : MonoBehaviour
     [SerializeField] private bool showGizmoLabels = true;
 
     private BattleGridCell[,] _cells;
+
+    /// <summary>
+    /// Mảng 2 chiều dữ liệu logic (kích thước rows x columns, đồng bộ với _cells) — quản lý
+    /// item nào (Gear/Unit) đang thực sự chiếm từng ô, độc lập với việc hiển thị UI.
+    /// </summary>
+    private GridItemCell[,] _itemCells;
 
     // Template (component) dùng làm "prefab" nguồn cho PoolingManager.Spawn<BattleGridCell>()
     // (GameObject của nó không parent vào transform của grid, để không bị BuildGrid() dọn nhầm).
@@ -117,7 +169,8 @@ public class BattleGridManager : MonoBehaviour
             }
         }
 
-        _cells = new BattleGridCell[rows, columns];
+        _cells     = new BattleGridCell[rows, columns];
+        _itemCells = new GridItemCell[rows, columns];
         var template = GetCellTemplate();
 
         RectTransform parentRT = GetComponent<RectTransform>();
@@ -166,6 +219,8 @@ public class BattleGridManager : MonoBehaviour
                 cell.SetState(initState);
 
                 _cells[r, c] = cell;
+
+                _itemCells[r, c] = new GridItemCell { IsLocked = !inZone, ItemType = GridItemType.None, ItemID = 0, ItemRef = null };
             }
         }
 
@@ -202,7 +257,11 @@ public class BattleGridManager : MonoBehaviour
     }
 
     /// <summary>Unlock mot o (Locked → UnlockedEmpty).</summary>
-    public void UnlockCell(int row, int col) => GetCell(row, col)?.Unlock();
+    public void UnlockCell(int row, int col)
+    {
+        GetCell(row, col)?.Unlock();
+        if (IsInBounds(row, col)) _itemCells[row, col].IsLocked = false;
+    }
 
     /// <summary>Dat item vao o da unlock (UnlockedEmpty → UnlockedFull). Khong gan weapon nao (Grid item thuan).</summary>
     public void PlaceItem(int row, int col) => GetCell(row, col)?.PlaceItem();
@@ -292,12 +351,16 @@ public class BattleGridManager : MonoBehaviour
     /// <summary>
     /// Dat 1 WeaponEntry len ban co tai vi tri anchor: danh dau cac BattleGridCell
     /// tuong ung la UnlockedFull (OccupyingWeapon = weapon) VA goi weapon.OccupyCell()
-    /// de WeaponEntry tu biet minh dang chiem nhung o nao.
+    /// de WeaponEntry tu biet minh dang chiem nhung o nao. Dong thoi ghi du lieu vao
+    /// he thong Cells (GridItemCell) va tu dong RefreshGearUnitLinks().
     /// Goi CanPlaceGear() truoc de dam bao hop le.
+    /// itemRef: GearItemUI dang goi ham nay (dung lam ItemRef/ItemID trong Cells).
     /// </summary>
-    public void PlaceGear(int anchorRow, int anchorCol, WeaponEntry weapon)
+    public void PlaceGear(int anchorRow, int anchorCol, WeaponEntry weapon, MonoBehaviour itemRef = null)
     {
         if (weapon == null || weapon.GridCells == null) return;
+
+        int id = itemRef != null ? itemRef.gameObject.GetInstanceID() : 0;
 
         foreach (var wc in weapon.GridCells)
         {
@@ -306,26 +369,43 @@ public class BattleGridManager : MonoBehaviour
 
             GetCell(r, c)?.PlaceItem(weapon);
             weapon.OccupyCell(wc.gridPosition);
+
+            if (IsInBounds(r, c))
+            {
+                _itemCells[r, c].ItemType = GridItemType.Gear;
+                _itemCells[r, c].ItemID   = id;
+                _itemCells[r, c].ItemRef  = itemRef;
+            }
         }
+
+        RefreshGearUnitLinks();
     }
 
     /// <summary>
     /// Go 1 WeaponEntry khoi ban co tai vi tri anchor: cac BattleGridCell tuong ung
     /// tro ve UnlockedEmpty (OccupyingWeapon = null) VA goi weapon.ReleaseAllCells()
-    /// de WeaponEntry giai phong toan bo trang thai chiem o cua no.
+    /// de WeaponEntry giai phong toan bo trang thai chiem o cua no. Dong thoi xoa du
+    /// lieu tuong ung trong he thong Cells (chi xoa neu dung ItemID, tranh xoa nham
+    /// item khac neu da bi ghi de) va tu dong RefreshGearUnitLinks().
     /// </summary>
-    public void RemoveGear(int anchorRow, int anchorCol, WeaponEntry weapon)
+    public void RemoveGear(int anchorRow, int anchorCol, WeaponEntry weapon, MonoBehaviour itemRef = null)
     {
         if (weapon == null || weapon.GridCells == null) return;
+
+        int id = itemRef != null ? itemRef.gameObject.GetInstanceID() : 0;
 
         foreach (var wc in weapon.GridCells)
         {
             int r = anchorRow + wc.gridPosition.x;
             int c = anchorCol + wc.gridPosition.y;
             GetCell(r, c)?.RemoveItem();
+
+            if (IsInBounds(r, c) && (itemRef == null || _itemCells[r, c].ItemID == id))
+                _itemCells[r, c].Clear();
         }
 
         weapon.ReleaseAllCells();
+        RefreshGearUnitLinks();
     }
 
     // ── Unit Placement (lien ket voi MyDuckData / UnitPlayerItemUI) ─
@@ -348,67 +428,106 @@ public class BattleGridManager : MonoBehaviour
 
     /// <summary>
     /// Dat 1 Unit (MyDuckData) len ban co tai vi tri anchor theo shape rieng: danh dau
-    /// cac BattleGridCell tuong ung la UnlockedFull (OccupyingUnit = unit).
+    /// cac BattleGridCell tuong ung la UnlockedFull (OccupyingUnit = unit). Dong thoi
+    /// ghi du lieu vao he thong Cells va tu dong RefreshGearUnitLinks().
     /// Goi CanPlaceUnit() truoc de dam bao hop le.
+    /// itemRef: UnitPlayerItemUI dang goi ham nay (dung lam ItemRef/ItemID trong Cells).
     /// </summary>
-    public void PlaceUnit(int anchorRow, int anchorCol, MyDuckData unit, Vector2Int[] shape)
+    public void PlaceUnit(int anchorRow, int anchorCol, MyDuckData unit, Vector2Int[] shape, MonoBehaviour itemRef = null)
     {
         if (shape == null) return;
+
+        int id = itemRef != null ? itemRef.gameObject.GetInstanceID() : 0;
 
         foreach (var o in shape)
         {
             int r = anchorRow + o.x;
             int c = anchorCol + o.y;
             GetCell(r, c)?.PlaceItem(unit);
+
+            if (IsInBounds(r, c))
+            {
+                _itemCells[r, c].ItemType = GridItemType.Unit;
+                _itemCells[r, c].ItemID   = id;
+                _itemCells[r, c].ItemRef  = itemRef;
+            }
         }
+
+        RefreshGearUnitLinks();
     }
 
     /// <summary>
     /// Go 1 Unit khoi ban co tai vi tri anchor theo shape rieng: cac BattleGridCell
-    /// tuong ung tro ve UnlockedEmpty (OccupyingUnit = null).
+    /// tuong ung tro ve UnlockedEmpty (OccupyingUnit = null). Dong thoi xoa du lieu
+    /// tuong ung trong he thong Cells (chi xoa neu dung ItemID) va tu dong
+    /// RefreshGearUnitLinks().
     /// </summary>
-    public void RemoveUnit(int anchorRow, int anchorCol, Vector2Int[] shape)
+    public void RemoveUnit(int anchorRow, int anchorCol, Vector2Int[] shape, MonoBehaviour itemRef = null)
     {
         if (shape == null) return;
+
+        int id = itemRef != null ? itemRef.gameObject.GetInstanceID() : 0;
 
         foreach (var o in shape)
         {
             int r = anchorRow + o.x;
             int c = anchorCol + o.y;
             GetCell(r, c)?.RemoveItem();
+
+            if (IsInBounds(r, c) && (itemRef == null || _itemCells[r, c].ItemID == id))
+                _itemCells[r, c].Clear();
         }
+
+        RefreshGearUnitLinks();
     }
 
-    // ── Adjacency Query (item nao lien ke voi item nao) ─────────
+    // ── Cells System — Links Gear-Unit ──────────────────────────
+
+    private bool IsInBounds(int r, int c) => _itemCells != null && r >= 0 && r < rows && c >= 0 && c < columns;
 
     /// <summary>
-    /// Lấy danh sách các item UI (GearItemUI/UnitPlayerItemUI, qua BattleGridCell.OccupyingItemUI)
-    /// đang chiếm các ô KỀ (4 hướng: trên/dưới/trái/phải) với shape tại anchor cho trước.
-    /// Loại trừ chính "self" (item đang hỏi) và loại trùng lặp (1 item to có thể kề nhiều ô).
-    /// Dùng làm nền cho các hàm kiểm tra "item A có liền kề item B loại X nào không".
+    /// Quét TOÀN BỘ hệ thống Cells (GridItemCell[,]), tìm mọi GearItem đang có ÍT NHẤT 1 ô
+    /// liền kề (4 hướng) với 1 UnitItem — gọi GearItemUI.OnConnect() (hiệu ứng "Đã kết nối!")
+    /// cho các Gear đó. Được gọi TỰ ĐỘNG mỗi khi Cells thay đổi (PlaceGear/RemoveGear/
+    /// PlaceUnit/RemoveUnit), không cần gọi tay từ bên ngoài.
+    /// Dùng ItemID (không phải Type+Tier) để nhóm đúng các ô thuộc CÙNG 1 Gear instance,
+    /// tránh nhầm 2 Gear khác nhau nhưng cùng loại+tier thành 1.
     /// </summary>
-    public System.Collections.Generic.List<MonoBehaviour> GetAdjacentOccupants(
-        int anchorRow, int anchorCol, Vector2Int[] shape, MonoBehaviour self)
+    public void RefreshGearUnitLinks()
     {
-        var result = new System.Collections.Generic.List<MonoBehaviour>();
-        if (shape == null) return result;
+        if (_itemCells == null) return;
 
         int[] dr = { -1, 1, 0, 0 };
         int[] dc = {  0, 0,-1, 1 };
 
-        foreach (var offset in shape)
+        var linkedGearIDs = new HashSet<int>();
+        var gearRefByID   = new Dictionary<int, MonoBehaviour>();
+
+        for (int r = 0; r < rows; r++)
         {
-            int r = anchorRow + offset.x;
-            int c = anchorCol + offset.y;
-            for (int d = 0; d < 4; d++)
+            for (int c = 0; c < columns; c++)
             {
-                var neighbor = GetCell(r + dr[d], c + dc[d]);
-                var occ = neighbor?.OccupyingItemUI;
-                if (occ != null && occ != self && !result.Contains(occ))
-                    result.Add(occ);
+                var cell = _itemCells[r, c];
+                if (cell.ItemType != GridItemType.Gear || cell.ItemRef == null) continue;
+
+                gearRefByID[cell.ItemID] = cell.ItemRef;
+                if (linkedGearIDs.Contains(cell.ItemID)) continue;
+
+                for (int d = 0; d < 4; d++)
+                {
+                    int nr = r + dr[d], nc = c + dc[d];
+                    if (!IsInBounds(nr, nc)) continue;
+                    if (_itemCells[nr, nc].ItemType == GridItemType.Unit)
+                    {
+                        linkedGearIDs.Add(cell.ItemID);
+                        break;
+                    }
+                }
             }
         }
-        return result;
+
+        foreach (var id in linkedGearIDs)
+            (gearRefByID[id] as GearItemUI)?.OnConnect();
     }
 
     // ── Helpers ──────────────────────────────────────────────
