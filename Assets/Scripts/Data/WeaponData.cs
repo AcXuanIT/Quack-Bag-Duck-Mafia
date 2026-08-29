@@ -85,8 +85,15 @@ public class WeaponEntry
 
     // ─── Spawn ───────────────────────────────────────────────
     [Header("=== Spawn ===")]
-    [Tooltip("Thời gian delay (giây) trước khi weapon spawn")]
+    [Tooltip("Chu kỳ (giây) giữa mỗi lần weapon này spawn 1 UnitDuck trên Grid (BattleSpawnDuck) " +
+             "— KHÔNG liên quan tới tốc độ tấn công, xem TimeAttack bên dưới.")]
     public float TimeDelay;
+
+    // ─── Attack ────────────────────────────────────────────────
+    [Header("=== Attack ===")]
+    [Tooltip("Tốc độ tấn công (giây/đòn) của UnitDuck/EnemyDuck khi cầm weapon này " +
+             "— dùng trong Duck.UpdateAttack() để tính chu kỳ ra đòn.")]
+    public float TimeAttack = 1f;
 
     // ─── Public API ───────────────────────────────────────────
 

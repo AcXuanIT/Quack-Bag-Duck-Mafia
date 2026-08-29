@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 5
     Name: Vit Dich Nem Luoi
     Tier: 2
-    BaseHP: 70
+    BaseHP: 210
     BaseDamage: 11
     SpriteTier1: {fileID: 21300000, guid: 0b63d846c9050fb4889350e1df77a96b, type: 2}
     SpriteTier2: {fileID: 21300000, guid: d4895bf86d3b934438c631283bb660ae, type: 2}
@@ -38,6 +38,7 @@ MonoBehaviour:
       SpriteTier3: {fileID: 0}
       SpriteTier4: {fileID: 0}
       ShapeSprite: {fileID: 0}
+      ShapeFill: {fileID: 0}
       GridCells: []
       Level: 1
       XP: 0
@@ -59,6 +60,7 @@ MonoBehaviour:
       Coin: 0
       IsLocked: 0
       TimeDelay: 0
+      TimeAttack: 1
     RewardCoin: 9
     RewardExp: 9
     SpawnWave: 3

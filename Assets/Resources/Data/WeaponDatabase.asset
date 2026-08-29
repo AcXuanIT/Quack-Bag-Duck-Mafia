@@ -23,9 +23,9 @@ MonoBehaviour:
     ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -36,16 +36,17 @@ MonoBehaviour:
     - 95
     - 115
     HPPerLevel:
-    - 200
-    - 260
-    - 330
-    - 410
-    - 500
+    - 600
+    - 780
+    - 990
+    - 1230
+    - 1500
     AttackRange: 1
     LevelLock: 0
     Coin: 100
     IsLocked: 0
-    TimeDelay: 0.5
+    TimeDelay: 1
+    TimeAttack: 1
   - ID: 9002
     Name: Test Bow Ban Cung
     SpriteTier1: {fileID: 21300000, guid: 0335f14d9344ad54fa790d0e231a3802, type: 2}
@@ -67,16 +68,17 @@ MonoBehaviour:
     - 152
     - 184
     HPPerLevel:
-    - 180
-    - 234
-    - 297
-    - 369
-    - 450
+    - 540
+    - 702
+    - 891
+    - 1107
+    - 1350
     AttackRange: 1
     LevelLock: 0
     Coin: 150
     IsLocked: 0
-    TimeDelay: 0.8
+    TimeDelay: 1.6
+    TimeAttack: 1
   - ID: 3
     Name: Shotgun Blast
     SpriteTier1: {fileID: 21300000, guid: e29b4fc6a5484a44992d470f12b36de4, type: 2}
@@ -87,11 +89,11 @@ MonoBehaviour:
     ShapeFill: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -102,16 +104,17 @@ MonoBehaviour:
     - 228
     - 276
     HPPerLevel:
-    - 220
-    - 286
-    - 363
-    - 451
-    - 550
+    - 660
+    - 858
+    - 1089
+    - 1353
+    - 1650
     AttackRange: 1
     LevelLock: 0
     Coin: 200
     IsLocked: 0
-    TimeDelay: 1
+    TimeDelay: 2
+    TimeAttack: 1
   - ID: 4
     Name: Sniper SR-1
     SpriteTier1: {fileID: 21300000, guid: f976d78aafac9604e852061b1de9c6dd, type: 2}
@@ -133,16 +136,17 @@ MonoBehaviour:
     - 380
     - 460
     HPPerLevel:
-    - 150
-    - 195
-    - 248
-    - 308
-    - 375
+    - 450
+    - 585
+    - 744
+    - 924
+    - 1125
     AttackRange: 1
     LevelLock: 0
     Coin: 250
     IsLocked: 0
-    TimeDelay: 1.5
+    TimeDelay: 3
+    TimeAttack: 1
   - ID: 5
     Name: SMG Rush
     SpriteTier1: {fileID: 21300000, guid: 7216ef482af38a44d8fdbe67f9975d22, type: 2}
@@ -166,16 +170,17 @@ MonoBehaviour:
     - 114
     - 138
     HPPerLevel:
-    - 250
-    - 325
-    - 412
-    - 512
-    - 625
+    - 750
+    - 975
+    - 1236
+    - 1536
+    - 1875
     AttackRange: 1
     LevelLock: 0
     Coin: 180
     IsLocked: 0
-    TimeDelay: 0.6
+    TimeDelay: 1.2
+    TimeAttack: 1
   - ID: 6
     Name: Laser Cutter
     SpriteTier1: {fileID: 21300000, guid: e8620715c131c054d8344c93fe6334e1, type: 2}
@@ -199,16 +204,17 @@ MonoBehaviour:
     - 285
     - 345
     HPPerLevel:
-    - 170
-    - 221
-    - 280
-    - 348
-    - 425
+    - 510
+    - 663
+    - 840
+    - 1044
+    - 1275
     AttackRange: 1
     LevelLock: 0
     Coin: 300
     IsLocked: 0
-    TimeDelay: 1.2
+    TimeDelay: 2.4
+    TimeAttack: 1
   - ID: 7
     Name: RPG Launch
     SpriteTier1: {fileID: 21300000, guid: 5f0f0df25ea098b4da347aa42c7473fd, type: 2}
@@ -232,16 +238,17 @@ MonoBehaviour:
     - 570
     - 690
     HPPerLevel:
-    - 300
-    - 390
-    - 495
-    - 615
-    - 750
+    - 900
+    - 1170
+    - 1485
+    - 1845
+    - 2250
     AttackRange: 1
     LevelLock: 0
     Coin: 400
     IsLocked: 0
-    TimeDelay: 2
+    TimeDelay: 4
+    TimeAttack: 1
   - ID: 8
     Name: Grenade Toss
     SpriteTier1: {fileID: 21300000, guid: cf0cfe4fdd3427d4eac7323b0802a50d, type: 2}
@@ -267,16 +274,17 @@ MonoBehaviour:
     - 475
     - 575
     HPPerLevel:
-    - 280
-    - 364
-    - 462
-    - 574
-    - 700
+    - 840
+    - 1092
+    - 1386
+    - 1722
+    - 2100
     AttackRange: 1
     LevelLock: 0
     Coin: 350
     IsLocked: 0
-    TimeDelay: 1.8
+    TimeDelay: 3.6
+    TimeAttack: 1
   - ID: 9
     Name: Plasma Gun
     SpriteTier1: {fileID: 21300000, guid: 85a012188f8bf7d4eaa5a8ba3b420e6b, type: 2}
@@ -287,9 +295,9 @@ MonoBehaviour:
     ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -300,16 +308,17 @@ MonoBehaviour:
     - 342
     - 414
     HPPerLevel:
-    - 210
-    - 273
-    - 346
-    - 430
-    - 525
+    - 630
+    - 819
+    - 1038
+    - 1290
+    - 1575
     AttackRange: 1
     LevelLock: 0
     Coin: 320
     IsLocked: 0
-    TimeDelay: 1.3
+    TimeDelay: 2.6
+    TimeAttack: 1
   - ID: 10
     Name: Rail Driver
     SpriteTier1: {fileID: 21300000, guid: 9e465033521661a4394fed777aaa3558, type: 2}
@@ -320,9 +329,9 @@ MonoBehaviour:
     ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -333,16 +342,17 @@ MonoBehaviour:
     - 418
     - 506
     HPPerLevel:
-    - 190
-    - 247
-    - 314
-    - 390
-    - 475
+    - 570
+    - 741
+    - 942
+    - 1170
+    - 1425
     AttackRange: 1
     LevelLock: 0
     Coin: 380
     IsLocked: 0
-    TimeDelay: 1.6
+    TimeDelay: 3.2
+    TimeAttack: 1
   - ID: 11
     Name: Arc Cannon
     SpriteTier1: {fileID: 21300000, guid: bd5cba237c00e0640b0624b30debfe57, type: 2}
@@ -353,11 +363,11 @@ MonoBehaviour:
     ShapeFill: {fileID: -388773172, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 1, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -368,16 +378,17 @@ MonoBehaviour:
     - 304
     - 368
     HPPerLevel:
-    - 230
-    - 299
-    - 380
-    - 472
-    - 575
+    - 690
+    - 897
+    - 1140
+    - 1416
+    - 1725
     AttackRange: 1
     LevelLock: 0
     Coin: 280
     IsLocked: 0
-    TimeDelay: 1.1
+    TimeDelay: 2.2
+    TimeAttack: 1
   - ID: 12
     Name: Missile Pod
     SpriteTier1: {fileID: 21300000, guid: 05e0241a92f7a5c499859916e479414c, type: 2}
@@ -388,9 +399,9 @@ MonoBehaviour:
     ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
     GridCells:
     - gridPosition: {x: 0, y: 0}
-      isOccupied: 0
+      isOccupied: 1
     - gridPosition: {x: 0, y: 1}
-      isOccupied: 0
+      isOccupied: 1
     Level: 1
     XP: 0
     XPToNextLevel: 100
@@ -401,16 +412,17 @@ MonoBehaviour:
     - 532
     - 644
     HPPerLevel:
-    - 260
-    - 338
-    - 429
-    - 533
-    - 650
+    - 780
+    - 1014
+    - 1287
+    - 1599
+    - 1950
     AttackRange: 1
     LevelLock: 0
     Coin: 420
     IsLocked: 0
-    TimeDelay: 1.9
+    TimeDelay: 3.8
+    TimeAttack: 1
   - ID: 13
     Name: Shadow Blade
     SpriteTier1: {fileID: 21300000, guid: 0dbef0dc0f367254db97fde900944f92, type: 2}
@@ -432,13 +444,14 @@ MonoBehaviour:
     - 665
     - 805
     HPPerLevel:
-    - 350
-    - 455
-    - 578
-    - 718
-    - 875
+    - 1050
+    - 1365
+    - 1734
+    - 2154
+    - 2625
     AttackRange: 1
     LevelLock: 0
     Coin: 500
     IsLocked: 1
-    TimeDelay: 2.5
+    TimeDelay: 5
+    TimeAttack: 1

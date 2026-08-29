@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 3
     Name: Vit Cung Thu
     Tier: 1
-    BaseHP: 90
+    BaseHP: 270
     BaseDamage: 15
     SpriteTier1: {fileID: 21300000, guid: f3d434c90118cb94b940f4918d62f40a, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 15b3a576f14a2c94fb58f45acbc551b0, type: 2}

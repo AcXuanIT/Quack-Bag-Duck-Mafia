@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 2
     Name: Vit Chien Binh
     Tier: 1
-    BaseHP: 120
+    BaseHP: 360
     BaseDamage: 12
     SpriteTier1: {fileID: 21300000, guid: ccc00a452214910418bbf76d63470d61, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 8efd3b09f1937a843b2ba049aaf48c1d, type: 2}

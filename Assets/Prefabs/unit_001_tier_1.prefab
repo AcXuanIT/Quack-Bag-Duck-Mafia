@@ -59,7 +59,7 @@ MonoBehaviour:
   chaseDelay: 0.4
   chaseDuration: 0.5
   chaseEase: 7
-  testHP: 1
+  testHP: 0.856
 --- !u!223 &3955083332382827196
 Canvas:
   m_ObjectHideFlags: 0
@@ -513,7 +513,7 @@ Rigidbody2D:
   m_GameObject: {fileID: 5535085941312086466}
   m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -547,6 +547,7 @@ MonoBehaviour:
   weaponRangeCollider: {fileID: 4024867016538830268}
   duckAnimation: {fileID: 7213698348271610182}
   hpBar: {fileID: 1764138375568122646}
+  moveSpeed: 1
 --- !u!1 &5952083493070786000
 GameObject:
   m_ObjectHideFlags: 0

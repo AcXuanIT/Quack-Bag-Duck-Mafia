@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 1
     Name: Vit Thuong
     Tier: 1
-    BaseHP: 100
+    BaseHP: 300
     BaseDamage: 10
     SpriteTier1: {fileID: 21300000, guid: 7d6b3920435b1144aab0141445b5a98e, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 4e6fa7cb407a8a94daea2e7dfe93bfac, type: 2}

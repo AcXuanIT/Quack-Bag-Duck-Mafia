@@ -76,7 +76,8 @@ public struct GridItemCell
 /// ô. Mỗi khi PlaceGear/RemoveGear/PlaceUnit/RemoveUnit chạy (thêm hoặc xoá item khỏi Grid),
 /// hệ thống tự động ghi/xoá dữ liệu tương ứng trong Cells, rồi gọi RefreshGearUnitLinks() để
 /// quét lại toàn bộ Cells và cập nhật trạng thái "liên kết" giữa GearItem và UnitItem liền kề
-/// (hiện hiệu ứng OnConnect() trên các Gear đang liền kề ít nhất 1 Unit).
+/// (hiện hiệu ứng OnConnect() + bật cờ IsLinkedToUnit trên các Gear đang liền kề ít nhất 1 Unit;
+/// tắt cờ đó trên các Gear không còn liền kề Unit nào).
 /// </summary>
 public class BattleGridManager : MonoBehaviour
 {
@@ -386,7 +387,9 @@ public class BattleGridManager : MonoBehaviour
     /// tro ve UnlockedEmpty (OccupyingWeapon = null) VA goi weapon.ReleaseAllCells()
     /// de WeaponEntry giai phong toan bo trang thai chiem o cua no. Dong thoi xoa du
     /// lieu tuong ung trong he thong Cells (chi xoa neu dung ItemID, tranh xoa nham
-    /// item khac neu da bi ghi de) va tu dong RefreshGearUnitLinks().
+    /// item khac neu da bi ghi de), tat co IsLinkedToUnit tren chinh Gear vua bi go
+    /// (vi no khong con trong Cells nen RefreshGearUnitLinks() se khong tu cap nhat
+    /// duoc no nua) va tu dong RefreshGearUnitLinks() cho phan con lai cua ban co.
     /// </summary>
     public void RemoveGear(int anchorRow, int anchorCol, WeaponEntry weapon, MonoBehaviour itemRef = null)
     {
@@ -405,6 +408,7 @@ public class BattleGridManager : MonoBehaviour
         }
 
         weapon.ReleaseAllCells();
+        (itemRef as GearItemUI)?.SetLinkedUnits(null);
         RefreshGearUnitLinks();
     }
 
@@ -488,8 +492,10 @@ public class BattleGridManager : MonoBehaviour
     /// <summary>
     /// Quét TOÀN BỘ hệ thống Cells (GridItemCell[,]), tìm mọi GearItem đang có ÍT NHẤT 1 ô
     /// liền kề (4 hướng) với 1 UnitItem — gọi GearItemUI.OnConnect() (hiệu ứng "Đã kết nối!")
-    /// cho các Gear đó. Được gọi TỰ ĐỘNG mỗi khi Cells thay đổi (PlaceGear/RemoveGear/
-    /// PlaceUnit/RemoveUnit), không cần gọi tay từ bên ngoài.
+    /// VÀ bật cờ IsLinkedToUnit (qua SetLinkedToUnit(true)) cho các Gear đó. Với các Gear đang
+    /// tồn tại trên Grid nhưng KHÔNG (còn) liền kề Unit nào, tắt cờ đó (SetLinkedToUnit(false))
+    /// để GearItemUI biết dừng chạy fillImage. Được gọi TỰ ĐỘNG mỗi khi Cells thay đổi
+    /// (PlaceGear/RemoveGear/PlaceUnit/RemoveUnit), không cần gọi tay từ bên ngoài.
     /// Dùng ItemID (không phải Type+Tier) để nhóm đúng các ô thuộc CÙNG 1 Gear instance,
     /// tránh nhầm 2 Gear khác nhau nhưng cùng loại+tier thành 1.
     /// </summary>
@@ -500,37 +506,89 @@ public class BattleGridManager : MonoBehaviour
         int[] dr = { -1, 1, 0, 0 };
         int[] dc = {  0, 0,-1, 1 };
 
-        var linkedGearIDs = new HashSet<int>();
-        var gearRefByID   = new Dictionary<int, MonoBehaviour>();
+        // Gom TAT CA UnitPlayerItemUI dang lien ke (4 huong) theo tung Gear (nhom theo
+        // ItemID de tranh nham 2 Gear khac nhau cung Type+Tier), khong chi mot flag co/khong.
+        var unitsByGearID = new Dictionary<int, List<UnitPlayerItemUI>>();
+        var gearRefByID   = new Dictionary<int, GearItemUI>();
 
         for (int r = 0; r < rows; r++)
         {
             for (int c = 0; c < columns; c++)
             {
                 var cell = _itemCells[r, c];
-                if (cell.ItemType != GridItemType.Gear || cell.ItemRef == null) continue;
+                var gear = cell.ItemType == GridItemType.Gear ? cell.ItemRef as GearItemUI : null;
+                if (gear == null) continue;
 
-                gearRefByID[cell.ItemID] = cell.ItemRef;
-                if (linkedGearIDs.Contains(cell.ItemID)) continue;
+                gearRefByID[cell.ItemID] = gear;
+                if (!unitsByGearID.TryGetValue(cell.ItemID, out var list))
+                {
+                    list = new List<UnitPlayerItemUI>();
+                    unitsByGearID[cell.ItemID] = list;
+                }
 
                 for (int d = 0; d < 4; d++)
                 {
                     int nr = r + dr[d], nc = c + dc[d];
                     if (!IsInBounds(nr, nc)) continue;
-                    if (_itemCells[nr, nc].ItemType == GridItemType.Unit)
+                    var neighbor = _itemCells[nr, nc];
+                    if (neighbor.ItemType == GridItemType.Unit
+                        && neighbor.ItemRef is UnitPlayerItemUI unit
+                        && !list.Contains(unit))
                     {
-                        linkedGearIDs.Add(cell.ItemID);
-                        break;
+                        list.Add(unit);
                     }
                 }
             }
         }
 
-        foreach (var id in linkedGearIDs)
-            (gearRefByID[id] as GearItemUI)?.OnConnect();
+        // Day danh sach lien ket thuc su vao dung GearItemUI tuong ung.
+        foreach (var kv in gearRefByID)
+        {
+            var units = unitsByGearID.TryGetValue(kv.Key, out var l) ? l : new List<UnitPlayerItemUI>();
+            kv.Value.SetLinkedUnits(units);
+            if (units.Count > 0) kv.Value.OnConnect();
+        }
     }
 
-    // ── Helpers ──────────────────────────────────────────────
+    /// <summary>
+    /// Lấy (truy vấn tức thời, không dùng cache) danh sách UnitPlayerItemUI hiện đang liền kề
+    /// (4 hướng) với TOÀN BỘ các ô mà gear đang chiếm trên Grid. Dùng cho debug/kiểm tra —
+    /// luồng chính (GearItemUI.LinkedUnits) đã được RefreshGearUnitLinks() cập nhật tự động.
+    /// </summary>
+    public List<UnitPlayerItemUI> GetLinkedUnits(GearItemUI gear)
+    {
+        var result = new List<UnitPlayerItemUI>();
+        if (gear == null || _itemCells == null || !gear.IsPlacedOnGrid) return result;
+
+        int gearId = gear.gameObject.GetInstanceID();
+        int[] dr = { -1, 1, 0, 0 };
+        int[] dc = {  0, 0,-1, 1 };
+
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < columns; c++)
+            {
+                var cell = _itemCells[r, c];
+                if (cell.ItemType != GridItemType.Gear || cell.ItemID != gearId) continue;
+
+                for (int d = 0; d < 4; d++)
+                {
+                    int nr = r + dr[d], nc = c + dc[d];
+                    if (!IsInBounds(nr, nc)) continue;
+                    var neighbor = _itemCells[nr, nc];
+                    if (neighbor.ItemType == GridItemType.Unit
+                        && neighbor.ItemRef is UnitPlayerItemUI unit
+                        && !result.Contains(unit))
+                    {
+                        result.Add(unit);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    // ── Helpers ───────────
 
     public int CountUnlockedEmpty()
     {

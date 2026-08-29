@@ -64,7 +64,10 @@ public class BatteCameraEffect : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        btnStartWar.onClick.AddListener(() => ToggleEffect());
+        btnStartWar.onClick.AddListener(() => {
+            ToggleEffect();
+            BattleManager.Instance.FinishTurnSetup();
+        });
 
         CacheOriginalValues();
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,7 +18,7 @@ using DG.Tweening;
 ///   - Nếu Weapon chưa có GridCells (rỗng/null), fallback về shape 1 ô [0,0].
 ///
 /// ĐẶT (PLACE) LÊN GRID — override TOÀN BỘ luồng kéo-thả của TierShopItemUI (giống UnitPlayerItemUI,
-/// KHÔNG dùng chung step "Unlock 1 ô Locked" hay auto-Discard() sau khi đặt của lớp cha):
+/// KHÔNG dùng chung step \"Unlock 1 ô Locked\" hay auto-Discard() sau khi đặt của lớp cha):
 ///   - Chỉ đặt được vào các ô ĐANG Unlocked (UnlockedEmpty) — KHÔNG unlock ô Locked.
 ///   - Khi hover trong lúc kéo: tô màu xanh/đỏ lên ĐÚNG các ô shape của Weapon (có thể nhiều
 ///     hơn 1 ô, hình dạng bất kỳ) để báo hợp lệ hay không — KHÔNG hiện lại các ô Locked ẩn.
@@ -49,6 +50,36 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
 
     private WeaponEntry _weapon;
     public  WeaponEntry Weapon => _weapon;
+
+    [Header("Charge Fill (chi chay khi BattleManager o trang thai TurnBattle)")]
+    [Tooltip("Neu bat, fillImage se chay day tu duoi len tren theo weapon.TimeDelay, het gio thi spawn UnitDuck cho tung Unit lien ket roi chay lai tu dau. Chi chay khi Gear dang lien ket (ke can) voi it nhat 1 UnitItem tren Grid.")]
+    [SerializeField] private bool chargeFillEnabled = true;
+    private float _chargeTimer;
+
+    [Header("Spawn Duck (khi fillImage chay day 1 vong)")]
+    [Tooltip("Prefab UnitDuck dung de spawn khi fillImage chay day (VD unit_001_tier_1 da gan script UnitDuck).")]
+    [SerializeField] private GameObject unitDuckPrefab;
+    [Tooltip("Vi tri spawn UnitDuck (world space). Neu de trong, mac dinh spawn tai vi tri hien tai cua chinh Gear nay.")]
+    [SerializeField] private Transform spawnPoint;
+
+    /// <summary>
+    /// Danh sách UnitPlayerItemUI đang LIỀN KỀ (4 hướng) với Gear này trên Battle Grid — do
+    /// BattleGridManager.RefreshGearUnitLinks() cập nhật mỗi khi hệ thống Cells thay đổi
+    /// (đặt/gỡ Gear hoặc Unit). Rỗng nếu Gear chưa đặt lên Grid hoặc không liền kề Unit nào.
+    /// </summary>
+    private readonly List<UnitPlayerItemUI> _linkedUnits = new List<UnitPlayerItemUI>();
+    public IReadOnlyList<UnitPlayerItemUI> LinkedUnits => _linkedUnits;
+
+    /// <summary>Đang liền kề (4 hướng) với ít nhất 1 UnitItem trên Grid hay không (LinkedUnits.Count > 0).</summary>
+    public bool IsLinkedToUnit => _linkedUnits.Count > 0;
+
+    /// <summary>
+    /// Phát khi 1 Gear ĐÃ ĐẶT trên Grid chạy đầy fillImage (đủ weapon.TimeDelay giây) trong lúc
+    /// BattleManager đang ở TurnBattle — tín hiệu để hệ thống spawn (VD BattleSpawnDuck trong
+    /// tương lai) biết cần spawn 1 UnitDuck tương ứng với Gear này. Static để bất kỳ listener
+    /// nào cũng đăng ký được mà không cần tham chiếu tới từng instance GearItemUI cụ thể.
+    /// </summary>
+    public static event System.Action<GearItemUI> OnGearFullCharge;
 
     // ─── Runtime: vị trí trên Grid (null nếu đang ở trong Shop, chưa đặt) ─────
     private BattleGridCell _placedAnchorCell;    // anchor hiện tại (ứng với offset (0,0) của shape) NẾU đang nằm trên Grid
@@ -100,13 +131,96 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
         _placedAnchorCell    = null;
         _dragStartAnchorCell = null;
         _hoveredAnchor        = null;
+        _linkedUnits.Clear();
 
         if (_weapon == null)
             Debug.LogWarning("[GearItemUI] Setup() nhan WeaponEntry NULL!");
 
         ApplyShapeSize(GetShapeCells());
         ApplyIconLayout();
+        SetupChargeFillImage();
         RefreshVisual();
+
+        _chargeTimer = 0f;
+    }
+
+    /// <summary>Cấu hình fillImage 1 lần thành dạng Filled/Vertical/Bottom để chạy đầy từ dưới lên trên.</summary>
+    private void SetupChargeFillImage()
+    {
+        if (fillImage == null) return;
+        fillImage.type       = Image.Type.Filled;
+        fillImage.fillMethod = Image.FillMethod.Vertical;
+        fillImage.fillOrigin = (int)Image.OriginVertical.Bottom;
+        fillImage.fillAmount = 0f;
+    }
+
+    /// <summary>
+    /// Cập nhật bởi BattleGridManager.RefreshGearUnitLinks() mỗi khi Cells thay đổi (đặt/gỡ Gear
+    /// hoặc Unit trên Grid). Truyền danh sách UnitPlayerItemUI hiện đang liền kề (4 hướng) với
+    /// Gear này — null hoặc rỗng nghĩa là không còn liền kề Unit nào.
+    /// </summary>
+    public void SetLinkedUnits(List<UnitPlayerItemUI> units)
+    {
+        _linkedUnits.Clear();
+        if (units != null) _linkedUnits.AddRange(units);
+    }
+
+    /// <summary>
+    /// Chỉ chạy khi: đã đặt trên Grid (IsPlacedOnGrid) + đang liền kề ít nhất 1 UnitItem
+    /// (IsLinkedToUnit) + BattleManager đang ở TurnBattle.
+    /// fillImage chạy đầy từ dưới lên trên trong đúng weapon.TimeDelay giây; khi chạy đầy
+    /// (fillAmount = 1) thì phát OnGearFullCharge (tín hiệu spawn duck) rồi CHẠY LẠI TỪ ĐẦU
+    /// (fillAmount về 0, timer reset). Ở mọi trường hợp khác (chưa đặt lên Grid, chưa liên kết
+    /// với Unit nào, hoặc BattleManager không ở TurnBattle) thì fill về 0 và không đếm giờ.
+    /// </summary>
+    private void Update()
+    {
+        if (!chargeFillEnabled || fillImage == null || _weapon == null) return;
+
+
+        bool isWar = IsPlacedOnGrid
+            && IsLinkedToUnit
+            && BattleManager.Instance != null
+            && BattleManager.Instance.CurrentState == BattleManager.BattleState.TurnBattle;
+
+        if (!isWar)
+        {
+            if (_chargeTimer != 0f || fillImage.fillAmount != 0f)
+            {
+                _chargeTimer = 0f;
+                fillImage.fillAmount = 0f;
+            }
+            return;
+        }
+
+        float duration = _weapon.TimeDelay > 0f ? _weapon.TimeDelay : 1f;
+        _chargeTimer += Time.deltaTime;
+        fillImage.fillAmount = Mathf.Clamp01(_chargeTimer / duration);
+
+        if (_chargeTimer >= duration)
+        {
+            _chargeTimer = 0f;
+            fillImage.fillAmount = 0f;
+
+            SpawnLinkedDucks();
+            OnGearFullCharge?.Invoke(this);
+        }
+    }
+
+    /// <summary>
+    /// Gọi khi fillImage chạy đầy 1 vòng (đủ weapon.TimeDelay giây) — lấy LinkedUnits (danh
+    /// sách UnitItem đang liền kề Gear này) và spawn 1 bản UnitDuck cho MỖI Unit trong danh
+    /// sách đó (có thể spawn nhiều cùng lúc nếu Gear liền kề nhiều Unit).
+    /// </summary>
+    private void SpawnLinkedDucks()
+    {
+        if (_linkedUnits.Count == 0) return;
+
+        foreach (var unit in _linkedUnits)
+        {
+            if (unit == null || unit.Unit == null) continue;
+            BattleManager.Instance.spawnDuck.SpawnDuck(_weapon, unit.Unit , CurrentTier , unit.CurrentTier);
+        }
     }
 
     /// <summary>

@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 4
     Name: Vit Dich Nhanh
     Tier: 2
-    BaseHP: 55
+    BaseHP: 165
     BaseDamage: 9
     SpriteTier1: {fileID: 21300000, guid: 3095f5e4c4facc04ba996e23e0eefb18, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 3ddc85895db803446b90e275be287cf0, type: 2}
@@ -38,6 +38,7 @@ MonoBehaviour:
       SpriteTier3: {fileID: 0}
       SpriteTier4: {fileID: 0}
       ShapeSprite: {fileID: 0}
+      ShapeFill: {fileID: 0}
       GridCells: []
       Level: 1
       XP: 0
@@ -59,6 +60,7 @@ MonoBehaviour:
       Coin: 0
       IsLocked: 0
       TimeDelay: 0
+      TimeAttack: 1
     RewardCoin: 8
     RewardExp: 8
     SpawnWave: 2

@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3178959799809631040
 RectTransform:
   m_ObjectHideFlags: 0
@@ -52,7 +52,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 132424420006941384}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -222,8 +222,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fillImage: {fileID: 1585554420930105159}
   iconImage: {fileID: 893698359706214515}
-  nameText: {fileID: 0}
-  levelText: {fileID: 0}
   tierColors:
   - {r: 0.55, g: 0.55, b: 0.55, a: 0.39215687}
   - {r: 0.25, g: 0.55, b: 1, a: 0.39215687}
@@ -234,11 +232,14 @@ MonoBehaviour:
   colorTrash: {r: 1, g: 0.3, b: 0.3, a: 0.9}
   bgImage: {fileID: 7625506140196040052}
   textConnect: {fileID: 1994340571781848696}
-  connectFadeDuration: 0.2
+  connectFadeDuration: 0.4
   frameImage: {fileID: 0}
   tierFrames: []
   colorValid: {r: 0.2, g: 1, b: 0.3, a: 0.9}
   colorInvalid: {r: 1, g: 0.2, b: 0.2, a: 0.9}
+  chargeFillEnabled: 1
+  unitDuckPrefab: {fileID: 5535085941312086466, guid: cf546c6daa346f94c86ee6f01a55b340, type: 3}
+  spawnPoint: {fileID: 0}
 --- !u!1 &4827855866259167147
 GameObject:
   m_ObjectHideFlags: 0

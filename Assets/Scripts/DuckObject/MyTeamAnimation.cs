@@ -6,14 +6,19 @@ using DG.Tweening;
 ///   1) PlaySpawnAnimation() — hiệu ứng "nảy" khi spawn (stretch → squash),
 ///      cùng kiến trúc chuyển động với DuckMoveAnimation nhưng KHÔNG lặp vô hạn,
 ///      chỉ chạy đúng 1 chu kỳ rồi dừng. Có cờ _isPlaying chặn gọi chồng lấp.
-///   2) PlayDamageFlash() — nháy trắng SpriteRenderer khi nhận damage.
+///   2) AnimationSpawn() — object "nhún" 1 lần trong 1 giây:
+///      (y,x) -> (y+0.05,x-0.05) -> (y,x) -> (y-0.05,x+0.05) -> (y,x).
+///      Nếu có nhiều tín hiệu spawn dồn dập trong lúc đang chạy thì KHÔNG huỷ
+///      animation hiện tại — chỉ ghi nhận có tín hiệu mới, đợi animation hiện
+///      tại chạy XONG rồi mới chạy lại thêm 1 lần.
+///   3) PlayDamageFlash() — nháy trắng SpriteRenderer khi nhận damage.
 /// </summary>
 public class MyTeamAnimation : MonoBehaviour
 {
     [Header("=== Spawn Animation ===")]
     public float stepDuration = 0.22f;
     public Ease  stepEase     = Ease.InOutSine;
-    public float pauseDelay   = 0.05f;
+    public float pauseDelay   = 0.005f;
 
     private Sequence _seq;
     private Vector3  _base;
@@ -85,6 +90,64 @@ public class MyTeamAnimation : MonoBehaviour
         });
     }
 
+    // ─── Bounce Animation (AnimationSpawn) ───────────────────
+
+    private Sequence _bounceSeq;
+    private bool     _isBouncing;
+    private bool     _bouncePending;
+
+    /// <summary>True khi hiệu ứng nhún (AnimationSpawn) đang chạy dở.</summary>
+    public bool IsBouncing => _isBouncing;
+
+    /// <summary>
+    /// Cho object "nhún" 1 lần trong tổng thời gian 1 giây:
+    ///   (y,x) -> (y+0.05, x-0.05) -> (y,x) -> (y-0.05, x+0.05) -> (y,x)
+    ///
+    /// Nếu có nhiều tín hiệu spawn dồn dập trong lúc animation đang chạy,
+    /// KHÔNG huỷ animation hiện tại giữa chừng — chỉ đánh dấu "có tín hiệu mới
+    /// đang chờ" (_bouncePending). Khi animation hiện tại chạy XONG mới nhận
+    /// tín hiệu đó và tự chạy lại thêm 1 lần. Nhiều tín hiệu dồn dập trong lúc
+    /// đó chỉ gộp lại thành ĐÚNG 1 lần chạy tiếp theo (không xếp hàng dài vô hạn).
+    /// </summary>
+    public void AnimationSpawn()
+    {
+        if (_isBouncing)
+        {
+            _bouncePending = true;
+            return;
+        }
+
+        PlayBounceOnce();
+    }
+
+    private void PlayBounceOnce()
+    {
+        _isBouncing = true;
+        _bouncePending = false;
+
+        _bounceSeq?.Kill();
+
+        const float totalDuration = 0.5f;
+        float stepTime = totalDuration / 4f;
+
+        var up   = new Vector3(_base.x - 0.005f, _base.y + 0.005f, _base.z);
+        var down = new Vector3(_base.x + 0.005f, _base.y - 0.005f, _base.z);
+
+        _bounceSeq = DOTween.Sequence();
+        _bounceSeq.Append(transform.DOScale(up,   stepTime).SetEase(Ease.InOutSine));
+        _bounceSeq.Append(transform.DOScale(_base, stepTime).SetEase(Ease.InOutSine));
+        _bounceSeq.Append(transform.DOScale(down, stepTime).SetEase(Ease.InOutSine));
+        _bounceSeq.Append(transform.DOScale(_base, stepTime).SetEase(Ease.InOutSine));
+        _bounceSeq.SetUpdate(UpdateType.Normal);
+        _bounceSeq.OnComplete(() =>
+        {
+            _isBouncing = false;
+
+            if (_bouncePending)
+                PlayBounceOnce();
+        });
+    }
+
     // ─── Damage Flash ───────────────────────────────────────
 
     /// <summary>
@@ -103,8 +166,11 @@ public class MyTeamAnimation : MonoBehaviour
     private void OnDisable()
     {
         _seq?.Kill();
+        _bounceSeq?.Kill();
         transform.localScale = _base;
         _isPlaying = false;
+        _isBouncing = false;
+        _bouncePending = false;
 
         _flashSpriteTween?.Kill();
         if (flashSpriteRenderer != null) flashSpriteRenderer.color = _originalSpriteColor;

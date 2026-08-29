@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 /// <summary>
 /// Lớp cơ sở (base) cho mọi "con vịt" chiến đấu trong trận (khác với DuckObject/EnemyObject
@@ -30,7 +31,12 @@ using UnityEngine;
 ///
 /// CHIẾN ĐẤU: khi Weapon Range Collider (trigger) chạm 1 tag hợp lệ (subclass tự định nghĩa qua
 /// HandleTriggerEnter/Exit — VD UnitDuck tìm tag ""Enemy"", EnemyDuck tìm tag ""Player""/""MyTeam""),
-/// Duck dừng di chuyển và tự động tấn công theo chu kỳ weaponData.TimeDelay (giây/đòn).
+/// Duck dừng di chuyển và tự động tấn công theo chu kỳ weaponData.TimeAttack (giây/đòn).
+/// LƯU Ý: weaponData.TimeDelay KHÔNG dùng ở đây — đó là chu kỳ spawn UnitDuck trên Grid
+/// (dùng bởi BattleSpawnDuck), khác với tốc độ tấn công (TimeAttack) dùng ở UpdateAttack().
+///
+/// NHẬN DAMAGE: mỗi khi TakeDamage() bị gọi (Hp giảm), HPBar cập nhật ngay (DuckHPBar.SetHP)
+/// VÀ đồng thời phát hiệu ứng nháy màu (PlayDamageFlash) trên duckRenderer để báo hiệu trực quan.
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Duck : MonoBehaviour
@@ -53,6 +59,16 @@ public abstract class Duck : MonoBehaviour
     [Tooltip("Script thanh máu — thường ở child \"HPBar\"")]
     [SerializeField] protected DuckHPBar hpBar;
 
+    [Header("=== Damage Flash ===")]
+    [Tooltip("Màu nháy khi Duck nhận damage")]
+    [SerializeField] protected Color damageFlashColor = Color.white;
+
+    [Tooltip("Thời gian tween từ damageFlashColor về màu gốc (giây)")]
+    [SerializeField] protected float damageFlashDuration = 0.08f;
+
+    private Color _originalDuckColor;
+    private Tween _damageFlashTween;
+
     // ─── Data ───────────────────────────────────────────────
     protected BaseDuckData duckData;
     protected WeaponEntry  weaponData;
@@ -72,6 +88,12 @@ public abstract class Duck : MonoBehaviour
 
     protected const float MinLaneY = 0f;
     protected const float MaxLaneY = 2f;
+
+    protected virtual void Awake()
+    {
+        if (duckRenderer != null)
+            _originalDuckColor = duckRenderer.color;
+    }
 
     protected virtual void Reset()
     {
@@ -107,6 +129,11 @@ public abstract class Duck : MonoBehaviour
         currentTarget = null;
         _attackTimer  = 0f;
 
+        // Dừng hiệu ứng nháy damage cũ (nếu có từ lần dùng trước trong Pool) và trả màu về gốc.
+        _damageFlashTween?.Kill();
+        if (duckRenderer != null)
+            duckRenderer.color = _originalDuckColor;
+
         float duckHp   = duck   != null ? duck.BaseHP            : 0f;
         float weaponHp = weapon != null ? weapon.GetCurrentHP()  : 0f;
         MaxHp = duckHp + weaponHp;
@@ -135,7 +162,10 @@ public abstract class Duck : MonoBehaviour
 
     // ─── Combat ─────────────────────────────────────────────
 
-    /// <summary>Nhận sát thương. Cập nhật HP Bar và kiểm tra chết (CheckDead → Despawn nếu Hp &lt;= 0).</summary>
+    /// <summary>
+    /// Nhận sát thương. Cập nhật HP Bar, phát hiệu ứng nháy damage (PlayDamageFlash),
+    /// rồi kiểm tra chết (CheckDead → Despawn nếu Hp &lt;= 0).
+    /// </summary>
     public virtual void TakeDamage(float amount)
     {
         if (IsDead || amount <= 0f) return;
@@ -145,7 +175,24 @@ public abstract class Duck : MonoBehaviour
         if (hpBar != null)
             hpBar.SetHP(MaxHp > 0f ? Mathf.Clamp01(Hp / MaxHp) : 0f);
 
+        PlayDamageFlash();
+
         CheckDead();
+    }
+
+    /// <summary>
+    /// Nháy màu duckRenderer (damageFlashColor) rồi tween mượt về màu gốc trong damageFlashDuration.
+    /// Nếu đang nháy dở thì huỷ tween cũ và nháy lại từ đầu (không cộng dồn).
+    /// </summary>
+    protected virtual void PlayDamageFlash()
+    {
+        if (duckRenderer == null) return;
+
+        _damageFlashTween?.Kill();
+        duckRenderer.color = damageFlashColor;
+        _damageFlashTween = duckRenderer
+            .DOColor(_originalDuckColor, damageFlashDuration)
+            .SetEase(Ease.OutQuad);
     }
 
     /// <summary>Gây sát thương (bằng Damage hiện tại) lên 1 Duck khác.</summary>
@@ -181,12 +228,18 @@ public abstract class Duck : MonoBehaviour
     /// <summary>Despawn Duck (trả về Pool nếu prefab được quản lý bởi PoolingManager, fallback Destroy).</summary>
     protected virtual void Despawn()
     {
+        // Đảm bảo không còn tween nháy damage chạy dở khi Duck bị trả về Pool.
+        _damageFlashTween?.Kill();
+        if (duckRenderer != null)
+            duckRenderer.color = _originalDuckColor;
+
         PoolingManager.Despawn(gameObject);
     }
 
     /// <summary>
-    /// Vòng lặp tấn công mục tiêu hiện tại (currentTarget) theo chu kỳ weaponData.TimeDelay (giây/đòn).
+    /// Vòng lặp tấn công mục tiêu hiện tại (currentTarget) theo chu kỳ weaponData.TimeAttack (giây/đòn).
     /// Subclass gọi hàm này trong Update() khi đã có currentTarget (do HandleTriggerEnter gán).
+    /// LƯU Ý: dùng TimeAttack (tốc độ tấn công), KHÔNG dùng TimeDelay (chu kỳ spawn trên Grid).
     /// </summary>
     protected virtual void UpdateAttack()
     {
@@ -197,7 +250,7 @@ public abstract class Duck : MonoBehaviour
         _attackTimer -= Time.deltaTime;
         if (_attackTimer > 0f) return;
 
-        _attackTimer = weaponData != null && weaponData.TimeDelay > 0f ? weaponData.TimeDelay : 1f;
+        _attackTimer = weaponData != null && weaponData.TimeAttack > 0f ? weaponData.TimeAttack : 1f;
 
         var targetDuck = currentTarget.GetComponent<Duck>();
         if (targetDuck != null) { DealDamage(targetDuck); return; }

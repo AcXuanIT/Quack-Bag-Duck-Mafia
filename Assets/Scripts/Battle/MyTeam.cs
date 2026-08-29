@@ -7,12 +7,16 @@ using UnityEngine;
 ///   - MyTeamHPBar      : hiển thị thanh HP + text HP
 ///   - MyTeamAnimation  : hiệu ứng "nảy" khi spawn (chạy 1 lần, không lặp)
 ///                        + hiệu ứng nháy trắng khi nhận damage (PlayDamageFlash)
+///                        + hiệu ứng "nhún" AnimationSpawn() (gọi khi spawn Duck)
 /// </summary>
 public class MyTeam : MonoBehaviour
 {
     [Header("=== References ===")]
     [SerializeField] private MyTeamHPBar     hpBar;
     [SerializeField] private MyTeamAnimation spawnAnimation;
+
+    /// <summary>Truy cập MyTeamAnimation gắn trên MyTeam (dùng để gọi AnimationSpawn() mỗi khi spawn Duck).</summary>
+    public MyTeamAnimation mytemAnimation => spawnAnimation;
 
     [Header("=== HP ===")]
     [SerializeField] private float baseHP = 100f;

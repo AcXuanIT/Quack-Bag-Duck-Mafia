@@ -5542,6 +5542,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 398141781}
+  - component: {fileID: 398141782}
   m_Layer: 0
   m_Name: SpawnDuck
   m_TagString: Untagged
@@ -5564,6 +5565,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 444891345}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &398141782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398141780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7821ac7bb49836478978ac8e00a9bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitDuckPrefab: {fileID: 5535085941312086466, guid: cf546c6daa346f94c86ee6f01a55b340, type: 3}
+  gridManager: {fileID: 272815564}
+  spawnbase: {fileID: 8380774614488246664}
+  parent: {fileID: 398141781}
+  randomOffsetY: {x: -1, y: 0}
+  randomOffsetX: {x: 0, y: 1}
 --- !u!1 &406456196
 GameObject:
   m_ObjectHideFlags: 0
@@ -5817,7 +5836,7 @@ MonoBehaviour:
   btnBuy: {fileID: 1023324715}
   componentContainer: {fileID: 2049431648}
   priceText: {fileID: 0}
-  battleManager: {fileID: 0}
+  battleManager: {fileID: 1521918428}
   gridItemPrefab: {fileID: 4714431184017745190, guid: 7bbc9aa15be348445987ae65f6a0b5fe, type: 3}
   gearItemPrefab: {fileID: 4714431184017745190, guid: 596c554262d87a547a5200f06b42c6de, type: 3}
   unitItemPrefab: {fileID: 4714431184017745190, guid: 13a4a298e152173489ad5385f4d852d7, type: 3}
@@ -8029,7 +8048,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 886e2fe157908764e87208e2c9760438, type: 2}
   - {fileID: 11400000, guid: 861231263e3aa7044bd1609d3bcd1b14, type: 2}
   weaponDatabase: {fileID: 11400000, guid: 46603bc65d64a2c4e8eb40c07fe119b3, type: 2}
-  mapBattleData: {fileID: 0}
+  mapBattleData:
+  - {fileID: 11400000, guid: 2f8ea7d2e2ab1704aad709e4d2e450e6, type: 2}
+  - {fileID: 11400000, guid: e3cee7b824d629841b17e28ccead18a5, type: 2}
+  - {fileID: 11400000, guid: 5f69e44343613644188693bd03a39dc5, type: 2}
+  - {fileID: 11400000, guid: 683cb73b93b88e648bc6c131d3dd2fd5, type: 2}
+  - {fileID: 11400000, guid: 03df90b75770a9946af54c3c80c71d77, type: 2}
+  - {fileID: 11400000, guid: b3956f21ad974ab41b473b5f91eeef94, type: 2}
+  - {fileID: 11400000, guid: 6d4705db0fb8f5a428c1fba4dc449b99, type: 2}
+  - {fileID: 11400000, guid: 8a12d3b7863f88c4a8d3feace0935b20, type: 2}
+  - {fileID: 11400000, guid: 1c52db8af6804a349865870dbaf31fda, type: 2}
+  - {fileID: 11400000, guid: 300be7325a6cb634daa5a98a0e530ff5, type: 2}
+  - {fileID: 11400000, guid: 5a6302a755c765e469811947bc39f708, type: 2}
 --- !u!1 &648998451
 GameObject:
   m_ObjectHideFlags: 0
@@ -20052,7 +20082,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1517577201}
   - component: {fileID: 1517577200}
-  - component: {fileID: 1517577202}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -20074,6 +20103,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponManager: {fileID: 1159675184}
   battleManager: {fileID: 1521918428}
+  gameData: {fileID: 0}
+  uiGameManager: {fileID: 0}
   batteMapObject: {fileID: 1636189195}
 --- !u!4 &1517577201
 Transform:
@@ -20093,18 +20124,6 @@ Transform:
   - {fileID: 643221431}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1517577202
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1517577199}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ba980b8c46f4424cb278a659da48810, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1521918426
 GameObject:
   m_ObjectHideFlags: 0
@@ -20153,10 +20172,13 @@ MonoBehaviour:
   currentState: 0
   currentTurn: 0
   currentWavesIndex: 1
+  currentMapBattleData: {fileID: 0}
   cameraEffect: {fileID: 1250302838}
-  battleSpawnEnemy: {fileID: 0}
+  battleSpawnEnemy: {fileID: 133810976}
   battleGridManager: {fileID: 272815564}
-  spawnEnemy: {fileID: 0}
+  spawnEnemy: {fileID: 133810976}
+  spawnDuck: {fileID: 398141782}
+  myTem: {fileID: 8380774614488246666}
 --- !u!1 &1548798499
 GameObject:
   m_ObjectHideFlags: 0
@@ -27989,6 +28011,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8419576247938738808, guid: 729fd721f582d7041b544a9f7ea7a15a, type: 3}
+      propertyPath: pauseDelay
+      value: 0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 8678734808904255905, guid: 729fd721f582d7041b544a9f7ea7a15a, type: 3}
       propertyPath: m_Name
       value: MyTeam
@@ -28003,6 +28029,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3402262866528434854, guid: 729fd721f582d7041b544a9f7ea7a15a, type: 3}
   m_PrefabInstance: {fileID: 8380774614488246660}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8380774614488246666 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 760591098240332237, guid: 729fd721f582d7041b544a9f7ea7a15a, type: 3}
+  m_PrefabInstance: {fileID: 8380774614488246660}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72303f3eafecf5f4c8b7834d36c2bfa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

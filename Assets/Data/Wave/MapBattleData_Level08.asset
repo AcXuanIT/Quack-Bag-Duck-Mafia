@@ -10,29 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: MapBattleData
+  m_Name: MapBattleData_Level08
   m_EditorClassIdentifier: Assembly-CSharp::MapBattsleData
   Waves:
   - WaveIndex: 1
     Enemies:
     - EnemyData:
-        ID: 1
-        Name: Vit Dich Thuong
-        Tier: 1
-        BaseHP: 60
-        BaseDamage: 8
-        SpriteTier1: {fileID: 21300000, guid: 477e84e08d94f2646b16b13c09248bef, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 18d55bba5b203af44913433959273217, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 0ebae15b6707ddf48bf4926308ae8c64, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 48b8caf259c1e3949b979a2597331761, type: 2}
+        ID: 8
+        Name: Vit Dich Bao Ve
+        Tier: 3
+        BaseHP: 150
+        BaseDamage: 12
+        SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 6a08a8752086d8e4a8fd31e98f96bd05, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 90f4611f256c195439aa55fa33f2be10, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 8
-        AttackSpeed: 1
-        MoveSpeed: 2
+        AttackDamage: 12
+        AttackSpeed: 1.1
+        MoveSpeed: 1.5
         weaponData:
           ID: 0
           Name: 
@@ -63,28 +63,28 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 5
-        RewardExp: 5
-        SpawnWave: 1
+        RewardCoin: 16
+        RewardExp: 16
+        SpawnWave: 4
       Count: 5
     - EnemyData:
-        ID: 2
-        Name: Vit Dich Cung
-        Tier: 1
-        BaseHP: 50
-        BaseDamage: 10
-        SpriteTier1: {fileID: 21300000, guid: cbff78ead8151d8459cdc0e9000be8f6, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: dd8d8d9013e18ae468b2a223d4ab0188, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: b539d57b529a0ad45b5c38549f632e4f, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: bf53ae77cc5be974c8c233cca967efcb, type: 2}
+        ID: 9
+        Name: Vit Dich Sat Thu
+        Tier: 3
+        BaseHP: 100
+        BaseDamage: 20
+        SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 29b66b29b8ec4734fb53ea63afa65568, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 10
-        AttackSpeed: 1.2
-        MoveSpeed: 2.2
+        AttackDamage: 20
+        AttackSpeed: 1.8
+        MoveSpeed: 2.5
         weaponData:
           ID: 0
           Name: 
@@ -115,133 +115,29 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 6
-        RewardExp: 6
-        SpawnWave: 1
-      Count: 3
+        RewardCoin: 18
+        RewardExp: 18
+        SpawnWave: 5
+      Count: 6
   - WaveIndex: 2
     Enemies:
     - EnemyData:
-        ID: 1
-        Name: Vit Dich Thuong
-        Tier: 1
-        BaseHP: 60
-        BaseDamage: 8
-        SpriteTier1: {fileID: 21300000, guid: 477e84e08d94f2646b16b13c09248bef, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 18d55bba5b203af44913433959273217, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 0ebae15b6707ddf48bf4926308ae8c64, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 48b8caf259c1e3949b979a2597331761, type: 2}
+        ID: 8
+        Name: Vit Dich Bao Ve
+        Tier: 3
+        BaseHP: 150
+        BaseDamage: 12
+        SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 6a08a8752086d8e4a8fd31e98f96bd05, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 90f4611f256c195439aa55fa33f2be10, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 8
-        AttackSpeed: 1
-        MoveSpeed: 2
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 5
-        RewardExp: 5
-        SpawnWave: 1
-      Count: 4
-    - EnemyData:
-        ID: 2
-        Name: Vit Dich Cung
-        Tier: 1
-        BaseHP: 50
-        BaseDamage: 10
-        SpriteTier1: {fileID: 21300000, guid: cbff78ead8151d8459cdc0e9000be8f6, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: dd8d8d9013e18ae468b2a223d4ab0188, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: b539d57b529a0ad45b5c38549f632e4f, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: bf53ae77cc5be974c8c233cca967efcb, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 10
-        AttackSpeed: 1.2
-        MoveSpeed: 2.2
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 6
-        RewardExp: 6
-        SpawnWave: 1
-      Count: 4
-    - EnemyData:
-        ID: 3
-        Name: Vit Dich Giap
-        Tier: 1
-        BaseHP: 90
-        BaseDamage: 6
-        SpriteTier1: {fileID: 21300000, guid: 577ee0a6ca64a954dadefd22b18580bc, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 595d85d0c7fc705439ecc29a1dac45eb, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 99f30f3634c54674c86f50f6941a1a97, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 58ac6af37c825b447aff2a2080005cd1, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 6
-        AttackSpeed: 0.8
+        AttackDamage: 12
+        AttackSpeed: 1.1
         MoveSpeed: 1.5
         weaponData:
           ID: 0
@@ -273,29 +169,133 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 7
-        RewardExp: 7
-        SpawnWave: 2
-      Count: 2
+        RewardCoin: 16
+        RewardExp: 16
+        SpawnWave: 4
+      Count: 5
+    - EnemyData:
+        ID: 9
+        Name: Vit Dich Sat Thu
+        Tier: 3
+        BaseHP: 100
+        BaseDamage: 20
+        SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 29b66b29b8ec4734fb53ea63afa65568, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 20
+        AttackSpeed: 1.8
+        MoveSpeed: 2.5
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 18
+        RewardExp: 18
+        SpawnWave: 5
+      Count: 6
   - WaveIndex: 3
     Enemies:
     - EnemyData:
-        ID: 3
-        Name: Vit Dich Giap
-        Tier: 1
-        BaseHP: 90
-        BaseDamage: 6
-        SpriteTier1: {fileID: 21300000, guid: 577ee0a6ca64a954dadefd22b18580bc, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 595d85d0c7fc705439ecc29a1dac45eb, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 99f30f3634c54674c86f50f6941a1a97, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 58ac6af37c825b447aff2a2080005cd1, type: 2}
+        ID: 7
+        Name: Vit Dich Tinh Nhue
+        Tier: 3
+        BaseHP: 130
+        BaseDamage: 15
+        SpriteTier1: {fileID: 21300000, guid: 70938cc0f8880ff4a9d0bbcdca059adc, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: b4963c3f76b0a2f4a80c4f97387e893e, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 1b86a048e034b2a4bb79031b0bd6303c, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 4d452b0ca589c63499fd04780a762106, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 6
-        AttackSpeed: 0.8
+        AttackDamage: 15
+        AttackSpeed: 1.3
+        MoveSpeed: 2
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 15
+        RewardExp: 15
+        SpawnWave: 4
+      Count: 6
+    - EnemyData:
+        ID: 8
+        Name: Vit Dich Bao Ve
+        Tier: 3
+        BaseHP: 150
+        BaseDamage: 12
+        SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 6a08a8752086d8e4a8fd31e98f96bd05, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 90f4611f256c195439aa55fa33f2be10, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 12
+        AttackSpeed: 1.1
         MoveSpeed: 1.5
         weaponData:
           ID: 0
@@ -327,28 +327,28 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 7
-        RewardExp: 7
-        SpawnWave: 2
-      Count: 3
+        RewardCoin: 16
+        RewardExp: 16
+        SpawnWave: 4
+      Count: 6
     - EnemyData:
-        ID: 4
-        Name: Vit Dich Nhanh
-        Tier: 2
-        BaseHP: 55
-        BaseDamage: 9
-        SpriteTier1: {fileID: 21300000, guid: 3095f5e4c4facc04ba996e23e0eefb18, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 3ddc85895db803446b90e275be287cf0, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 3a5d3a7fbe4b1a24dbf2f13c4c31abe6, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 1a84e640cc985824388fc85c84c27ae9, type: 2}
+        ID: 9
+        Name: Vit Dich Sat Thu
+        Tier: 3
+        BaseHP: 100
+        BaseDamage: 20
+        SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 29b66b29b8ec4734fb53ea63afa65568, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 9
-        AttackSpeed: 1.5
-        MoveSpeed: 3
+        AttackDamage: 20
+        AttackSpeed: 1.8
+        MoveSpeed: 2.5
         weaponData:
           ID: 0
           Name: 
@@ -379,133 +379,29 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 8
-        RewardExp: 8
-        SpawnWave: 2
-      Count: 4
-    - EnemyData:
-        ID: 5
-        Name: Vit Dich Nem Luoi
-        Tier: 2
-        BaseHP: 70
-        BaseDamage: 11
-        SpriteTier1: {fileID: 21300000, guid: 0b63d846c9050fb4889350e1df77a96b, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: d4895bf86d3b934438c631283bb660ae, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: ddcbf7c338b4f784f8717b617000505f, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: bcec8a80f1b4d1548b8eb38c38616d60, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 11
-        AttackSpeed: 1
-        MoveSpeed: 2
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 9
-        RewardExp: 9
-        SpawnWave: 3
-      Count: 2
+        RewardCoin: 18
+        RewardExp: 18
+        SpawnWave: 5
+      Count: 7
   - WaveIndex: 4
     Enemies:
     - EnemyData:
-        ID: 4
-        Name: Vit Dich Nhanh
-        Tier: 2
-        BaseHP: 55
-        BaseDamage: 9
-        SpriteTier1: {fileID: 21300000, guid: 3095f5e4c4facc04ba996e23e0eefb18, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 3ddc85895db803446b90e275be287cf0, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 3a5d3a7fbe4b1a24dbf2f13c4c31abe6, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 1a84e640cc985824388fc85c84c27ae9, type: 2}
+        ID: 7
+        Name: Vit Dich Tinh Nhue
+        Tier: 3
+        BaseHP: 130
+        BaseDamage: 15
+        SpriteTier1: {fileID: 21300000, guid: 70938cc0f8880ff4a9d0bbcdca059adc, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: b4963c3f76b0a2f4a80c4f97387e893e, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 1b86a048e034b2a4bb79031b0bd6303c, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 4d452b0ca589c63499fd04780a762106, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 9
-        AttackSpeed: 1.5
-        MoveSpeed: 3
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 8
-        RewardExp: 8
-        SpawnWave: 2
-      Count: 3
-    - EnemyData:
-        ID: 5
-        Name: Vit Dich Nem Luoi
-        Tier: 2
-        BaseHP: 70
-        BaseDamage: 11
-        SpriteTier1: {fileID: 21300000, guid: 0b63d846c9050fb4889350e1df77a96b, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: d4895bf86d3b934438c631283bb660ae, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: ddcbf7c338b4f784f8717b617000505f, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: bcec8a80f1b4d1548b8eb38c38616d60, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 11
-        AttackSpeed: 1
+        AttackDamage: 15
+        AttackSpeed: 1.3
         MoveSpeed: 2
         weaponData:
           ID: 0
@@ -537,28 +433,28 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 9
-        RewardExp: 9
-        SpawnWave: 3
-      Count: 3
+        RewardCoin: 15
+        RewardExp: 15
+        SpawnWave: 4
+      Count: 6
     - EnemyData:
-        ID: 6
-        Name: Vit Dich Phong Thu
-        Tier: 2
-        BaseHP: 110
-        BaseDamage: 7
-        SpriteTier1: {fileID: 21300000, guid: 1ff9287aa6b924c43bb1793b70e91923, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: d76e4ac65d5d9e046a34b2f78876b911, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 869de9e8b57d1b94393a401008d3aaae, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 749fc5ee47d5d424186994b2837900c6, type: 2}
+        ID: 8
+        Name: Vit Dich Bao Ve
+        Tier: 3
+        BaseHP: 150
+        BaseDamage: 12
+        SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 6a08a8752086d8e4a8fd31e98f96bd05, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 90f4611f256c195439aa55fa33f2be10, type: 2}
         GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
         ColorBase: {r: 1, g: 1, b: 1, a: 1}
         ColorBlue: {r: 0, g: 0, b: 1, a: 1}
         ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
         ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 7
-        AttackSpeed: 0.9
-        MoveSpeed: 1.2
+        AttackDamage: 12
+        AttackSpeed: 1.1
+        MoveSpeed: 1.5
         weaponData:
           ID: 0
           Name: 
@@ -589,10 +485,62 @@ MonoBehaviour:
           Coin: 0
           IsLocked: 0
           TimeDelay: 0
-        RewardCoin: 10
-        RewardExp: 10
-        SpawnWave: 3
-      Count: 3
+        RewardCoin: 16
+        RewardExp: 16
+        SpawnWave: 4
+      Count: 6
+    - EnemyData:
+        ID: 9
+        Name: Vit Dich Sat Thu
+        Tier: 3
+        BaseHP: 100
+        BaseDamage: 20
+        SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 29b66b29b8ec4734fb53ea63afa65568, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 20
+        AttackSpeed: 1.8
+        MoveSpeed: 2.5
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 18
+        RewardExp: 18
+        SpawnWave: 5
+      Count: 7
   - WaveIndex: 5
     Enemies:
     - EnemyData:
@@ -646,7 +594,7 @@ MonoBehaviour:
         RewardCoin: 10
         RewardExp: 10
         SpawnWave: 3
-      Count: 3
+      Count: 7
     - EnemyData:
         ID: 7
         Name: Vit Dich Tinh Nhue
@@ -698,7 +646,7 @@ MonoBehaviour:
         RewardCoin: 15
         RewardExp: 15
         SpawnWave: 4
-      Count: 3
+      Count: 7
     - EnemyData:
         ID: 8
         Name: Vit Dich Bao Ve
@@ -750,113 +698,7 @@ MonoBehaviour:
         RewardCoin: 16
         RewardExp: 16
         SpawnWave: 4
-      Count: 2
-  - WaveIndex: 6
-    Enemies:
-    - EnemyData:
-        ID: 7
-        Name: Vit Dich Tinh Nhue
-        Tier: 3
-        BaseHP: 130
-        BaseDamage: 15
-        SpriteTier1: {fileID: 21300000, guid: 70938cc0f8880ff4a9d0bbcdca059adc, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: b4963c3f76b0a2f4a80c4f97387e893e, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 1b86a048e034b2a4bb79031b0bd6303c, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 4d452b0ca589c63499fd04780a762106, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 15
-        AttackSpeed: 1.3
-        MoveSpeed: 2
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 15
-        RewardExp: 15
-        SpawnWave: 4
-      Count: 3
-    - EnemyData:
-        ID: 8
-        Name: Vit Dich Bao Ve
-        Tier: 3
-        BaseHP: 150
-        BaseDamage: 12
-        SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 6a08a8752086d8e4a8fd31e98f96bd05, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 90f4611f256c195439aa55fa33f2be10, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 12
-        AttackSpeed: 1.1
-        MoveSpeed: 1.5
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 16
-        RewardExp: 16
-        SpawnWave: 4
-      Count: 3
+      Count: 7
     - EnemyData:
         ID: 9
         Name: Vit Dich Sat Thu
@@ -908,165 +750,9 @@ MonoBehaviour:
         RewardCoin: 18
         RewardExp: 18
         SpawnWave: 5
-      Count: 4
-  - WaveIndex: 7
+      Count: 8
+  - WaveIndex: 6
     Enemies:
-    - EnemyData:
-        ID: 3
-        Name: Vit Dich Giap
-        Tier: 1
-        BaseHP: 90
-        BaseDamage: 6
-        SpriteTier1: {fileID: 21300000, guid: 577ee0a6ca64a954dadefd22b18580bc, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 595d85d0c7fc705439ecc29a1dac45eb, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 99f30f3634c54674c86f50f6941a1a97, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 58ac6af37c825b447aff2a2080005cd1, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 6
-        AttackSpeed: 0.8
-        MoveSpeed: 1.5
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 7
-        RewardExp: 7
-        SpawnWave: 2
-      Count: 2
-    - EnemyData:
-        ID: 4
-        Name: Vit Dich Nhanh
-        Tier: 2
-        BaseHP: 55
-        BaseDamage: 9
-        SpriteTier1: {fileID: 21300000, guid: 3095f5e4c4facc04ba996e23e0eefb18, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: 3ddc85895db803446b90e275be287cf0, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 3a5d3a7fbe4b1a24dbf2f13c4c31abe6, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 1a84e640cc985824388fc85c84c27ae9, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 9
-        AttackSpeed: 1.5
-        MoveSpeed: 3
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 8
-        RewardExp: 8
-        SpawnWave: 2
-      Count: 3
-    - EnemyData:
-        ID: 5
-        Name: Vit Dich Nem Luoi
-        Tier: 2
-        BaseHP: 70
-        BaseDamage: 11
-        SpriteTier1: {fileID: 21300000, guid: 0b63d846c9050fb4889350e1df77a96b, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: d4895bf86d3b934438c631283bb660ae, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: ddcbf7c338b4f784f8717b617000505f, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: bcec8a80f1b4d1548b8eb38c38616d60, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 11
-        AttackSpeed: 1
-        MoveSpeed: 2
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 9
-        RewardExp: 9
-        SpawnWave: 3
-      Count: 3
     - EnemyData:
         ID: 6
         Name: Vit Dich Phong Thu
@@ -1118,7 +804,7 @@ MonoBehaviour:
         RewardCoin: 10
         RewardExp: 10
         SpawnWave: 3
-      Count: 3
+      Count: 7
     - EnemyData:
         ID: 7
         Name: Vit Dich Tinh Nhue
@@ -1170,61 +856,7 @@ MonoBehaviour:
         RewardCoin: 15
         RewardExp: 15
         SpawnWave: 4
-      Count: 2
-  - WaveIndex: 8
-    Enemies:
-    - EnemyData:
-        ID: 7
-        Name: Vit Dich Tinh Nhue
-        Tier: 3
-        BaseHP: 130
-        BaseDamage: 15
-        SpriteTier1: {fileID: 21300000, guid: 70938cc0f8880ff4a9d0bbcdca059adc, type: 2}
-        SpriteTier2: {fileID: 21300000, guid: b4963c3f76b0a2f4a80c4f97387e893e, type: 2}
-        SpriteTier3: {fileID: 21300000, guid: 1b86a048e034b2a4bb79031b0bd6303c, type: 2}
-        SpriteTier4: {fileID: 21300000, guid: 4d452b0ca589c63499fd04780a762106, type: 2}
-        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
-        ColorBase: {r: 1, g: 1, b: 1, a: 1}
-        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
-        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-        AttackDamage: 15
-        AttackSpeed: 1.3
-        MoveSpeed: 2
-        weaponData:
-          ID: 0
-          Name: 
-          SpriteTier1: {fileID: 0}
-          SpriteTier2: {fileID: 0}
-          SpriteTier3: {fileID: 0}
-          SpriteTier4: {fileID: 0}
-          ShapeSprite: {fileID: 0}
-          ShapeFill: {fileID: 0}
-          GridCells: []
-          Level: 1
-          XP: 0
-          XPToNextLevel: 0
-          DamagePerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          HPPerLevel:
-          - 0
-          - 0
-          - 0
-          - 0
-          - 0
-          AttackRange: 1
-          LevelLock: 0
-          Coin: 0
-          IsLocked: 0
-          TimeDelay: 0
-        RewardCoin: 15
-        RewardExp: 15
-        SpawnWave: 4
-      Count: 4
+      Count: 7
     - EnemyData:
         ID: 8
         Name: Vit Dich Bao Ve
@@ -1276,7 +908,7 @@ MonoBehaviour:
         RewardCoin: 16
         RewardExp: 16
         SpawnWave: 4
-      Count: 4
+      Count: 7
     - EnemyData:
         ID: 9
         Name: Vit Dich Sat Thu
@@ -1328,4 +960,266 @@ MonoBehaviour:
         RewardCoin: 18
         RewardExp: 18
         SpawnWave: 5
-      Count: 5
+      Count: 8
+  - WaveIndex: 7
+    Enemies:
+    - EnemyData:
+        ID: 5
+        Name: Vit Dich Nem Luoi
+        Tier: 2
+        BaseHP: 70
+        BaseDamage: 11
+        SpriteTier1: {fileID: 21300000, guid: 0b63d846c9050fb4889350e1df77a96b, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: d4895bf86d3b934438c631283bb660ae, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: ddcbf7c338b4f784f8717b617000505f, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: bcec8a80f1b4d1548b8eb38c38616d60, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 11
+        AttackSpeed: 1
+        MoveSpeed: 2
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 9
+        RewardExp: 9
+        SpawnWave: 3
+      Count: 8
+    - EnemyData:
+        ID: 6
+        Name: Vit Dich Phong Thu
+        Tier: 2
+        BaseHP: 110
+        BaseDamage: 7
+        SpriteTier1: {fileID: 21300000, guid: 1ff9287aa6b924c43bb1793b70e91923, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: d76e4ac65d5d9e046a34b2f78876b911, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 869de9e8b57d1b94393a401008d3aaae, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 749fc5ee47d5d424186994b2837900c6, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 7
+        AttackSpeed: 0.9
+        MoveSpeed: 1.2
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 10
+        RewardExp: 10
+        SpawnWave: 3
+      Count: 8
+    - EnemyData:
+        ID: 7
+        Name: Vit Dich Tinh Nhue
+        Tier: 3
+        BaseHP: 130
+        BaseDamage: 15
+        SpriteTier1: {fileID: 21300000, guid: 70938cc0f8880ff4a9d0bbcdca059adc, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: b4963c3f76b0a2f4a80c4f97387e893e, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 1b86a048e034b2a4bb79031b0bd6303c, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 4d452b0ca589c63499fd04780a762106, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 15
+        AttackSpeed: 1.3
+        MoveSpeed: 2
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 15
+        RewardExp: 15
+        SpawnWave: 4
+      Count: 8
+    - EnemyData:
+        ID: 8
+        Name: Vit Dich Bao Ve
+        Tier: 3
+        BaseHP: 150
+        BaseDamage: 12
+        SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 6a08a8752086d8e4a8fd31e98f96bd05, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 90f4611f256c195439aa55fa33f2be10, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 12
+        AttackSpeed: 1.1
+        MoveSpeed: 1.5
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 16
+        RewardExp: 16
+        SpawnWave: 4
+      Count: 8
+    - EnemyData:
+        ID: 9
+        Name: Vit Dich Sat Thu
+        Tier: 3
+        BaseHP: 100
+        BaseDamage: 20
+        SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
+        SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
+        SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
+        SpriteTier4: {fileID: 21300000, guid: 29b66b29b8ec4734fb53ea63afa65568, type: 2}
+        GridSprite: {fileID: 21300000, guid: d10763716efdad34fa56075790a22a09, type: 2}
+        ColorBase: {r: 1, g: 1, b: 1, a: 1}
+        ColorBlue: {r: 0, g: 0, b: 1, a: 1}
+        ColorPurple: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+        ColorYellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+        AttackDamage: 20
+        AttackSpeed: 1.8
+        MoveSpeed: 2.5
+        weaponData:
+          ID: 0
+          Name: 
+          SpriteTier1: {fileID: 0}
+          SpriteTier2: {fileID: 0}
+          SpriteTier3: {fileID: 0}
+          SpriteTier4: {fileID: 0}
+          ShapeSprite: {fileID: 0}
+          ShapeFill: {fileID: 0}
+          GridCells: []
+          Level: 1
+          XP: 0
+          XPToNextLevel: 0
+          DamagePerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          HPPerLevel:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          AttackRange: 1
+          LevelLock: 0
+          Coin: 0
+          IsLocked: 0
+          TimeDelay: 0
+        RewardCoin: 18
+        RewardExp: 18
+        SpawnWave: 5
+      Count: 9

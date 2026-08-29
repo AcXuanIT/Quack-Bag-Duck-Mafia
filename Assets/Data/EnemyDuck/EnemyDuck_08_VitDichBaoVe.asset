@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 8
     Name: Vit Dich Bao Ve
     Tier: 3
-    BaseHP: 150
+    BaseHP: 450
     BaseDamage: 12
     SpriteTier1: {fileID: 21300000, guid: 58d9fefa5b8ff1e48984b72f40fb1945, type: 2}
     SpriteTier2: {fileID: 21300000, guid: f0085b71741ae934181d3a483cb5ffcb, type: 2}
@@ -38,6 +38,7 @@ MonoBehaviour:
       SpriteTier3: {fileID: 0}
       SpriteTier4: {fileID: 0}
       ShapeSprite: {fileID: 0}
+      ShapeFill: {fileID: 0}
       GridCells: []
       Level: 1
       XP: 0
@@ -59,6 +60,7 @@ MonoBehaviour:
       Coin: 0
       IsLocked: 0
       TimeDelay: 0
+      TimeAttack: 1
     RewardCoin: 16
     RewardExp: 16
     SpawnWave: 4

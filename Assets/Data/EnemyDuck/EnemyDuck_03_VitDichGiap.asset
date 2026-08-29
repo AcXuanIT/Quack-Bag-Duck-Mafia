@@ -16,7 +16,7 @@ MonoBehaviour:
     ID: 3
     Name: Vit Dich Giap
     Tier: 1
-    BaseHP: 90
+    BaseHP: 270
     BaseDamage: 6
     SpriteTier1: {fileID: 21300000, guid: 577ee0a6ca64a954dadefd22b18580bc, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 595d85d0c7fc705439ecc29a1dac45eb, type: 2}
@@ -38,6 +38,7 @@ MonoBehaviour:
       SpriteTier3: {fileID: 0}
       SpriteTier4: {fileID: 0}
       ShapeSprite: {fileID: 0}
+      ShapeFill: {fileID: 0}
       GridCells: []
       Level: 1
       XP: 0
@@ -59,6 +60,7 @@ MonoBehaviour:
       Coin: 0
       IsLocked: 0
       TimeDelay: 0
+      TimeAttack: 1
     RewardCoin: 7
     RewardExp: 7
     SpawnWave: 2
