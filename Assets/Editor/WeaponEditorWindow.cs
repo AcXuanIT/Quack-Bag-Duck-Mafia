@@ -7,7 +7,7 @@ using UnityEngine;
 // ================================================================
 //  WeaponEditorWindow  –  Tools ▸ ⚔ Weapon Database Editor
 //  Full CRUD editor: thêm / sửa / nhân bản / xoá / sắp xếp
-//  Hỗ trợ DamagePerLevel[5] & HPPerLevel[5] (không còn Damage/HP đơn lẻ)
+//  Hỗ trợ DamagePerLevel[5] & HPPerLevel[5] & XPToNextLevel[5] (không còn Damage/HP/XPToNextLevel đơn lẻ)
 // ================================================================
 public class WeaponEditorWindow : EditorWindow
 {
@@ -22,8 +22,9 @@ public class WeaponEditorWindow : EditorWindow
     // ── State ─────────────────────────────────────────────────
     private WeaponData         _db;
     private string             _dbPath;
-    private List<WeaponEntry>  _list     = new List<WeaponEntry>();
-    private List<WeaponEntry>  _filtered = new List<WeaponEntry>();
+    private List<WeaponEntry>      _list      = new List<WeaponEntry>();      // Entry (dereference qua _assetList[i].Entry)
+    private List<WeaponDataAsset>  _assetList = new List<WeaponDataAsset>();  // WeaponDataAsset song song 1-1 voi _list
+    private List<WeaponEntry>      _filtered  = new List<WeaponEntry>();
 
     private int         _selectedIndex    = -1;
     private WeaponEntry _editing;
@@ -336,10 +337,11 @@ public class WeaponEditorWindow : EditorWindow
 
         GUI.Label(new Rect(rect.xMax - 42, rect.y + 4, 38, 18), $"#{w.ID}", _sRowID);
 
-        // XP mini bar
-        if (!w.IsLocked && w.XPToNextLevel > 0)
+        // XP mini bar — ngưỡng lấy theo Level hiện tại (mảng XPToNextLevel[5])
+        int xpNeededRow = w.GetCurrentXPToNextLevel();
+        if (!w.IsLocked && xpNeededRow > 0)
         {
-            float ratio = Mathf.Clamp01((float)w.XP / w.XPToNextLevel);
+            float ratio = Mathf.Clamp01((float)w.XP / xpNeededRow);
             var   barBg = new Rect(rect.x + 64, rect.yMax - 8, rect.width - 70, 4);
             EditorGUI.DrawRect(barBg, new Color(0.1f, 0.1f, 0.15f));
             EditorGUI.DrawRect(new Rect(barBg.x, barBg.y, barBg.width * ratio, barBg.height), CCyan);
@@ -681,8 +683,12 @@ public class WeaponEditorWindow : EditorWindow
         GUILayout.Space(10);
 
         // ══ LEVEL & XP ═════════════════════════════════════════
-        SectionLabel("⭐  Level & XP");
+        SectionLabel("⭐  Level & XP  (XPToNextLevel = XP cần để lên Lv kế tiếp, theo TỪNG Level 1-5)");
         GUILayout.Space(6);
+
+        // Đảm bảo array XPToNextLevel đủ 5 phần tử
+        if (_editing.XPToNextLevel == null || _editing.XPToNextLevel.Length != 5)
+            _editing.XPToNextLevel = new int[5];
 
         EditorGUILayout.BeginHorizontal();
         GUILayout.Space(16);
@@ -702,15 +708,43 @@ public class WeaponEditorWindow : EditorWindow
 
             GUILayout.Space(4);
             FieldRow("XP hiện tại", () => _editing.XP = Mathf.Max(0, EditorGUILayout.IntField(_editing.XP, GUILayout.Width(120))));
-            FieldRow("XP lên Lv tiếp", () => _editing.XPToNextLevel = Mathf.Max(0, EditorGUILayout.IntField(_editing.XPToNextLevel, GUILayout.Width(120))));
+
+            GUILayout.Space(8);
+
+            // XPToNextLevel[5] — 1 hàng field theo từng Level, giống Damage/HP per-level ở trên
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("XP lên Lv kế (theo Lv)", GUILayout.Width(150));
+            for (int lv = 0; lv < 5; lv++)
+            {
+                bool isCurrentLv = (lv + 1) == _editing.Level;
+                GUI.color = isCurrentLv ? CLevelColors[lv] : new Color(0.6f, 0.6f, 0.6f);
+                GUILayout.Label("Lv" + (lv + 1) + "→", GUILayout.Width(34));
+                GUI.color = Color.white;
+
+                if (isCurrentLv)
+                {
+                    var oldBg = GUI.backgroundColor;
+                    GUI.backgroundColor = new Color(0.05f, 0.15f, 0.2f);
+                    _editing.XPToNextLevel[lv] = Mathf.Max(0, EditorGUILayout.IntField(_editing.XPToNextLevel[lv], GUILayout.Width(70)));
+                    GUI.backgroundColor = oldBg;
+                }
+                else
+                {
+                    GUI.enabled = lv < 4; // Lv5 (index4) là max, không có "lên Lv kế" -> khoá field
+                    _editing.XPToNextLevel[lv] = Mathf.Max(0, EditorGUILayout.IntField(_editing.XPToNextLevel[lv], GUILayout.Width(70)));
+                    GUI.enabled = true;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
 
             GUILayout.Space(6);
-            float xpR  = _editing.XPToNextLevel > 0 ? Mathf.Clamp01((float)_editing.XP / _editing.XPToNextLevel) : 1f;
+            int    xpNeededCur = _editing.GetCurrentXPToNextLevel();
+            float xpR  = xpNeededCur > 0 ? Mathf.Clamp01((float)_editing.XP / xpNeededCur) : 1f;
             var   xpBR = GUILayoutUtility.GetRect(0, 18, GUILayout.ExpandWidth(true));
             xpBR = new Rect(xpBR.x + 4, xpBR.y, xpBR.width - 8, xpBR.height);
             EditorGUI.DrawRect(xpBR, new Color(0.08f, 0.08f, 0.12f));
             EditorGUI.DrawRect(new Rect(xpBR.x, xpBR.y, xpBR.width * xpR, xpBR.height), CCyan);
-            GUI.Label(xpBR, $"  {_editing.XP} / {_editing.XPToNextLevel}  ({xpR * 100:0}%)",
+            GUI.Label(xpBR, $"  {_editing.XP} / {xpNeededCur}  ({xpR * 100:0}%)",
                 new GUIStyle(GUI.skin.label){ fontSize = 10, normal = { textColor = Color.white } });
 
             GUILayout.Space(4);
@@ -748,7 +782,7 @@ public class WeaponEditorWindow : EditorWindow
             GUILayout.Space(8);
             GUI.color = CCyan;
             if (GUILayout.Button("↑ Max Level (5)", GUILayout.Width(120), GUILayout.Height(28)))
-            { _editing.Level = 5; _editing.XP = 0; _editing.XPToNextLevel = 0; }
+            { _editing.Level = 5; _editing.XP = 0; }
             GUI.color = Color.white;
 
             GUILayout.Space(8);
@@ -937,19 +971,30 @@ public class WeaponEditorWindow : EditorWindow
     private void SyncListFromDB()
     {
         _list.Clear();
+        _assetList.Clear();
         if (_db?.Weapons != null)
-            foreach (var w in _db.Weapons) _list.Add(w);
+            foreach (var asset in _db.Weapons)
+            {
+                if (asset == null || asset.Entry == null) continue; // asset bi thieu/broken -> bo qua
+                _assetList.Add(asset);
+                _list.Add(asset.Entry);
+            }
     }
 
     private void SaveDatabase()
     {
         if (_db == null) return;
         Undo.RecordObject(_db, "Save Weapon Database");
-        _db.Weapons = _list.ToArray();
+        // _list[i].Entry duoc mutate TRUC TIEP tren object cua _assetList[i] (WeaponEntry la
+        // class/reference type) ngay tu ApplyEditing() -> chi can dong bo lai CAU TRUC mang
+        // (add/remove/reorder) vao _db.Weapons, roi SetDirty tung WeaponDataAsset lien quan.
+        _db.Weapons = _assetList.ToArray();
+        foreach (var asset in _assetList)
+            if (asset != null) EditorUtility.SetDirty(asset);
         EditorUtility.SetDirty(_db);
         AssetDatabase.SaveAssets();
         _isDirty = false;
-        Debug.Log($"[WeaponEditor] ✅ Đã lưu {_list.Count} vũ khí vào {_dbPath}");
+        Debug.Log($"[WeaponEditor] ✅ Đã lưu {_list.Count} vũ khí ({_assetList.Count} WeaponDataAsset) vào {_dbPath}");
     }
 
     private void CreateNewDatabase()
@@ -959,7 +1004,7 @@ public class WeaponEditorWindow : EditorWindow
         if (string.IsNullOrEmpty(path)) return;
 
         var newDb = CreateInstance<WeaponData>();
-        newDb.Weapons = Array.Empty<WeaponEntry>();
+        newDb.Weapons = Array.Empty<WeaponDataAsset>();
         AssetDatabase.CreateAsset(newDb, path);
         AssetDatabase.SaveAssets();
         _dbPath = path;
@@ -978,6 +1023,54 @@ public class WeaponEditorWindow : EditorWindow
             if (sp != null) _allSprites.Add(sp);
         }
         _allSprites = _allSprites.OrderBy(s => s.name).ToList();
+    }
+
+    /// <summary>
+    /// Thư mục chứa các file WeaponDataAsset riêng lẻ — mặc định là thư mục con "Weapons" nằm
+    /// cạnh WeaponDatabase.asset (VD Assets/Resources/Data/Weapons/), tạo mới nếu chưa có.
+    /// </summary>
+    private string GetWeaponsFolder()
+    {
+        string dbFolder = System.IO.Path.GetDirectoryName(_dbPath)?.Replace('\\', '/') ?? "Assets";
+        string weaponsFolder = dbFolder + "/Weapons";
+        if (!AssetDatabase.IsValidFolder(weaponsFolder))
+            AssetDatabase.CreateFolder(dbFolder, "Weapons");
+        return weaponsFolder;
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "Weapon";
+        foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            name = name.Replace(c, '_');
+        return name.Replace(" ", "_");
+    }
+
+    /// <summary>
+    /// Tạo 1 file WeaponDataAsset MỚI trên disk (qua AssetDatabase.CreateAsset — đảm bảo
+    /// m_Script trỏ đúng guid thật của script, KHÔNG bị lỗi "fileID: 0" như các asset viết tay
+    /// trước đây), gán entry vào Entry rồi lưu. Trả về null nếu tạo thất bại.
+    /// </summary>
+    private WeaponDataAsset CreateWeaponAssetFile(WeaponEntry entry)
+    {
+        string folder   = GetWeaponsFolder();
+        string fileName = $"Weapon_{entry.ID}_{SanitizeFileName(entry.Name)}.asset";
+        string path     = AssetDatabase.GenerateUniqueAssetPath(folder + "/" + fileName);
+
+        var asset = CreateInstance<WeaponDataAsset>();
+        asset.Entry = entry;
+
+        AssetDatabase.CreateAsset(asset, path);
+        AssetDatabase.SaveAssets();
+
+        if (asset == null)
+        {
+            Debug.LogError($"[WeaponEditor] Không thể tạo WeaponDataAsset tại: {path}");
+            return null;
+        }
+
+        Debug.Log($"[WeaponEditor] 📄 Đã tạo WeaponDataAsset mới: {path}");
+        return asset;
     }
 
     #endregion
@@ -1002,7 +1095,7 @@ public class WeaponEditorWindow : EditorWindow
             Name            = "New Weapon",
             Level           = 1,
             XP              = 0,
-            XPToNextLevel   = 100,
+            XPToNextLevel   = new int[]{ 100, 130, 170, 220, 0 },
             DamagePerLevel  = new float[]{ 50f, 62f, 78f, 95f, 115f },
             HPPerLevel      = new float[]{ 200f, 260f, 330f, 410f, 500f },
             Coin            = 300,
@@ -1010,6 +1103,11 @@ public class WeaponEditorWindow : EditorWindow
             TimeDelay       = 0f,
             GridCells       = Array.Empty<WeaponGridCell>(),
         };
+
+        var asset = CreateWeaponAssetFile(entry);
+        if (asset == null) return; // loi da log ben trong CreateWeaponAssetFile
+
+        _assetList.Add(asset);
         _list.Add(entry);
         _isDirty = true;
         RebuildFiltered();
@@ -1023,12 +1121,17 @@ public class WeaponEditorWindow : EditorWindow
         var copy  = CloneEntry(_editing);
         copy.ID   = GenerateFreeID(-1);
         copy.Name = _editing.Name + " (copy)";
+
+        var asset = CreateWeaponAssetFile(copy);
+        if (asset == null) return;
+
+        _assetList.Add(asset);
         _list.Add(copy);
         _isDirty = true;
         RebuildFiltered();
         SelectWeapon(_list.Count - 1);
         Repaint();
-        Debug.Log($"[WeaponEditor] Nhân bản: {copy.Name}");
+        Debug.Log($"[WeaponEditor] Nhân bản: {copy.Name} → {AssetDatabase.GetAssetPath(asset)}");
     }
 
     private void ApplyEditing()
@@ -1043,6 +1146,8 @@ public class WeaponEditorWindow : EditorWindow
             }
 
         CopyEntry(_editing, _list[_selectedIndex]);
+        if (_selectedIndex < _assetList.Count && _assetList[_selectedIndex] != null)
+            EditorUtility.SetDirty(_assetList[_selectedIndex]);
         _isDirty = true;
         RebuildFiltered();
         Repaint();
@@ -1059,12 +1164,15 @@ public class WeaponEditorWindow : EditorWindow
     {
         if (_selectedIndex < 0 || _selectedIndex >= _list.Count) return;
         string n = _list[_selectedIndex].Name;
+        // Chi go tham chieu khoi Database — KHONG xoa file .asset tren disk, vi cung 1
+        // WeaponDataAsset co the dang duoc it nhat 1 EnemyDuckData.weaponAsset tham chieu chung.
         _list.RemoveAt(_selectedIndex);
+        if (_selectedIndex < _assetList.Count) _assetList.RemoveAt(_selectedIndex);
         _selectedIndex = Mathf.Clamp(_selectedIndex - 1, -1, _list.Count - 1);
         _editing       = _selectedIndex >= 0 ? CloneEntry(_list[_selectedIndex]) : null;
         _isDirty       = true;
         RebuildFiltered();
-        Debug.Log($"[WeaponEditor] 🗑 Đã xoá: {n}");
+        Debug.Log($"[WeaponEditor] 🗑 Đã gỡ khỏi Database: {n} (file .asset vẫn còn trên disk)."); 
         Repaint();
     }
 
@@ -1088,7 +1196,7 @@ public class WeaponEditorWindow : EditorWindow
             ShapeSprite     = s.ShapeSprite,
             Level           = s.Level,
             XP              = s.XP,
-            XPToNextLevel   = s.XPToNextLevel,
+            XPToNextLevel   = s.XPToNextLevel != null ? (int[])s.XPToNextLevel.Clone() : new int[5],
             DamagePerLevel  = s.DamagePerLevel != null ? (float[])s.DamagePerLevel.Clone() : new float[5],
             HPPerLevel      = s.HPPerLevel     != null ? (float[])s.HPPerLevel.Clone()     : new float[5],
             Coin            = s.Coin,
@@ -1117,7 +1225,7 @@ public class WeaponEditorWindow : EditorWindow
         d.ShapeSprite     = s.ShapeSprite;
         d.Level           = s.Level;
         d.XP              = s.XP;
-        d.XPToNextLevel   = s.XPToNextLevel;
+        d.XPToNextLevel   = s.XPToNextLevel != null ? (int[])s.XPToNextLevel.Clone() : new int[5];
         d.DamagePerLevel  = s.DamagePerLevel != null ? (float[])s.DamagePerLevel.Clone() : new float[5];
         d.HPPerLevel      = s.HPPerLevel     != null ? (float[])s.HPPerLevel.Clone()     : new float[5];
         d.Coin            = s.Coin;

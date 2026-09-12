@@ -25,6 +25,18 @@ public class LoadingStartGameUI : MonoBehaviour
     /// </summary>
     public void StartLoadingSequence()
     {
+        // Đảm bảo TOÀN BỘ chuỗi GameObject cha (VD "StartGame") đều đang bật trước. Nếu 1 cha nào
+        // đó đang tắt, gameObject.SetActive(true) bên dưới chỉ bật activeSelf của riêng object này,
+        // activeInHierarchy vẫn là false -> Unity sẽ KHÔNG gọi Awake() -> _loadingBar vẫn null ->
+        // NullReferenceException ngay dòng StartLoading() phía dưới.
+        Transform parent = transform.parent;
+        while (parent != null)
+        {
+            if (!parent.gameObject.activeSelf)
+                parent.gameObject.SetActive(true);
+            parent = parent.parent;
+        }
+
         gameObject.SetActive(true);
         _loadingBar.StartLoading(OnLoadingComplete);
     }

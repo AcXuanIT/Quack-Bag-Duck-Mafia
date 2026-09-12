@@ -16,8 +16,8 @@ MonoBehaviour:
     ID: 6
     Name: Vit Dich Phong Thu
     Tier: 2
-    BaseHP: 330
-    BaseDamage: 7
+    BaseHP: 990
+    BaseDamage: 35
     SpriteTier1: {fileID: 21300000, guid: 1ff9287aa6b924c43bb1793b70e91923, type: 2}
     SpriteTier2: {fileID: 21300000, guid: d76e4ac65d5d9e046a34b2f78876b911, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 869de9e8b57d1b94393a401008d3aaae, type: 2}
@@ -30,37 +30,7 @@ MonoBehaviour:
     AttackDamage: 7
     AttackSpeed: 0.9
     MoveSpeed: 1.2
-    weaponData:
-      ID: 0
-      Name: 
-      SpriteTier1: {fileID: 0}
-      SpriteTier2: {fileID: 0}
-      SpriteTier3: {fileID: 0}
-      SpriteTier4: {fileID: 0}
-      ShapeSprite: {fileID: 0}
-      ShapeFill: {fileID: 0}
-      GridCells: []
-      Level: 1
-      XP: 0
-      XPToNextLevel: 0
-      DamagePerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      HPPerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      AttackRange: 1
-      LevelLock: 0
-      Coin: 0
-      IsLocked: 0
-      TimeDelay: 0
-      TimeAttack: 1
+    weaponAsset: {fileID: 11400000, guid: f4a5b3ef6ce88554ab6fd678bfe67a96, type: 2}
     RewardCoin: 10
     RewardExp: 10
     SpawnWave: 3

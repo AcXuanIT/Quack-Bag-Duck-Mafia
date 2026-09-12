@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6997dbcd4020474fa56c5c11118c4ca, type: 3}
+  m_Name: Weapon_15_Test_Bow_Ban_Cung
+  m_EditorClassIdentifier: 
+  Entry:
+    ID: 15
+    Name: Cung
+    Category: 0
+    SpriteTier1: {fileID: 21300000, guid: 0335f14d9344ad54fa790d0e231a3802, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 8ba20fd6b090bf54d8e2d72d03e19d45, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 3838701b9b9d5f742abe352b73276180, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 4e020ade2396b2844bda0e85046b64b8, type: 2}
+    ShapeSprite: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: -730190378, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 1
+    Level: 1
+    XP: 5
+    XPToNextLevel: 08000000100000001c0000002800000000000000
+    DamagePerLevel:
+    - 80
+    - 100
+    - 124
+    - 152
+    - 184
+    HPPerLevel:
+    - 540
+    - 702
+    - 891
+    - 1107
+    - 1350
+    Power: 0d00000011000000150000001a00000020000000
+    AttackRange: 3.5
+    LevelLock: 0
+    Coin: 150
+    IsLocked: 0
+    TimeDelay: 4
+    TimeAttack: 1
+    vfxWeapon: {fileID: 7937223791722628261, guid: 29fda0b8dd8d5554ca6e7ccfdb62a3d9, type: 3}

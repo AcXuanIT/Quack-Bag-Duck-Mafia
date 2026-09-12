@@ -4,7 +4,7 @@ using UnityEngine;
 /// ScriptableObject định nghĩa dữ liệu 1 GridItem trong Shop (hình dạng ô để unlock Battle Grid).
 ///
 /// LƯU Ý CẤU TRÚC MỚI: ShopItemData giờ CHỈ dùng cho Grid item.
-/// - Gear   : lấy thẳng từ WeaponData (Assets/Resources/Data/WeaponDatabase) qua DataManager,
+/// - Gear   : lấy thẳng từ WeaponData (Assets/Data/Weapon/WeaponDatabase.asset) qua DataManager,
 ///            không còn ShopItemData wrapper cho Gear nữa.
 /// - UnitDuck: lấy thẳng từ MyDuckData (Assets/Data/MyDuck) qua DataManager,
 ///            không còn ShopItemData wrapper cho UnitDuck nữa.

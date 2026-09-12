@@ -16,8 +16,8 @@ MonoBehaviour:
     ID: 9
     Name: Vit Dich Sat Thu
     Tier: 3
-    BaseHP: 300
-    BaseDamage: 20
+    BaseHP: 900
+    BaseDamage: 100
     SpriteTier1: {fileID: 21300000, guid: e2198d9f29413c948beda4ce0c3a7eaf, type: 2}
     SpriteTier2: {fileID: 21300000, guid: a602bd7200c50a242b01346678d0b1da, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 10057a43e00413442ab3cfacad3b283a, type: 2}
@@ -30,37 +30,7 @@ MonoBehaviour:
     AttackDamage: 20
     AttackSpeed: 1.8
     MoveSpeed: 2.5
-    weaponData:
-      ID: 0
-      Name: 
-      SpriteTier1: {fileID: 0}
-      SpriteTier2: {fileID: 0}
-      SpriteTier3: {fileID: 0}
-      SpriteTier4: {fileID: 0}
-      ShapeSprite: {fileID: 0}
-      ShapeFill: {fileID: 0}
-      GridCells: []
-      Level: 1
-      XP: 0
-      XPToNextLevel: 0
-      DamagePerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      HPPerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      AttackRange: 1
-      LevelLock: 0
-      Coin: 0
-      IsLocked: 0
-      TimeDelay: 0
-      TimeAttack: 1
+    weaponAsset: {fileID: 11400000, guid: 65ba2ba4bad008e4ab0dca25789a4760, type: 2}
     RewardCoin: 18
     RewardExp: 18
     SpawnWave: 5

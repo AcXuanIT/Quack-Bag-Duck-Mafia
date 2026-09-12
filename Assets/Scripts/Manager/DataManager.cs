@@ -8,7 +8,7 @@ public class DataManager : Singleton<DataManager>
     [SerializeField] private List<MyDuckDataAsset> myDuckAssets = new List<MyDuckDataAsset>();
     [SerializeField] private List<EnemyDuckDataAsset> enemyDuckAssets = new List<EnemyDuckDataAsset>();
 
-    [Header("=== Assets/Resources/Data (tự Resources.Load nếu để trống) ===")]
+    [Header("=== Assets/Data/Weapon (gán tay — WeaponDatabase.asset, cùng cấu trúc với MyDuck/EnemyDuck) ===")]
     [SerializeField] private WeaponData weaponDatabase;
 
     [SerializeField] private List<MapBattsleData> mapBattleData = new List<MapBattsleData>();

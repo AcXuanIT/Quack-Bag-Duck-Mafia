@@ -4,6 +4,15 @@ using UnityEngine.UI;
 /// <summary>
 /// Gan vao Batte/Setting.
 /// Dung Awake de AddListener vi Setting co the dang inactive khi Start chay.
+///
+/// BackToMenu() dung chung cho CA 2 truong hop:
+///   1. Nguoi choi bam btnBackMenu trong Pause Setting giua tran dau.
+///   2. Nguoi choi bam nut tren PanelWin/PanelLose khi tran dau da ket thuc (duoc gan qua
+///      Inspector onClick cua nut do, tro thang toi BackToMenu() - xem UIWin/Button va
+///      UILose/Button).
+/// Truoc khi tat UI/BatteMap, LUON goi BattleManager.Instance.ReturnToMenu() truoc tien de
+/// don sach TOAN BO du lieu/vat the cua tran dau (UnitDuck, EnemyDuck, Grid, Gear/Unit da dat
+/// tren Grid, HP MyTeam) - tranh du lieu cu bi de len khi choi lai/qua man tiep theo.
 /// </summary>
 public class BattleSettingController : MonoBehaviour
 {
@@ -47,9 +56,18 @@ public class BattleSettingController : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    /// <summary>
+    /// Ket thuc van dau va quay ve MenuGame. Goi tu btnBackMenu (Pause) HOAC tu nut tren
+    /// PanelWin/PanelLose (gan truc tiep qua Inspector onClick).
+    /// </summary>
     public void BackToMenu()
     {
         Time.timeScale = 1f;
+
+        // 0. Don sach TOAN BO du lieu/vat the cua tran dau hien tai (UnitDuck, EnemyDuck, Grid,
+        //    Gear/Unit da dat tren Grid, HP MyTeam...) truoc khi rroi khoi man Battle.
+        if (BattleManager.Instance != null)
+            BattleManager.Instance.ReturnToMenu();
 
         // 1. An Setting
         if (settingPanel != null) settingPanel.SetActive(false);
@@ -60,7 +78,9 @@ public class BattleSettingController : MonoBehaviour
         // 3. Tat BatteMap non-UI
         if (batteMapObject != null) batteMapObject.SetActive(false);
 
-        // 4. Xoa tat ca item trong Component container (GridShopItemUI spawned)
+        // 4. Xoa tat ca item con sot trong Component container (GridShopItemUI spawned) - da
+        //    duoc BattleManager.ReturnToMenu() xoa het roi nhung giu lai buoc nay de an toan
+        //    (idempotent) neu componentContainer con item nao khac khong thuoc quan ly Battle.
         if (componentContainer != null)
         {
             for (int i = componentContainer.childCount - 1; i >= 0; i--)

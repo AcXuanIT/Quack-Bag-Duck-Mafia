@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6997dbcd4020474fa56c5c11118c4ca, type: 3}
+  m_Name: Weapon_5_SMG_Rush
+  m_EditorClassIdentifier: 
+  Entry:
+    ID: 5
+    Name: "Ti\u1EC3u Li\xEAn Xung K\xEDch"
+    Category: 1
+    SpriteTier1: {fileID: 21300000, guid: 7216ef482af38a44d8fdbe67f9975d22, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 5aa620f86522d1048822b4b7db5e2e77, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 32e38a87719de5e4bbc2ec2bb38c1819, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: 93b49ec3d61a70146947be0f9bf06545, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 0
+    - gridPosition: {x: 0, y: 1}
+      isOccupied: 0
+    Level: 1
+    XP: 0
+    XPToNextLevel: 0900000012000000200000002d00000000000000
+    DamagePerLevel:
+    - 60
+    - 75
+    - 93
+    - 114
+    - 138
+    HPPerLevel:
+    - 750
+    - 975
+    - 1236
+    - 1536
+    - 1875
+    Power: 0e00000011000000160000001b00000021000000
+    AttackRange: 2.5
+    LevelLock: 0
+    Coin: 180
+    IsLocked: 0
+    TimeDelay: 4
+    TimeAttack: 1
+    vfxWeapon: {fileID: 0}

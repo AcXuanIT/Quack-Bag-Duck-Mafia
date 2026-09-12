@@ -64,8 +64,10 @@ public class BatteCameraEffect : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
+        // Lưu ý: KHÔNG gọi ToggleEffect() ở đây — BattleManager.FinishTurnSetup() đã tự gọi
+        // cameraEffect.ReverseEffect() khi chuyển sang TurnBattle, gọi thêm ở đây sẽ bị trùng
+        // (2 lần Reverse liên tiếp).
         btnStartWar.onClick.AddListener(() => {
-            ToggleEffect();
             BattleManager.Instance.FinishTurnSetup();
         });
 
@@ -183,6 +185,36 @@ public class BatteCameraEffect : MonoBehaviour
     {
         if (_isAnimated) ReverseEffect();
         else PlayEffect();
+    }
+
+    // ─────────────────────────────────────────────
+    /// <summary>
+    /// Snap NGAY về trạng thái gốc (KHÔNG chạy tween/animation) và reset cờ _isAnimated về false.
+    /// Dùng khi Reset trận đấu (BattleManager.ResetBattleState()) để đảm bảo lần ToggleEffect()
+    /// kế tiếp (turn đầu tiên của trận mới) luôn chạy đúng PlayEffect() thay vì bị lệch trạng thái
+    /// do trận trước thoát giữa chừng (VD: bấm Back Menu khi đang zoom effect) khiến _isAnimated
+    /// vẫn còn true — xem class doc BattleManager phần "Camera Effect".
+    /// </summary>
+    [ContextMenu("Reset To Origin")]
+    public void ResetToOrigin()
+    {
+        _seq?.Kill();
+        _isAnimated = false;
+
+        if (compoentItem != null)
+            compoentItem.SetActive(false);
+
+        if (batteRect != null)
+        {
+            batteRect.anchoredPosition = _batteOriginPos;
+            batteRect.localScale       = _batteOriginScale;
+        }
+
+        if (mainCamera != null)
+        {
+            mainCamera.transform.position = _cameraOriginPos;
+            mainCamera.orthographicSize   = _cameraOriginOrthoSize;
+        }
     }
 
     void OnDestroy()

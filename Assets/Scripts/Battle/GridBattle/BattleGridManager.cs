@@ -77,7 +77,8 @@ public struct GridItemCell
 /// hệ thống tự động ghi/xoá dữ liệu tương ứng trong Cells, rồi gọi RefreshGearUnitLinks() để
 /// quét lại toàn bộ Cells và cập nhật trạng thái "liên kết" giữa GearItem và UnitItem liền kề
 /// (hiện hiệu ứng OnConnect() + bật cờ IsLinkedToUnit trên các Gear đang liền kề ít nhất 1 Unit;
-/// tắt cờ đó trên các Gear không còn liền kề Unit nào).
+/// tắt cờ đó trên các Gear không còn liền kề Unit nào), ĐỒNG THỜI tính lại tổng Power của toàn
+/// bộ đội hình (xem RecalculateTotalPower()) và đẩy qua BattleManager.SetPower().
 /// </summary>
 public class BattleGridManager : MonoBehaviour
 {
@@ -230,6 +231,10 @@ public class BattleGridManager : MonoBehaviour
         Debug.Log("[BattleGridManager] Grid " + columns + "x" + rows + " built (pooled)."
             + " spriteLocked=" + (spriteLocked   != null ? spriteLocked.name   : "NULL")
             + " spriteUnlocked=" + (spriteUnlocked != null ? spriteUnlocked.name : "NULL"));
+
+        // Grid vừa build lại đồng nghĩa không còn Gear/Unit nào trên bàn cờ -> Power về 0.
+        if (BattleManager.Instance != null)
+            BattleManager.Instance.SetPower(0);
     }
 
     /// <summary>
@@ -498,6 +503,9 @@ public class BattleGridManager : MonoBehaviour
     /// (PlaceGear/RemoveGear/PlaceUnit/RemoveUnit), không cần gọi tay từ bên ngoài.
     /// Dùng ItemID (không phải Type+Tier) để nhóm đúng các ô thuộc CÙNG 1 Gear instance,
     /// tránh nhầm 2 Gear khác nhau nhưng cùng loại+tier thành 1.
+    ///
+    /// Sau khi cập nhật xong liên kết, gọi RecalculateTotalPower() để tính lại tổng Power
+    /// của toàn bộ đội hình dựa trên đúng danh sách liên kết vừa quét được.
     /// </summary>
     public void RefreshGearUnitLinks()
     {
@@ -548,6 +556,36 @@ public class BattleGridManager : MonoBehaviour
             kv.Value.SetLinkedUnits(units);
             if (units.Count > 0) kv.Value.OnConnect();
         }
+
+        RecalculateTotalPower(gearRefByID, unitsByGearID);
+    }
+
+    /// <summary>
+    /// Tính lại TOÀN BỘ tổng Power của đội hình Player hiện đang trên Battle Grid, theo công
+    /// thức: mỗi GearItem (WeaponEntry) đang liền kề (4 hướng) với Unit đóng góp
+    /// WeaponEntry.GetCurrentPower() (Power tại Level hiện tại của weapon) NHÂN với số Unit
+    /// đang liền kề nó (unitsByGearID[gearID].Count). Gear không liền kề Unit nào (0 unit)
+    /// đóng góp 0 Power. Kết quả tổng được đẩy thẳng qua BattleManager.Instance.SetPower() —
+    /// đây là NƠI DUY NHẤT tính công thức Power, BattleManager chỉ giữ giá trị và cập nhật UI.
+    /// Gọi tự động ở cuối RefreshGearUnitLinks() mỗi khi Cells thay đổi (đặt/gỡ Gear hoặc Unit).
+    /// </summary>
+    private void RecalculateTotalPower(Dictionary<int, GearItemUI> gearRefByID, Dictionary<int, List<UnitPlayerItemUI>> unitsByGearID)
+    {
+        int totalPower = 0;
+
+        foreach (var kv in gearRefByID)
+        {
+            var gear = kv.Value;
+            if (gear == null || gear.Weapon == null) continue;
+
+            int unitCount = unitsByGearID.TryGetValue(kv.Key, out var units) ? units.Count : 0;
+            if (unitCount <= 0) continue;
+
+            totalPower += gear.Weapon.GetCurrentPower() * unitCount;
+        }
+
+        if (BattleManager.Instance != null)
+            BattleManager.Instance.SetPower(totalPower);
     }
 
     /// <summary>

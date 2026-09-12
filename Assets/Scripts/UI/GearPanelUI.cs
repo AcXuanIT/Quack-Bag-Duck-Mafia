@@ -40,7 +40,9 @@ public class GearPanelUI : MonoBehaviour
         var unlockedList = new List<WeaponEntry>();
         var lockedList   = new List<WeaponEntry>();
 
-        foreach (var w in weaponDatabase.Weapons)
+        // weaponDatabase.Weapons giờ là WeaponDataAsset[] — dereference qua .Entry cho từng
+        // asset (GetEntries() bỏ qua phần tử null/Entry null giúp).
+        foreach (var w in weaponDatabase.GetEntries())
         {
             if (!w.IsLocked) unlockedList.Add(w);
             else             lockedList.Add(w);

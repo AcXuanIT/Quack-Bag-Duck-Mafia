@@ -63,14 +63,15 @@ public class WeaponSlotUI : MonoBehaviour
         if (hpText)     hpText.text     = unlocked ? $"{data.GetCurrentHP():0}" : "-";
         if (coinText)   coinText.text   = unlocked ? $"{data.Coin}" : "-";
 
-        // --- XP Bar ---
+        // --- XP Bar --- (ngưỡng lấy theo Level hiện tại — xem WeaponEntry.GetCurrentXPToNextLevel())
         if (xpBar)
         {
             xpBar.gameObject.SetActive(unlocked);
-            if (unlocked && data.XPToNextLevel > 0)
+            int xpNeeded = data.GetCurrentXPToNextLevel();
+            if (unlocked && xpNeeded > 0)
             {
-                xpBar.value = (float)data.XP / data.XPToNextLevel;
-                if (xpText) xpText.text = $"{data.XP}/{data.XPToNextLevel}";
+                xpBar.value = (float)data.XP / xpNeeded;
+                if (xpText) xpText.text = $"{data.XP}/{xpNeeded}";
             }
         }
 

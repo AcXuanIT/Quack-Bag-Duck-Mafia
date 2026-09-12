@@ -7,7 +7,8 @@ using TMPro;
 /// Quản lý Shop trong màn Battle.
 /// - Grid  : vẫn dùng ShopItemData (List gridItems) — vì shape của Grid item không tồn tại ở đâu khác.
 /// - Gear  : KHÔNG còn ItemPool ShopItemData nữa — random trực tiếp 1 WeaponEntry từ
-///           DataManager.Instance.WeaponDatabase.Weapons (nguồn WeaponData duy nhất).
+///           DataManager.Instance.WeaponDatabase.GetEntries() (nguồn WeaponData duy nhất,
+///           dereference qua từng WeaponDataAsset).
 /// - UnitDuck : KHÔNG còn ItemPool ShopItemData nữa — random trực tiếp 1 MyDuckData từ
 ///           DataManager.Instance.AllMyDuckAssets (nguồn Assets/Data/MyDuck duy nhất).
 ///
@@ -17,11 +18,16 @@ using TMPro;
 /// - GridItem spawn ra LUÔN được ràng buộc theo GridSystem: chỉ random trong số
 ///   những item có ÍT NHẤT 1 vị trí đặt hợp lệ thật sự trên bàn cờ hiện tại
 ///   (BattleGridManager.HasValidPlacement).
+///
+/// Player Money: KHÔNG còn giữ biến tiền riêng (_playerGold đã bị xoá) — nguồn dữ liệu tiền
+/// DUY NHẤT là BattleManager.PlayerMoney. Mua item (OnBuyPressed()) gọi thẳng
+/// battleManager.SpendMoney(buyPrice); BattleManager tự đẩy cập nhật lại RefreshUI() ở đây
+/// mỗi khi tiền thay đổi (xem BattleManager.NotifyMoneyChanged()).
 /// </summary>
 public class ShopBatteManager : MonoBehaviour
 {
     [Header("Price")]
-    [SerializeField] private int buyPrice = 100;
+    [SerializeField] private int buyPrice = 20;
 
     [Header("References")]
     [SerializeField] private RectTransform trashZone;
@@ -32,7 +38,9 @@ public class ShopBatteManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI priceText;
 
     [Header("Battle Manager")]
-    [Tooltip("Lắng nghe OnTurnSetupStart để tự động refresh Shop mỗi khi turn mới bắt đầu")]
+    [Tooltip("Lắng nghe OnTurnSetupStart để tự động refresh Shop mỗi khi turn mới bắt đầu. " +
+             "Đồng thời là nguồn dữ liệu DUY NHẤT cho tiền của Player (PlayerMoney/SpendMoney/AddMoney) " +
+             "— ShopBatteManager không còn giữ biến tiền riêng.")]
     [SerializeField] private BattleManager battleManager;
 
     [Header("Prefabs")]
@@ -48,7 +56,6 @@ public class ShopBatteManager : MonoBehaviour
     [SerializeField] private List<ShopItemData> gridItems = new List<ShopItemData>();
 
     private List<GameObject>  _spawnedItems = new List<GameObject>();
-    private int _playerGold = 9999;
     private BattleGridManager _gridManager;
 
     void Start()
@@ -122,6 +129,7 @@ public class ShopBatteManager : MonoBehaviour
 
     /// <summary>
     /// Nhấn Buy: spawn đúng 1 GearItem + 1 GridItem + 1 UnitItem (cần ít nhất 3 slot trống).
+    /// Trừ tiền qua BattleManager.SpendMoney() — nguồn dữ liệu tiền DUY NHẤT của trận đấu.
     /// </summary>
     public void OnBuyPressed()
     {
@@ -129,17 +137,20 @@ public class ShopBatteManager : MonoBehaviour
         int freeSlots = maxSlots - _spawnedItems.Count;
 
         if (freeSlots < 3) { Debug.Log("[Shop] Không đủ slot (cần ít nhất 3)."); return; }
-        if (_playerGold < buyPrice) { Debug.Log($"[Shop] Thiếu vàng ({_playerGold}/{buyPrice})."); return; }
 
-        _playerGold -= buyPrice;
-        RefreshUI();
+        if (battleManager == null) { Debug.LogWarning("[Shop] Thieu BattleManager!"); return; }
+        if (!battleManager.SpendMoney(buyPrice))
+        {
+            Debug.Log($"[Shop] Thiếu tiền ({battleManager.PlayerMoney}/{buyPrice}).");
+            return;
+        }
 
         // Buy: luôn spawn 1 GearItem + 1 GridItem + 1 UnitItem
         SpawnItemOfType(ItemKind.Gear);
         SpawnItemOfType(ItemKind.Grid);
         SpawnItemOfType(ItemKind.UnitDuck);
 
-        Debug.Log($"[Shop] Spawn 1 Gear + 1 Grid + 1 Unit. Gold={_playerGold}. Slots={_spawnedItems.Count}/{maxSlots}");
+        Debug.Log($"[Shop] Spawn 1 Gear + 1 Grid + 1 Unit. Money={battleManager.PlayerMoney}. Slots={_spawnedItems.Count}/{maxSlots}");
     }
 
     // ── Spawn ────────────────────────────────────────────────
@@ -184,20 +195,22 @@ public class ShopBatteManager : MonoBehaviour
         RegisterSpawned(go);
     }
 
-    /// <summary>Spawn 1 GearItem — random trực tiếp 1 WeaponEntry từ DataManager (WeaponData).</summary>
+    /// <summary>Spawn 1 GearItem — random trực tiếp 1 WeaponEntry từ DataManager (WeaponData),
+    /// dereference qua WeaponData.GetEntries() (mỗi entry lấy từ 1 WeaponDataAsset riêng).</summary>
     private void SpawnGearItem()
     {
         if (gearItemPrefab == null) { Debug.LogWarning("[Shop] Thieu gearItemPrefab!"); return; }
         if (componentContainer == null) { Debug.LogWarning("[Shop] Thieu componentContainer!"); return; }
 
         var weaponDb = DataManager.Instance.WeaponDatabase;
-        if (weaponDb == null || weaponDb.Weapons == null || weaponDb.Weapons.Length == 0)
+        WeaponEntry[] entries = weaponDb != null ? weaponDb.GetEntries() : null;
+        if (entries == null || entries.Length == 0)
         {
             Debug.LogWarning("[Shop] DataManager.WeaponDatabase rong — khong co Gear nao de spawn!");
             return;
         }
 
-        WeaponEntry weapon = weaponDb.Weapons[Random.Range(0, weaponDb.Weapons.Length)];
+        WeaponEntry weapon = entries[Random.Range(0, entries.Length)];
 
         var go = Instantiate(gearItemPrefab, componentContainer);
         go.SetActive(true);
@@ -275,13 +288,23 @@ public class ShopBatteManager : MonoBehaviour
     public void RemoveItemAt(int i)           { SyncSpawnedList(); if (i < 0 || i >= _spawnedItems.Count) return; var g = _spawnedItems[i]; _spawnedItems.RemoveAt(i); Destroy(g); }
     public int  CurrentItemCount             { get { SyncSpawnedList(); return _spawnedItems.Count; } }
     public bool HasFreeSlot                  => CurrentItemCount < maxSlots;
-    public int  PlayerGold                   => _playerGold;
-    public void AddGold(int amount)          { _playerGold += amount; RefreshUI(); }
 
-    private void RefreshUI()
+    /// <summary>Tiền hiện tại của Player — đọc thẳng từ BattleManager (nguồn dữ liệu DUY NHẤT).</summary>
+    public int PlayerGold => battleManager != null ? battleManager.PlayerMoney : 0;
+
+    /// <summary>Cộng thêm tiền cho Player — forward thẳng qua BattleManager.AddMoney() (tự đẩy RefreshUI()).</summary>
+    public void AddGold(int amount)
     {
+        if (battleManager != null) battleManager.AddMoney(amount);
+    }
+
+    /// <summary>Cập nhật giá tiền hiển thị và trạng thái nút Buy — gọi từ BattleManager mỗi khi
+    /// PlayerMoney thay đổi (NotifyMoneyChanged()), và tự gọi khi Start().</summary>
+    public void RefreshUI()
+    {
+        int currentMoney = battleManager != null ? battleManager.PlayerMoney : 0;
         if (priceText != null) priceText.text = buyPrice.ToString();
-        if (btnBuy    != null) btnBuy.interactable = (_playerGold >= buyPrice);
+        if (btnBuy    != null) btnBuy.interactable = (currentMoney >= buyPrice);
     }
 
     /// <summary>

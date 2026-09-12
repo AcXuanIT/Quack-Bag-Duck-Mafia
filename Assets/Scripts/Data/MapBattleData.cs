@@ -6,8 +6,8 @@ using UnityEngine;
 [System.Serializable]
 public class EnemySpawnEntry
 {
-    [Tooltip("Data của loại enemy (EnemyDuckData)")]
-    public EnemyDuckData EnemyData;
+    [Tooltip("Data của loại enemy (EnemyDuckDataAsset)")]
+    public EnemyDuckDataAsset EnemyData;
 
     [Tooltip("Số lượng enemy loại này cần spawn trong wave")]
     [Min(0)]
@@ -51,7 +51,6 @@ public class WaveData
 public class MapBattsleData : ScriptableObject
 {
     [Header("=== Waves ===")]
-    [Tooltip("Danh sách các Wave trong màn chơi này")]
     public WaveData[] Waves;
 
     /// <summary>Tổng số wave trong màn chơi.</summary>

@@ -58,12 +58,14 @@ public class WeaponSlotGridUI : MonoBehaviour
         if (levelText != null)
             levelText.text = "Cấp " + data.Level;
 
-        // XP Bar
-        float xpPct = data.XPToNextLevel > 0 ? (float)data.XP / data.XPToNextLevel : 0f;
+        // XP Bar — ngưỡng lấy theo Level hiện tại (xem WeaponEntry.GetCurrentXPToNextLevel())
+        int xpNeeded = data.GetCurrentXPToNextLevel();
+        float xpPct = xpNeeded > 0 ? (float)data.XP / xpNeeded : 0f;
+        Debug.Log($"WeaponSlotGridUI.Bind: {data.Name} Level {data.Level} XP {data.XP}/{xpNeeded} ({xpPct:P1})");
         SetXPBar(xpPct);
 
         if (xpText != null)
-            xpText.text = data.XP + "/" + data.XPToNextLevel;
+            xpText.text = data.XP + "/" + xpNeeded;
 
         // Click listener
         var btn = GetComponent<Button>();

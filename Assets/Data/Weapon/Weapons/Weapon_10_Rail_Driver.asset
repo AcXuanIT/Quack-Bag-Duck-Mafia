@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6997dbcd4020474fa56c5c11118c4ca, type: 3}
+  m_Name: Weapon_10_Rail_Driver
+  m_EditorClassIdentifier: 
+  Entry:
+    ID: 10
+    Name: "S\xFAng Ray \u0110i\u1EC7n T\u1EEB"
+    Category: 1
+    SpriteTier1: {fileID: 21300000, guid: 9e465033521661a4394fed777aaa3558, type: 2}
+    SpriteTier2: {fileID: 21300000, guid: 565a90dff09950c4eb517d2133f26a5f, type: 2}
+    SpriteTier3: {fileID: 21300000, guid: 4aedaa19e53eeff4bbdee0ee09e295e0, type: 2}
+    SpriteTier4: {fileID: 21300000, guid: e9720fe01e818f643b95b5693390c6c0, type: 2}
+    ShapeSprite: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    ShapeFill: {fileID: 982554497, guid: ddc3b036ba13c604ab69cd5224e78449, type: 3}
+    GridCells:
+    - gridPosition: {x: 0, y: 0}
+      isOccupied: 1
+    - gridPosition: {x: 0, y: 1}
+      isOccupied: 1
+    Level: 1
+    XP: 4
+    XPToNextLevel: 1300000026000000430000005f00000000000000
+    DamagePerLevel:
+    - 220
+    - 275
+    - 341
+    - 418
+    - 506
+    HPPerLevel:
+    - 570
+    - 741
+    - 942
+    - 1170
+    - 1425
+    Power: 1c000000230000002c0000003600000041000000
+    AttackRange: 6.5
+    LevelLock: 0
+    Coin: 380
+    IsLocked: 0
+    TimeDelay: 10
+    TimeAttack: 1
+    vfxWeapon: {fileID: 0}

@@ -16,8 +16,8 @@ MonoBehaviour:
     ID: 1
     Name: Vit Dich Thuong
     Tier: 1
-    BaseHP: 180
-    BaseDamage: 8
+    BaseHP: 540
+    BaseDamage: 40
     SpriteTier1: {fileID: 21300000, guid: 477e84e08d94f2646b16b13c09248bef, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 18d55bba5b203af44913433959273217, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 0ebae15b6707ddf48bf4926308ae8c64, type: 2}
@@ -30,37 +30,7 @@ MonoBehaviour:
     AttackDamage: 8
     AttackSpeed: 1
     MoveSpeed: 2
-    weaponData:
-      ID: 0
-      Name: 
-      SpriteTier1: {fileID: 0}
-      SpriteTier2: {fileID: 0}
-      SpriteTier3: {fileID: 0}
-      SpriteTier4: {fileID: 0}
-      ShapeSprite: {fileID: 0}
-      ShapeFill: {fileID: 0}
-      GridCells: []
-      Level: 1
-      XP: 0
-      XPToNextLevel: 0
-      DamagePerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      HPPerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      AttackRange: 1
-      LevelLock: 0
-      Coin: 0
-      IsLocked: 0
-      TimeDelay: 0
-      TimeAttack: 1
+    weaponAsset: {fileID: 11400000, guid: 435fb202bb950e741b578e6c0f58c0ff, type: 2}
     RewardCoin: 5
     RewardExp: 5
     SpawnWave: 1

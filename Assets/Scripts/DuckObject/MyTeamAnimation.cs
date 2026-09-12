@@ -11,7 +11,12 @@ using DG.Tweening;
 ///      Nếu có nhiều tín hiệu spawn dồn dập trong lúc đang chạy thì KHÔNG huỷ
 ///      animation hiện tại — chỉ ghi nhận có tín hiệu mới, đợi animation hiện
 ///      tại chạy XONG rồi mới chạy lại thêm 1 lần.
-///   3) PlayDamageFlash() — nháy trắng SpriteRenderer khi nhận damage.
+///   3) PlayDamageFlash() — nháy màu SpriteRenderer khi nhận damage.
+///      LƯU Ý MÀU: SpriteRenderer.color là phép NHÂN (tint), không phải overlay. Sprite gốc
+///      mặc định color = (1,1,1,1) trắng tinh, nên nếu flashColor = trắng thì set color =
+///      flashColor KHÔNG đổi gì cả (trắng x trắng = trắng, không thể "sáng hơn trắng").
+///      Vì vậy flashColor mặc định dùng ĐỎ — tint nhân với đỏ luôn tạo khác biệt rõ rệt
+///      bất kể màu gốc sprite là gì.
 /// </summary>
 public class MyTeamAnimation : MonoBehaviour
 {
@@ -31,8 +36,9 @@ public class MyTeamAnimation : MonoBehaviour
     [Tooltip("SpriteRenderer hiển thị hình Duck/Team — object hiện dùng SpriteRenderer để hiển thị")]
     [SerializeField] private SpriteRenderer flashSpriteRenderer;
 
-    [Tooltip("Màu nháy khi nhận damage")]
-    [SerializeField] private Color flashColor = Color.white;
+    [Tooltip("Màu nháy khi nhận damage. Dùng ĐỎ (không dùng trắng) vì SpriteRenderer.color " +
+             "là tint NHÂN — sprite gốc đã trắng (1,1,1,1) nên nháy trắng sẽ không thấy được.")]
+    [SerializeField] private Color flashColor = new Color(1f, 0.15f, 0.15f, 1f);
 
     [Tooltip("Thời gian tween từ flashColor về màu gốc (giây)")]
     [SerializeField] private float flashDuration = 0.08f;
@@ -151,7 +157,7 @@ public class MyTeamAnimation : MonoBehaviour
     // ─── Damage Flash ───────────────────────────────────────
 
     /// <summary>
-    /// Nháy trắng SpriteRenderer khi nhận damage:
+    /// Nháy màu SpriteRenderer khi nhận damage:
     /// set color = flashColor ngay lập tức rồi tween mượt về màu gốc trong flashDuration.
     /// </summary>
     public void PlayDamageFlash()

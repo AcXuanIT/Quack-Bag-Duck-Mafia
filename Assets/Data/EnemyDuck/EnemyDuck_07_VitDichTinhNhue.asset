@@ -16,8 +16,8 @@ MonoBehaviour:
     ID: 7
     Name: Vit Dich Tinh Nhue
     Tier: 3
-    BaseHP: 390
-    BaseDamage: 15
+    BaseHP: 1170
+    BaseDamage: 75
     SpriteTier1: {fileID: 21300000, guid: 70938cc0f8880ff4a9d0bbcdca059adc, type: 2}
     SpriteTier2: {fileID: 21300000, guid: b4963c3f76b0a2f4a80c4f97387e893e, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 1b86a048e034b2a4bb79031b0bd6303c, type: 2}
@@ -30,37 +30,7 @@ MonoBehaviour:
     AttackDamage: 15
     AttackSpeed: 1.3
     MoveSpeed: 2
-    weaponData:
-      ID: 0
-      Name: 
-      SpriteTier1: {fileID: 0}
-      SpriteTier2: {fileID: 0}
-      SpriteTier3: {fileID: 0}
-      SpriteTier4: {fileID: 0}
-      ShapeSprite: {fileID: 0}
-      ShapeFill: {fileID: 0}
-      GridCells: []
-      Level: 1
-      XP: 0
-      XPToNextLevel: 0
-      DamagePerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      HPPerLevel:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      AttackRange: 1
-      LevelLock: 0
-      Coin: 0
-      IsLocked: 0
-      TimeDelay: 0
-      TimeAttack: 1
+    weaponAsset: {fileID: 11400000, guid: bbed61093382daa44b5d53ff3a590968, type: 2}
     RewardCoin: 15
     RewardExp: 15
     SpawnWave: 4

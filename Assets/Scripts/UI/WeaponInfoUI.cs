@@ -112,10 +112,13 @@ public class WeaponInfoUI : MonoBehaviour
         // HP
         if (hpCurrent != null) hpCurrent.text =data.GetCurrentHP().ToString("0");
         if (hpUpgrade != null) hpUpgrade.text = "+" + (data.GetNextLevelHP()-data.GetCurrentHP()).ToString("0");
-        // XP Bar
-        float xpPct = data.XPToNextLevel > 0 ? (float)data.XP / data.XPToNextLevel : 0f;
+
+        // XP Bar — ngưỡng XP cần để lên Level tiếp theo lấy theo Level HIỆN TẠI (mảng
+        // XPToNextLevel[5], xem WeaponData.cs — GetCurrentXPToNextLevel() trả về 0 nếu đã max Lv5).
+        int xpNeeded = data.GetCurrentXPToNextLevel();
+        float xpPct = xpNeeded > 0 ? (float)data.XP / xpNeeded : 0f;
         SetBar(xpSlice, _xpSliceFullWidth, xpPct);
-        if (xpText != null) xpText.text = data.XP + "/" + data.XPToNextLevel;
+        if (xpText != null) xpText.text = data.XP + "/" + xpNeeded;
 
         // Price
         if (priceUpgrade != null) priceUpgrade.text = data.Coin.ToString();
