@@ -33967,7 +33967,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &5647078973963763091
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -34454,6 +34454,10 @@ PrefabInstance:
     - target: {fileID: 668801788194713587, guid: c0ed52ec76f618e40bf0f63c8f458519, type: 3}
       propertyPath: m_Name
       value: Boom
+      objectReference: {fileID: 0}
+    - target: {fileID: 668801788194713587, guid: c0ed52ec76f618e40bf0f63c8f458519, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7004148769746377398, guid: c0ed52ec76f618e40bf0f63c8f458519, type: 3}
       propertyPath: m_LocalScale.x

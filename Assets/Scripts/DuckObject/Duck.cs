@@ -73,8 +73,13 @@ using DG.Tweening;
 ///
 /// VFX TẤN CÔNG: nếu weaponData.vfxWeapon (GameObject, xem WeaponData.cs) khác null VÀ posVFX
 /// (child "Weapon/PosVFX") đã được gán, SpawnWeaponVFX() sẽ Spawn prefab đó qua PoolingManager
-/// tại vị trí/góc quay của posVFX mỗi khi ra đòn. Nếu prefab VFX có component VFXGun, RunVFX()
-/// được gọi ngay để tự phát animation rồi tự Despawn khi animation chạy xong (xem VFXGun.cs).
+/// tại vị trí/góc quay của posVFX mỗi khi ra đòn. Có 2 nhánh xử lý tuỳ Category:
+///   - Ranged/Melee/Thrown: nếu prefab VFX có component VFXGun, RunVFX() được gọi ngay để tự phát
+///     animation TẠI CHỖ (posVFX) rồi tự Despawn khi animation chạy xong (xem VFXGun.cs).
+///   - Boom: prefab VFX (thường là Assets/Prefabs/VFX/Boom.prefab, component BoomVFX — xem
+///     BoomVFX.cs) được SpawnBoomVFX() truyền dữ liệu (sprite weapon, Damage, tag phe) rồi gọi
+///     Launch() để bay VÒNG CUNG từ vị trí Duck này (attacker) tới vị trí currentTarget, tự nổ +
+///     gây AoE damage cho phe địch khi tới nơi, rồi tự Despawn.
 ///
 /// VỊ TRÍ posVFX (GÓC TRÊN-PHẢI SPRITE WEAPON): mỗi khi Init() gán Image mới cho weaponRenderer
 /// (weaponRenderer.sprite = weapon.GetSpriteByTier(...)), RecalculatePosVFX() được gọi ngay sau
@@ -452,9 +457,38 @@ public abstract class Duck : MonoBehaviour
         GameObject vfxObj = PoolingManager.Spawn(weaponData.vfxWeapon, posVFX.position, posVFX.rotation);
         if (vfxObj == null) return;
 
+        // weaponData.Category == Boom -> vfxWeapon là prefab Boom (component BoomVFX, xem
+        // BoomVFX.cs) cần bay vòng cung tới currentTarget rồi tự nổ + gây AoE damage, KHÁC hoàn
+        // toàn luồng VFXGun (phát tại chỗ ngay tại posVFX) dùng cho Ranged/Melee/Thrown.
+        if (weaponData.Category == WeaponCategory.Boom)
+        {
+            SpawnBoomVFX(vfxObj);
+            return;
+        }
+
         var vfxGun = vfxObj.GetComponent<VFXGun>();
         if (vfxGun != null)
             vfxGun.RunVFX();
+    }
+
+    /// <summary>
+    /// Truyền dữ liệu (sprite weapon hiện tại, Damage của Duck này, tag phe của Duck này) vào
+    /// BoomVFX vừa Spawn rồi gọi Launch() — VFX tự bay vòng cung từ vị trí Duck này (attacker) tới
+    /// vị trí currentTarget (target enemy tại thời điểm ném) rồi tự nổ + gây damage khi tới nơi
+    /// (xem BoomVFX.cs). Fallback vị trí posVFX nếu thiếu currentTarget (không nên xảy ra vì
+    /// SpawnWeaponVFX() chỉ được gọi từ PlayAttackAnimation(), luôn có currentTarget hợp lệ tại
+    /// thời điểm UpdateAttack() ra đòn).
+    /// </summary>
+    private void SpawnBoomVFX(GameObject vfxObj)
+    {
+        var boomVFX = vfxObj.GetComponent<BoomVFX>();
+        if (boomVFX == null) return;
+
+        Vector3 startPos  = transform.position;
+        Vector3 targetPos = currentTarget != null ? currentTarget.position : posVFX.position;
+        Sprite  sprite    = weaponRenderer != null ? weaponRenderer.sprite : null;
+
+        boomVFX.Launch(startPos, targetPos, sprite, Damage, gameObject.tag);
     }
 
     /// <summary>
@@ -579,6 +613,8 @@ public abstract class Duck : MonoBehaviour
         _attackTimer = weaponData != null && weaponData.TimeAttack > 0f ? weaponData.TimeAttack : 1f;
 
         PlayAttackAnimation();
+
+        if (weaponData.Category == WeaponCategory.Boom) return;
 
         var targetDuck = currentTarget.GetComponent<Duck>();
         if (targetDuck != null) { DealDamage(targetDuck); return; }

@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6997dbcd4020474fa56c5c11118c4ca, type: 3}
-  m_Name: Weapon_4_Sniper_SR_1
+  m_Name: Weapon_4_Boom
   m_EditorClassIdentifier: 
   Entry:
     ID: 4
-    Name: "S\xFAng B\u1EAFn T\u1EC9a SR-1"
-    Category: 2
+    Name: Boom
+    Category: 3
     SpriteTier1: {fileID: 21300000, guid: f976d78aafac9604e852061b1de9c6dd, type: 2}
     SpriteTier2: {fileID: 21300000, guid: 48718461427948e4db6d007de88e3e15, type: 2}
     SpriteTier3: {fileID: 21300000, guid: 5799dbb3034017a4dab957bbea12d6dd, type: 2}
@@ -46,5 +46,5 @@ MonoBehaviour:
     Coin: 250
     IsLocked: 0
     TimeDelay: 6
-    TimeAttack: 1
-    vfxWeapon: {fileID: 7937223791722628261, guid: 29fda0b8dd8d5554ca6e7ccfdb62a3d9, type: 3}
+    TimeAttack: 5
+    vfxWeapon: {fileID: 668801788194713587, guid: c0ed52ec76f618e40bf0f63c8f458519, type: 3}
