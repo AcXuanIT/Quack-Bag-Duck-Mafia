@@ -122,7 +122,7 @@ public class UnitPlayerItemUI : TierShopItemUI, IGridPlaceable
         return o != null && o._unit != null && _unit != null && o._unit.ID == _unit.ID;
     }
 
-    // ─── Info Panel (giữ để xem thông tin) ────────────────────
+    // ─── Info Panel (giữ để xem thông tin) ────────────────
     public override void OnPointerDown(PointerEventData eventData)
     {
         if (_unit == null) return;
@@ -133,6 +133,8 @@ public class UnitPlayerItemUI : TierShopItemUI, IGridPlaceable
 
     public override void OnBeginDrag(PointerEventData eventData)
     {
+        if (IsBattleTurnLocked()) return; // Khong cho phep keo-tha Unit khi BattleManager dang o TurnBattle
+
         _isDragging           = true;
         _originalParent       = transform.parent;
         _originalSiblingIndex = transform.GetSiblingIndex();

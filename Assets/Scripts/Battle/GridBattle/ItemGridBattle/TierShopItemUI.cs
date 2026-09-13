@@ -219,6 +219,17 @@ public abstract class TierShopItemUI : MonoBehaviour,
 
     public void Discard() => Destroy(gameObject);
 
+    /// <summary>
+    /// True khi BattleManager đang ở trạng thái TurnBattle — dùng để CHẶN kéo-thả
+    /// (gọi ở đầu OnBeginDrag) của GearItemUI/UnitPlayerItemUI trong lúc đang đánh trận.
+    /// Trả về false (không khoá) nếu BattleManager chưa tồn tại/chưa khởi tạo.
+    /// </summary>
+    protected bool IsBattleTurnLocked()
+    {
+        return BattleManager.Instance != null
+            && BattleManager.Instance.CurrentState == BattleManager.BattleState.TurnBattle;
+    }
+
     // ─── Click ───────────────────────────────────────────────
     public virtual void OnPointerClick(PointerEventData eventData)
     {
@@ -267,6 +278,8 @@ public abstract class TierShopItemUI : MonoBehaviour,
     // ─── Drag ───────────────────────────────────────────────
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
+        if (IsBattleTurnLocked()) return; // Khong cho phep bat dau keo khi dang TurnBattle
+
         _isDragging           = true;
         _originalParent       = transform.parent;
         _originalSiblingIndex = transform.GetSiblingIndex();

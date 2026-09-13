@@ -378,7 +378,7 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
         return o != null && o._weapon != null && _weapon != null && o._weapon.ID == _weapon.ID;
     }
 
-    // ─── Info Panel (giữ để xem thông tin) ────────────────────
+    // ─── Info Panel (giữ để xem thông tin) ────────────────
     public override void OnPointerDown(PointerEventData eventData)
     {
         if (_weapon == null) return;
@@ -389,6 +389,8 @@ public class GearItemUI : TierShopItemUI, IGridPlaceable
 
     public override void OnBeginDrag(PointerEventData eventData)
     {
+        if (IsBattleTurnLocked()) return; // Khong cho phep keo-tha Gear khi BattleManager dang o TurnBattle
+
         _isDragging           = true;
         _originalParent       = transform.parent;
         _originalSiblingIndex = transform.GetSiblingIndex();

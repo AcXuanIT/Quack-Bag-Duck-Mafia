@@ -103,4 +103,24 @@ public class UIGameManager : MonoBehaviour
             battleManager?.FinishIntro();
         }
     }
+
+    /// <summary>
+    /// Gọi từ Button quay lại Menu (VD: nút Back trong panelUIWin/panelUILose của BattleMapUI,
+    /// hoặc btnBackMenu trong UISetting).
+    /// Chạy LoadMap slide (chiều ngược lại với Play) để chuyển từ BattleMap về StartGame:
+    /// LoadMapAnimator.PlayReverse() tự tắt BattleMapUI/BatteMap GO và bật lại MenuGame
+    /// tại điểm giữa animation.
+    /// </summary>
+    public void OnBackToStartGameClicked()
+    {
+        if (loadMapAnimator == null)
+        {
+            Debug.LogWarning("[UIGameManager] LoadMapAnimator chưa được gán!");
+            battleMapUI?.Hide();
+            gameManager?.DisableBatteMap();
+            return;
+        }
+
+        loadMapAnimator.PlayReverse(loadMapDuration);
+    }
 }

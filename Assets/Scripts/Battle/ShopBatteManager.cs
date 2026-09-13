@@ -13,11 +13,13 @@ using TMPro;
 ///           DataManager.Instance.AllMyDuckAssets (nguồn Assets/Data/MyDuck duy nhất).
 ///
 /// - Component GO chứa tối đa 4 item
-/// - btnBuy spawn 1 GearItem + 1 GridItem + 1 UnitItem (cần ít nhất 3 slot trống)
+/// - btnBuy spawn 3 item ngẫu nhiên theo trọng số (cần ít nhất 3 slot trống)
 /// - Tự động refresh Shop mỗi khi 1 Turn mới bắt đầu (BattleManager.OnTurnSetupStart)
 /// - GridItem spawn ra LUÔN được ràng buộc theo GridSystem: chỉ random trong số
 ///   những item có ÍT NHẤT 1 vị trí đặt hợp lệ thật sự trên bàn cờ hiện tại
 ///   (BattleGridManager.HasValidPlacement).
+/// - Tỷ lệ spawn (cả RefreshShop() lẫn OnBuyPressed()): GridItem 20% / GearItem 40% / UnitItem 40%
+///   (xem GetRandomItemKindWeighted()).
 ///
 /// Player Money: KHÔNG còn giữ biến tiền riêng (_playerGold đã bị xoá) — nguồn dữ liệu tiền
 /// DUY NHẤT là BattleManager.PlayerMoney. Mua item (OnBuyPressed()) gọi thẳng
@@ -51,6 +53,11 @@ public class ShopBatteManager : MonoBehaviour
     [Header("Spawn Config")]
     [SerializeField] private int defaultSpawnCount = 3;
     [SerializeField] private int maxSlots          = 4;
+
+    [Header("Spawn Weights (RefreshShop + OnBuyPressed) — tổng không bắt buộc = 100, sẽ tự chuẩn hoá")]
+    [SerializeField] private float gridSpawnWeight = 20f; // GridItem  20%
+    [SerializeField] private float gearSpawnWeight = 40f; // GearItem  40%
+    [SerializeField] private float unitSpawnWeight = 40f; // UnitItem  40%
 
     [Header("Item Pool — Grid (vẫn dùng ShopItemData)")]
     [SerializeField] private List<ShopItemData> gridItems = new List<ShopItemData>();
@@ -99,7 +106,7 @@ public class ShopBatteManager : MonoBehaviour
 
     /// <summary>
     /// Xoá toàn bộ item đang hiển thị trong Shop và spawn lại defaultSpawnCount
-    /// item mới (random đều 3 loại Grid/Gear/UnitDuck). Gọi mỗi khi turn mới bắt đầu,
+    /// item mới (random có trọng số: Grid 20% / Gear 40% / UnitDuck 40%). Gọi mỗi khi turn mới bắt đầu,
     /// hoặc có thể gọi thủ công (VD nút Reroll) nếu cần sau này.
     /// </summary>
     public void RefreshShop()
@@ -107,10 +114,29 @@ public class ShopBatteManager : MonoBehaviour
         ClearAllItems();
         for (int i = 0; i < defaultSpawnCount; i++)
         {
-            var type = (ItemKind)Random.Range(0, 3);
+            var type = GetRandomItemKindWeighted();
             SpawnItemOfType(type);
         }
         Debug.Log($"[Shop] RefreshShop: spawned {defaultSpawnCount} item moi cho turn.");
+    }
+
+    /// <summary>
+    /// Random 1 ItemKind theo trọng số: GridItem 20% / GearItem 40% / UnitItem 40%
+    /// (lấy từ gridSpawnWeight / gearSpawnWeight / unitSpawnWeight, tự chuẩn hoá theo tổng).
+    /// </summary>
+    private ItemKind GetRandomItemKindWeighted()
+    {
+        float total = gridSpawnWeight + gearSpawnWeight + unitSpawnWeight;
+        if (total <= 0f) return (ItemKind)Random.Range(0, 3); // fallback nếu cấu hình sai
+
+        float roll = Random.Range(0f, total);
+
+        if (roll < gridSpawnWeight) return ItemKind.Grid;
+        roll -= gridSpawnWeight;
+
+        if (roll < gearSpawnWeight) return ItemKind.Gear;
+
+        return ItemKind.UnitDuck;
     }
 
     /// <summary>Xoá toàn bộ item đang có trong componentContainer.</summary>
@@ -128,8 +154,9 @@ public class ShopBatteManager : MonoBehaviour
     // ── Buy ──────────────────────────────────────────────────
 
     /// <summary>
-    /// Nhấn Buy: spawn đúng 1 GearItem + 1 GridItem + 1 UnitItem (cần ít nhất 3 slot trống).
-    /// Trừ tiền qua BattleManager.SpendMoney() — nguồn dữ liệu tiền DUY NHẤT của trận đấu.
+    /// Nhấn Buy: spawn 3 item random theo trọng số Grid 20% / Gear 40% / UnitDuck 40%
+    /// (cần ít nhất 3 slot trống). Trừ tiền qua BattleManager.SpendMoney() — nguồn dữ liệu
+    /// tiền DUY NHẤT của trận đấu.
     /// </summary>
     public void OnBuyPressed()
     {
@@ -145,12 +172,11 @@ public class ShopBatteManager : MonoBehaviour
             return;
         }
 
-        // Buy: luôn spawn 1 GearItem + 1 GridItem + 1 UnitItem
-        SpawnItemOfType(ItemKind.Gear);
-        SpawnItemOfType(ItemKind.Grid);
-        SpawnItemOfType(ItemKind.UnitDuck);
+        // Buy: spawn 3 item random theo trọng số (Grid 20% / Gear 40% / Unit 40%)
+        for (int i = 0; i < 3; i++)
+            SpawnItemOfType(GetRandomItemKindWeighted());
 
-        Debug.Log($"[Shop] Spawn 1 Gear + 1 Grid + 1 Unit. Money={battleManager.PlayerMoney}. Slots={_spawnedItems.Count}/{maxSlots}");
+        Debug.Log($"[Shop] Buy: spawned 3 item (weighted). Money={battleManager.PlayerMoney}. Slots={_spawnedItems.Count}/{maxSlots}");
     }
 
     // ── Spawn ────────────────────────────────────────────────
