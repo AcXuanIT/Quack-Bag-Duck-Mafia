@@ -61,7 +61,7 @@ public class WeaponSlotGridUI : MonoBehaviour
         // XP Bar — ngưỡng lấy theo Level hiện tại (xem WeaponEntry.GetCurrentXPToNextLevel())
         int xpNeeded = data.GetCurrentXPToNextLevel();
         float xpPct = xpNeeded > 0 ? (float)data.XP / xpNeeded : 0f;
-        Debug.Log($"WeaponSlotGridUI.Bind: {data.Name} Level {data.Level} XP {data.XP}/{xpNeeded} ({xpPct:P1})");
+     
         SetXPBar(xpPct);
 
         if (xpText != null)

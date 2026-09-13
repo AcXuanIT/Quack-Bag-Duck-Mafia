@@ -158,7 +158,7 @@ public class WeaponManager : MonoBehaviour
         w.Coin           = Mathf.RoundToInt(w.Coin * 1.5f);
 
         Dirty(id); OnWeaponChanged?.Invoke(w);
-        Debug.Log($"[WeaponManager] {w.Name} leveled up → Lv{w.Level}!");
+
         return true;
     }
 

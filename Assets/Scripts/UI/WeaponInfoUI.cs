@@ -16,6 +16,7 @@ public class WeaponInfoUI : MonoBehaviour
 
     [Header("=== Weapon Icon lớn ===")]
     public Image weaponIcon;               // BGWaeponInfo/WeaponInfo/WeaponIconBG/WeaponIcon
+    public TextMeshProUGUI weaponLevel;        // BGWaeponInfo/WeaponInfo/WeaponIconBG/WeaponName
 
     [Header("=== Level Bar ===")]
     public RectTransform   levelBar;        // BGWaeponInfo/Level/LevelBar   (thanh nền)
@@ -37,6 +38,7 @@ public class WeaponInfoUI : MonoBehaviour
 
     [Header("=== Upgrade Button ===")]
     public TextMeshProUGUI priceUpgrade;    // btnUpgrade/PriceUpgeade
+    public Button          btnUpdate;       // btnUpgrade — bấm để nâng Level (cần đủ XP + Coin)
 
     [Header("=== Back Button ===")]
     public Button btnBack;                  // btnBack
@@ -46,13 +48,17 @@ public class WeaponInfoUI : MonoBehaviour
     private float _xpSliceFullWidth;
     private bool  _initialized;
 
+    // ── Data đang hiển thị (dùng lại khi bấm Update) ────────────
+    private WeaponEntry _currentData;
+
     private const int MAX_LEVEL = 5;
 
     // ─────────────────────────────────────────────────────────
     private void Awake()
     {
         InitBars();
-        if (btnBack != null) btnBack.onClick.AddListener(Hide);
+        if (btnBack   != null) btnBack.onClick.AddListener(Hide);
+        if (btnUpdate != null) btnUpdate.onClick.AddListener(OnClickUpdate);
         gameObject.SetActive(false);
     }
 
@@ -95,6 +101,9 @@ public class WeaponInfoUI : MonoBehaviour
         if (!_initialized) InitBars();
         gameObject.SetActive(true);
 
+        _currentData = data;
+        if (data == null) return;
+
         // Title
         if (textWeaponName != null)  textWeaponName.text     = data.Name;
         // Icon title + icon lớn đều dùng SpriteTier1 (UIGear default)
@@ -103,6 +112,7 @@ public class WeaponInfoUI : MonoBehaviour
 
         // Level (1-5)
         if (levelText != null) levelText.text = "Cấp " + data.Level;
+        if (weaponLevel != null) weaponLevel.text = "Cấp " + data.Level;
         SetBar(levelSlice, _levelSliceFullWidth, (float)data.Level / MAX_LEVEL);
 
         // Damage
@@ -122,6 +132,9 @@ public class WeaponInfoUI : MonoBehaviour
 
         // Price
         if (priceUpgrade != null) priceUpgrade.text = data.Coin.ToString();
+
+        // Nút Update — bật/tắt theo điều kiện Level chưa max + đủ XP + đủ Coin
+        RefreshUpdateButton();
     }
 
     /// <summary>Đóng panel WeaponInfo.</summary>
@@ -134,4 +147,65 @@ public class WeaponInfoUI : MonoBehaviour
             Mathf.Lerp(0f, fullWidth, Mathf.Clamp01(t)),
             slice.sizeDelta.y);
     }
+
+    // ─────────────────────────────────────────────────────────
+    #region Update (Level Up) Button
+
+    /// <summary>
+    /// Bật/tắt nút Update theo điều kiện: weapon chưa max Level (5), đã đủ XP theo ngưỡng
+    /// GetCurrentXPToNextLevel() của Level hiện tại, VÀ Player đủ Coin (data.Coin — giá nâng
+    /// cấp hiện tại, xem WeaponData.cs) để trả cho lần nâng cấp này.
+    /// </summary>
+    private void RefreshUpdateButton()
+    {
+        if (btnUpdate == null || _currentData == null) return;
+
+        bool notMaxLevel = _currentData.Level < MAX_LEVEL;
+        int  xpNeeded    = _currentData.GetCurrentXPToNextLevel();
+        bool enoughXP    = notMaxLevel && xpNeeded > 0 && _currentData.XP >= xpNeeded;
+
+        int  playerCoin  = GameManager.Instance != null ? GameManager.Instance.Coin : 0;
+        bool enoughCoin  = playerCoin >= _currentData.Coin;
+
+        btnUpdate.interactable = notMaxLevel && enoughXP && enoughCoin;
+    }
+
+    /// <summary>
+    /// Bấm nút Update: gọi WeaponManager.TryLevelUp() (đã kiểm tra đủ XP + Coin, trừ Coin,
+    /// trừ XP, tăng Level, tăng chỉ số bên trong WeaponEntry — xem WeaponManager.cs), sau đó
+    /// lưu lại số Coin còn dư vào GameData qua GameManager.SetCoin(), rồi show lại weaponData
+    /// (cùng 1 instance WeaponEntry đã được WeaponManager sửa trực tiếp) để cập nhật UI.
+    /// </summary>
+    private void OnClickUpdate()
+    {
+        if (_currentData == null) return;
+
+        if (WeaponManager.Instance == null)
+        {
+            Debug.LogWarning("[WeaponInfoUI] Thiếu WeaponManager.Instance, không thể Update!");
+            return;
+        }
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[WeaponInfoUI] Thiếu GameManager.Instance, không thể Update!");
+            return;
+        }
+
+        int coin = GameManager.Instance.Coin;
+        bool success = WeaponManager.Instance.TryLevelUp(_currentData.ID, ref coin);
+        if (!success)
+        {
+            Debug.Log("[WeaponInfoUI] Update thất bại — chưa đủ XP/Coin hoặc weapon đã max Level.");
+            RefreshUpdateButton();
+            return;
+        }
+
+        // Lưu lại số Coin còn dư sau khi WeaponManager đã trừ vào biến tạm ở trên.
+        GameManager.Instance.SetCoin(coin);
+
+        // Show lại weaponData (đã được WeaponManager cập nhật Level/XP/Coin/stats trực tiếp).
+        Show(_currentData);
+    }
+
+    #endregion
 }

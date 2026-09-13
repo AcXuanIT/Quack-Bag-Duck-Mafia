@@ -29,25 +29,25 @@ MonoBehaviour:
       isOccupied: 1
     - gridPosition: {x: 0, y: 1}
       isOccupied: 1
-    Level: 1
-    XP: 1
+    Level: 5
+    XP: 885
     XPToNextLevel: 0a00000014000000230000003200000000000000
     DamagePerLevel:
-    - 120
-    - 150
-    - 186
-    - 228
-    - 276
+    - 209.88074
+    - 262.35092
+    - 325.31512
+    - 398.77338
+    - 482.72568
     HPPerLevel:
-    - 660
-    - 858
-    - 1089
-    - 1353
-    - 1650
+    - 966.3061
+    - 1256.1979
+    - 1594.405
+    - 1980.9275
+    - 2415.7651
     Power: 13000000180000001d000000240000002c000000
-    AttackRange: 1.5
+    AttackRange: 2
     LevelLock: 0
-    Coin: 200
+    Coin: 1012
     IsLocked: 0
     TimeDelay: 10
     TimeAttack: 1

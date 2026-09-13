@@ -343,6 +343,7 @@ public abstract class Duck : MonoBehaviour
             var weaponGO = weaponAnimator.gameObject;
             weaponGO.SetActive(false);
             weaponGO.transform.localPosition = weaponRestLocalPosition;
+            weaponGO.transform.localRotation = Quaternion.identity;
             weaponGO.SetActive(true);
             weaponAnimator.Rebind(); // reset về Idle, xoá trigger/queue cũ còn sót từ lần dùng trước (Pool)
         }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fc20441afce3fb4eb6db6879ab13a50, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  coin: 0
+  coin: 2002
   ruby: 0
-  currentWaveIndex: 1
-  currentWave: {fileID: 0}
+  currentMapIndex: 2
+  power: 320

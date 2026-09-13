@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -34,6 +35,20 @@ public class UIGameManager : MonoBehaviour
     [Header("=== Game Manager (Non-UI) ===")]
     [Tooltip("GameManager quản lý các GameObject không phải UI. BattleManager được truy cập qua gameManager.battleManager")]
     [SerializeField] private GameManager gameManager;
+
+    [Header("=== HUD Info ===")]
+    [Tooltip("Text hiển thị tên/thông tin BattleMap hiện tại — cập nhật qua RefreshCurrentBattleMapText(), " +
+             "được MenuPanelController gọi mỗi khi Panel Map được load")]
+    [SerializeField] private TextMeshProUGUI textCurrentBattleMap;
+
+    [Tooltip("Text hiển thị số Ruby của Player")]
+    [SerializeField] private TextMeshProUGUI textRuby;
+
+    [Tooltip("Text hiển thị số Coin của Player")]
+    [SerializeField] private TextMeshProUGUI textCoin;
+
+    [Tooltip("Text hiển thị chỉ số Power của Player")]
+    [SerializeField] private TextMeshProUGUI textPower;
 
     private void Start()
     {
@@ -122,5 +137,38 @@ public class UIGameManager : MonoBehaviour
         }
 
         loadMapAnimator.PlayReverse(loadMapDuration);
+    }
+
+    /// <summary>
+    /// Cập nhật textPower, textRuby, textCoin (đọc qua GameManager, giá trị thực lưu trong
+    /// GameData). Được MenuPanelController gọi mỗi khi 1 Panel bất kỳ trong MenuMid được load.
+    ///
+    /// Trước khi đọc gameManager.Power, gọi gameManager.RecalculatePower() để tính lại Power từ
+    /// TOÀN BỘ weapon đã mở khoá (WeaponManager) và ghi vào GameData — đảm bảo textPower luôn
+    /// khớp với tiến độ nâng cấp/mở khoá vũ khí mới nhất mỗi khi Player chuyển Panel Menu, không
+    /// cần lắng nghe riêng sự kiện WeaponManager.OnWeaponChanged/OnDatabaseReloaded.
+    /// </summary>
+    public void RefreshHUD()
+    {
+        if (gameManager == null)
+        {
+            return;
+        }
+
+        gameManager.RecalculatePower();
+
+        if (textPower != null) textPower.text =gameManager.Power.ToString();
+        if (textRuby != null) textRuby.text = gameManager.Ruby.ToString();
+        if (textCoin != null) textCoin.text = gameManager.Coin.ToString();
+    }
+
+    /// <summary>
+    /// Cập nhật textCurrentBattleMap = CurrentMapIndex (đọc qua GameManager, giá trị thực lưu
+    /// trong GameData). Được MenuPanelController gọi mỗi khi Panel Map được load.
+    /// </summary>
+    public void RefreshCurrentBattleMapText()
+    {
+        if (gameManager == null || textCurrentBattleMap == null) return;
+        textCurrentBattleMap.text = "Cấp độ " + gameManager.CurrentMapIndex.ToString();
     }
 }

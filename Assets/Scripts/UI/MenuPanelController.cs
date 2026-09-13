@@ -6,11 +6,27 @@ using System.Collections;
 /// Quản lý hiệu ứng chuyển panel trong MenuMid.
 /// Panel mới slide vào từ trái hoặc phải tùy vào index của button.
 /// Panel cũ slide ra theo chiều ngược lại.
+///
+/// HUD (Power/Ruby/Coin/CurrentBattleMap):
+///   - Mỗi khi 1 Panel bất kỳ được load (ShowPanel/ShowPanelImmediate), gọi
+///     uiGameManager.RefreshHUD() để cập nhật textPower/textRuby/textCoin (UIGameManager đọc các
+///     giá trị này qua GameManager, giá trị thực lưu trong GameData).
+///   - Riêng khi Panel Map (index = MAP_PANEL_INDEX) được load, gọi thêm
+///     uiGameManager.RefreshCurrentBattleMapText() để cập nhật textCurrentBattleMap =
+///     CurrentMapIndex (cũng đọc qua GameManager).
 /// </summary>
 public class MenuPanelController : MonoBehaviour
 {
     [Header("Panels (theo thứ tự index button: Shop=0, Car=1, Map=2, Gear=3, Talent=4)")]
     public RectTransform[] panels;
+
+    [Header("=== HUD ===")]
+    [Tooltip("UIGameManager — dùng để cập nhật textPower/textRuby/textCoin (mọi Panel) và " +
+             "textCurrentBattleMap (riêng Panel Map) mỗi khi 1 Panel được load")]
+    [SerializeField] private UIGameManager uiGameManager;
+
+    // Index của Panel Map trong mảng panels (Shop=0, Car=1, Map=2, Gear=3, Talent=4)
+    private const int MAP_PANEL_INDEX = 2;
 
     // Index panel đang hiển thị
     private int _currentIndex = -1;
@@ -39,6 +55,8 @@ public class MenuPanelController : MonoBehaviour
         _slideCoroutine = StartCoroutine(SlideRoutine(_currentIndex, newIndex, duration));
 
         _currentIndex = newIndex;
+
+        NotifyPanelLoaded(newIndex);
     }
 
     /// <summary>Hiển thị panel mặc định không có animation</summary>
@@ -51,6 +69,23 @@ public class MenuPanelController : MonoBehaviour
             panels[i].gameObject.SetActive(i == index);
             panels[i].anchoredPosition = Vector2.zero;
         }
+
+        NotifyPanelLoaded(index);
+    }
+
+    /// <summary>
+    /// Gọi mỗi khi 1 Panel được load (ShowPanel/ShowPanelImmediate): cập nhật HUD chung
+    /// (Power/Ruby/Coin) qua UIGameManager, và riêng textCurrentBattleMap nếu panel vừa load là
+    /// Panel Map.
+    /// </summary>
+    private void NotifyPanelLoaded(int index)
+    {
+        if (uiGameManager == null) return;
+
+        uiGameManager.RefreshHUD();
+
+        if (index == MAP_PANEL_INDEX)
+            uiGameManager.RefreshCurrentBattleMapText();
     }
 
     private IEnumerator SlideRoutine(int oldIndex, int newIndex, float duration)

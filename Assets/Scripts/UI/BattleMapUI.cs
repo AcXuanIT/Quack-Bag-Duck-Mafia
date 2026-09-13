@@ -44,6 +44,22 @@ public class BattleMapUI : MonoBehaviour
     [Tooltip("Panel hiển thị khi thua trận (BattleManager.BattleState.Lose)")]
     [SerializeField] private GameObject panelUILose;
 
+    [Tooltip("Text hiển thị số Coin đã kiếm được trong BattleMap hiện tại, nằm trong panelUIWin " +
+             "(VD: UIWin/BG/CoinBG/Coin/text) — cập nhật từ BattleManager.EarnedCoin mỗi khi ShowWin() được gọi.")]
+    [SerializeField] private TextMeshProUGUI textCoinWin;
+
+    [Tooltip("Text hiển thị số Ruby đã kiếm được trong BattleMap hiện tại, nằm trong panelUIWin " +
+             "(VD: UIWin/BG/CoinBG/Ruby/text) — cập nhật từ BattleManager.EarnedRuby mỗi khi ShowWin() được gọi.")]
+    [SerializeField] private TextMeshProUGUI textRubyWin;
+
+    [Tooltip("Text hiển thị số Coin đã kiếm được trong BattleMap hiện tại, nằm trong panelUILose " +
+             "(VD: UILose/BG/CoinBG/Coin/text) — cập nhật từ BattleManager.EarnedCoin mỗi khi ShowLose() được gọi.")]
+    [SerializeField] private TextMeshProUGUI textCoinLose;
+
+    [Tooltip("Text hiển thị số Ruby đã kiếm được trong BattleMap hiện tại, nằm trong panelUILose " +
+             "(VD: UILose/BG/CoinBG/Ruby/text) — cập nhật từ BattleManager.EarnedRuby mỗi khi ShowLose() được gọi.")]
+    [SerializeField] private TextMeshProUGUI textRubyLose;
+
     // Giá trị Power đang hiển thị trên textPower (đích đến của tween gần nhất) — dùng làm điểm bắt
     // đầu (from) cho lần UpdateTextPower() kế tiếp, và điểm neo khi Kill() 1 tween đang chạy dở.
     private int _displayedPower;
@@ -158,21 +174,39 @@ public class BattleMapUI : MonoBehaviour
     /// <summary>
     /// Hiện Panel UIWin — gọi từ BattleManager khi trận đấu chuyển sang BattleState.Win
     /// (đã đánh bại hết enemy của Wave cuối cùng). Ẩn Panel UILose để tránh hiện đè 2 panel.
+    /// Cập nhật textCoinWin/textRubyWin theo BattleManager.EarnedCoin/EarnedRuby — LƯU Ý:
+    /// BattleManager phải cộng thưởng coinPerMapWin/rubyPerMapWin vào earnedCoin/earnedRuby
+    /// TRƯỚC khi gọi ShowWin(), nếu không số hiển thị sẽ thiếu phần thưởng thắng Map
+    /// (xem BattleManager.FinishTurnBattle() case Win).
     /// </summary>
     public void ShowWin()
     {
         if (panelUILose != null) panelUILose.SetActive(false);
         if (panelUIWin != null) panelUIWin.SetActive(true);
+
+        if (BattleManager.Instance != null)
+        {
+            if (textCoinWin != null) textCoinWin.text = BattleManager.Instance.EarnedCoin.ToString();
+            if (textRubyWin != null) textRubyWin.text = BattleManager.Instance.EarnedRuby.ToString();
+        }
     }
 
     /// <summary>
     /// Hiện Panel UILose — gọi từ BattleManager khi trận đấu chuyển sang BattleState.Lose
     /// (HP của MyTeam &lt;= 0). Ẩn Panel UIWin để tránh hiện đè 2 panel.
+    /// Cập nhật textCoinLose/textRubyLose theo BattleManager.EarnedCoin/EarnedRuby (Coin/Ruby
+    /// đã tích luỹ được từ các Wave đã vượt qua trước khi thua — không có thưởng thắng Map).
     /// </summary>
     public void ShowLose()
     {
         if (panelUIWin != null) panelUIWin.SetActive(false);
         if (panelUILose != null) panelUILose.SetActive(true);
+
+        if (BattleManager.Instance != null)
+        {
+            if (textCoinLose != null) textCoinLose.text = BattleManager.Instance.EarnedCoin.ToString();
+            if (textRubyLose != null) textRubyLose.text = BattleManager.Instance.EarnedRuby.ToString();
+        }
     }
 
     /// <summary>

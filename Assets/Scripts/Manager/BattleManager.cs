@@ -43,8 +43,12 @@ using UnityEngine;
 ///     Wave hiện tại trên UI.
 ///   - Khi StartBattle(): gọi battleMapUI.HideResultPanels() để đảm bảo panel Win/Lose
 ///     của trận trước không còn hiển thị.
-///   - Khi chuyển sang BattleState.Win: gọi battleMapUI.ShowWin().
-///   - Khi chuyển sang BattleState.Lose: gọi battleMapUI.ShowLose().
+///   - Khi chuyển sang BattleState.Win: cộng thưởng coinPerMapWin/rubyPerMapWin vào
+///     earnedCoin/earnedRuby TRƯỚC, rồi mới gọi battleMapUI.ShowWin() — để ShowWin() đọc
+///     đúng tổng Coin/Ruby đã kiếm được (bao gồm cả thưởng thắng Map) khi cập nhật
+///     textCoin/textRuby (xem BattleMapUI.ShowWin()/UpdateResultRewardsText()).
+///   - Khi chuyển sang BattleState.Lose: gọi battleMapUI.ShowLose() — tự cập nhật
+///     textCoin/textRuby theo earnedCoin/earnedRuby đã tích luỹ từ các Wave đã vượt qua.
 ///   - Mỗi khi playerMoney thay đổi (xem mục Player Money bên dưới): gọi
 ///     battleMapUI.UpdateTextPlayerMoney(playerMoney).
 ///   - Mỗi khi power thay đổi (xem mục Power bên dưới): gọi
@@ -63,6 +67,10 @@ using UnityEngine;
 ///     (mặc định 50) qua AddMoney().
 ///   - Mua item trong Shop (ShopBatteManager.OnBuyPressed()): gọi SpendMoney(buyPrice) — trừ
 ///     tiền và trả về false nếu không đủ (Shop tự chặn giao dịch khi false).
+///   - LƯU Ý: playerMoney CHỈ tồn tại trong nội bộ 1 trận đấu (dùng để mua đồ trong Shop lúc
+///     đang Battle), reset về startMoney mỗi trận — KHÁC HOÀN TOÀN với earnedCoin/earnedRuby
+///     (xem mục "Battle Rewards" bên dưới), vốn là Coin/Ruby THẬT được cộng vào GameData khi
+///     BattleMap kết thúc.
 ///
 /// Power (power):
 ///   - Nguồn dữ liệu DUY NHẤT cho tổng điểm sức mạnh (Power) hiện tại của đội hình Player
@@ -80,20 +88,44 @@ using UnityEngine;
 ///   - Mỗi khi power thay đổi (SetPower()): gọi battleMapUI.UpdateTextPower(power) để cập
 ///     nhật UI (đếm số chạy dần, xem BattleMapUI.UpdateTextPower()).
 ///
+/// Battle Rewards (earnedCoin/earnedRuby) — Coin/Ruby THẬT cộng vào GameData:
+///   - earnedCoin/earnedRuby là 2 biến TẠM lưu Coin/Ruby Player đã "kiếm được" trong trận đấu
+///     hiện tại nhưng CHƯA lưu vào GameData — khác hoàn toàn playerMoney (tiền Shop nội bộ) và
+///     power (sức mạnh đội hình).
+///   - Vượt qua 1 Wave (CheckWaveCleared(), BẤT KỂ Wave cuối hay không, cùng lúc với
+///     AddMoney(moneyPerWaveWin)): earnedCoin += coinPerWaveWin (mặc định 10).
+///   - Thắng xong TOÀN BỘ BattleMap (FinishTurnBattle() case Win, tức vượt qua Wave cuối cùng):
+///     cộng thêm earnedCoin += coinPerMapWin (mặc định 50) và earnedRuby += rubyPerMapWin
+///     (mặc định 10) — NGOÀI Coin đã cộng từ từng Wave — TRƯỚC KHI gọi battleMapUI.ShowWin(),
+///     để textCoin/textRuby trên Panel Win hiển thị đúng tổng đã cộng thưởng Map.
+///   - Thua (Lose): KHÔNG có thưởng thêm, nhưng earnedCoin/earnedRuby đã tích luỹ được từ các
+///     Wave đã vượt qua trước khi thua vẫn được giữ nguyên (không bị mất).
+///   - CommitEarnedRewards() (gọi từ ResetBattleState(), xem mục "Dọn Dẹp/Reset Trận Đấu"):
+///     cộng dồn earnedCoin/earnedRuby vào GameData qua GameManager.AddBattleRewards() rồi reset
+///     cả 2 về 0. Vì ResetBattleState() dùng chung cho StartBattle() (safety net) VÀ
+///     ReturnToMenu() (dùng chung cho Back Menu lúc Pause/Abandon VÀ nút Back trên
+///     PanelWin/PanelLose), nên việc cộng Coin/Ruby vào GameData luôn xảy ra khi 1 BattleMap kết
+///     thúc — BẤT KỂ Win, Lose, hay bỏ dở (Abandon) giữa chừng.
+///
 /// My Team (MyTeam):
 ///   - BattleManager lắng nghe myTem.OnDeath (HP <= 0) để tự động chuyển trận đấu
 ///     sang BattleState.Lose bất kể đang ở TurnSetup hay TurnBattle (xem HandleMyTeamDeath()).
 ///
 /// Map Battle Data:
 ///   - currentMapBattleData là MapBattleData của level đang chiến đấu.
-///     Có thể được gán tay từ bên ngoài qua SetMapBattleData() (ví dụ
-///     GameManager.OnBattle), hoặc nếu chưa được gán, BattleManager sẽ tự lấy
-///     từ DataManager.Instance.MapBattleData theo mapBattleIndex (xem
-///     ResolveMapBattleData()) ngay khi cần dùng (FinishTurnSetup()).
+///     GameManager.OnBattle() gọi SetMapIndex(currentMapIndex) mỗi khi Player bấm Play — set
+///     mapBattleIndex và xoá currentMapBattleData đã gán tay trước đó (nếu có) để đảm bảo
+///     ResolveMapBattleData() luôn lấy đúng MapBattleData theo tiến độ (CurrentMapIndex) hiện
+///     tại từ DataManager.Instance.MapBattleData (xem ResolveMapBattleData()) ngay khi cần dùng
+///     (FinishTurnSetup()). Vẫn có thể gán tay trực tiếp qua SetMapBattleData() nếu cần test 1
+///     MapBattleData cụ thể mà không thông qua index.
 ///
 /// Điều Kiện Thắng/Thua:
 ///   - Win: currentWavesIndex là Wave cuối cùng (>= CurrentMapBattleData.WaveCount)
-///     VÀ toàn bộ enemy của Wave đó đã chết hết (battleSpawnEnemy.IsWaveCleared()).
+///     VÀ toàn bộ enemy của Wave đó đã chết hết (battleSpawnEnemy.IsWaveCleared()). Khi vào
+///     BattleState.Win (nghĩa là đã thắng xong BattleMap này): cộng thưởng coinPerMapWin/
+///     rubyPerMapWin vào earnedCoin/earnedRuby (xem mục "Battle Rewards"), đồng thời gọi
+///     GameManager.Instance.OnBattleMapWin() để +1 CurrentMapIndex và lưu lại vào GameData.
 ///   - Lose: HP của MyTeam <= 0 (myTem.IsDead / sự kiện myTem.OnDeath).
 ///
 /// DỌN DẸP / RESET TRẬN ĐẤU (ResetBattleState — dùng chung cho cả StartBattle() VÀ ReturnToMenu()):
@@ -104,7 +136,8 @@ using UnityEngine;
 ///   "mồ côi" tồn tại xuyên suốt các trận nếu không dọn tay), KHÔNG reset lại HP của MyTeam
 ///   (MyTeam.InitHP() chỉ chạy 1 lần trong Awake()), KHÔNG reset cameraEffect (gây bug lệch
 ///   Play/Reverse mô tả ở mục "Camera Effect" phía trên), và KHÔNG reset playerMoney. Giờ
-///   ResetBattleState() xử lý dứt điểm toàn bộ (kể cả playerMoney và power), được gọi ở ĐẦU
+///   ResetBattleState() xử lý dứt điểm toàn bộ (kể cả playerMoney, power, và commit
+///   earnedCoin/earnedRuby vào GameData — xem CommitEarnedRewards()), được gọi ở ĐẦU
 ///   StartBattle() (an toàn dù trận trước kết thúc bất thường) và trong ReturnToMenu().
 ///
 /// QUAY VỀ MENU (ReturnToMenu — gọi từ BattleSettingController.BackToMenu(), dùng chung cho cả nút
@@ -138,8 +171,9 @@ public class BattleManager : Singleton<BattleManager>
     public int CurrentWavesIndex => currentWavesIndex;
 
     [Header("=== Map Battle Data ===")]
-    [Tooltip("MapBattleData của level hiện tại. Có thể gán tay qua SetMapBattleData() " +
-             "(GameManager.OnBattle) — nếu để trống, sẽ tự lấy từ DataManager theo mapBattleIndex.")]
+    [Tooltip("MapBattleData của level hiện tại. Được gán gián tiếp qua SetMapIndex() " +
+             "(GameManager.OnBattle truyền CurrentMapIndex) — nếu để trống, sẽ tự lấy từ " +
+             "DataManager theo mapBattleIndex. Vẫn có thể gán tay trực tiếp qua SetMapBattleData() nếu cần.")]
     [SerializeField] private MapBattsleData currentMapBattleData;
     public MapBattsleData CurrentMapBattleData => currentMapBattleData;
 
@@ -177,7 +211,9 @@ public class BattleManager : Singleton<BattleManager>
     [Header("=== Player Money ===")]
     [Tooltip("Số tiền (money) hiện tại của Player trong trận đấu — nguồn dữ liệu DUY NHẤT (ShopBatteManager " +
              "không còn giữ biến tiền riêng, đọc/trừ tiền thẳng qua BattleManager). Reset = startMoney khi " +
-             "ResetBattleState() (StartBattle()/ReturnToMenu()), +moneyPerWaveWin mỗi khi thắng xong 1 Wave.")]
+             "ResetBattleState() (StartBattle()/ReturnToMenu()), +moneyPerWaveWin mỗi khi thắng xong 1 Wave. " +
+             "LƯU Ý: đây KHÔNG phải Coin thật (xem earnedCoin/GameData.Coin bên dưới) — playerMoney chỉ dùng " +
+             "để mua đồ trong Shop nội bộ trận đấu và bị xoá khi trận đấu kết thúc.")]
     [SerializeField] private int playerMoney;
     public int PlayerMoney => playerMoney;
 
@@ -199,6 +235,30 @@ public class BattleManager : Singleton<BattleManager>
              "kề (xem BattleGridManager.RecalculateTotalPower()). Reset về 0 khi ResetBattleState().")]
     [SerializeField] private int power;
     public int Power => power;
+
+    [Header("=== Battle Rewards (Coin/Ruby thật, cộng vào GameData) ===")]
+    [Tooltip("Số Coin thưởng khi Player vượt qua 1 Wave (BẤT KỂ Wave cuối hay không) — cộng dồn " +
+             "vào earnedCoin, xem CheckWaveCleared(). Mặc định 10.")]
+    [SerializeField] private int coinPerWaveWin = 10;
+
+    [Tooltip("Số Coin thưởng THÊM khi Player thắng xong TOÀN BỘ BattleMap (vượt qua Wave cuối cùng) — " +
+             "cộng dồn vào earnedCoin, NGOÀI Coin đã cộng từ từng Wave. Mặc định 50.")]
+    [SerializeField] private int coinPerMapWin = 50;
+
+    [Tooltip("Số Ruby thưởng khi Player thắng xong TOÀN BỘ BattleMap (vượt qua Wave cuối cùng) — " +
+             "cộng dồn vào earnedRuby. Mặc định 10.")]
+    [SerializeField] private int rubyPerMapWin = 10;
+
+    [Tooltip("Coin TẠM tích luỹ được trong trận đấu hiện tại (thưởng Wave + thưởng thắng BattleMap) — " +
+             "CHƯA lưu vào GameData. Được cộng vào GameData (qua GameManager.AddBattleRewards()) rồi reset " +
+             "về 0 khi BattleMap kết thúc (Win/Lose/Abandon), xem CommitEarnedRewards()/ResetBattleState().")]
+    [SerializeField] private int earnedCoin;
+    public int EarnedCoin => earnedCoin;
+
+    [Tooltip("Ruby TẠM tích luỹ được trong trận đấu hiện tại (chỉ có khi thắng xong toàn bộ BattleMap) — " +
+             "CHƯA lưu vào GameData, xử lý tương tự earnedCoin (xem CommitEarnedRewards()).")]
+    [SerializeField] private int earnedRuby;
+    public int EarnedRuby => earnedRuby;
 
     // State được lưu lại trước khi Pause, để Resume() quay lại đúng chỗ
     private BattleState _stateBeforePause;
@@ -246,10 +306,22 @@ public class BattleManager : Singleton<BattleManager>
 
     // ─── Public API ─────────────────────────────────────────
 
-    /// <summary>Gán MapBattleData cho trận đấu sắp diễn ra (gọi từ GameManager.OnBattle trước khi mở Battle).</summary>
+    /// <summary>Gán MapBattleData cho trận đấu sắp diễn ra (gán tay trực tiếp, dùng khi không muốn đi qua index).</summary>
     public void SetMapBattleData(MapBattsleData mapBattleData)
     {
         currentMapBattleData = mapBattleData;
+    }
+
+    /// <summary>
+    /// Gán mapBattleIndex cho trận đấu sắp diễn ra dựa theo CurrentMapIndex của GameManager/GameData
+    /// (gọi từ GameManager.OnBattle() trước khi mở Battle). Xoá currentMapBattleData đã gán tay
+    /// trước đó (nếu có) để đảm bảo ResolveMapBattleData() lấy lại đúng MapBattleData theo index mới
+    /// từ DataManager thay vì dùng data cũ.
+    /// </summary>
+    public void SetMapIndex(int mapIndex)
+    {
+        mapBattleIndex = mapIndex;
+        currentMapBattleData = null;
     }
 
     /// <summary>
@@ -305,8 +377,21 @@ public class BattleManager : Singleton<BattleManager>
         {
             case BattleResult.Win:
                 SetState(BattleState.Win);
+
+                // Thắng xong TOÀN BỘ BattleMap -> cộng thêm thưởng Coin/Ruby (NGOÀI Coin mỗi Wave
+                // đã cộng ở CheckWaveCleared()) TRƯỚC KHI gọi battleMapUI.ShowWin(), để textCoin/
+                // textRuby trên Panel Win đọc đúng tổng đã bao gồm thưởng Map. Chưa lưu vào GameData
+                // ngay — sẽ được CommitEarnedRewards() cộng dồn khi ResetBattleState() chạy
+                // (StartBattle() kế tiếp hoặc ReturnToMenu()).
+                earnedCoin += coinPerMapWin;
+                earnedRuby += rubyPerMapWin;
+
                 if (battleMapUI != null)
                     battleMapUI.ShowWin();
+
+                // Thắng xong BattleMap này -> báo GameManager +1 CurrentMapIndex và lưu vào GameData.
+                GameManager.Instance?.OnBattleMapWin();
+
                 OnWin?.Invoke();
                 break;
 
@@ -350,9 +435,13 @@ public class BattleManager : Singleton<BattleManager>
     /// chung cho cả nút "Back Menu" trong Pause VÀ nút trên PanelWin/PanelLose khi ván đấu kết thúc).
     /// Dọn sạch TOÀN BỘ vật thể/trạng thái của trận đấu hiện tại qua ResetBattleState() (UnitDuck,
     /// EnemyDuck, Grid, Gear/Unit đã spawn kể cả đã đặt trên Grid, HP MyTeam, turn/wave, playerMoney,
-    /// power, CameraEffect) rồi đưa currentState về Intro (trạng thái "chưa bắt đầu trận nào"). KHÔNG
-    /// tự bật/tắt bất kỳ GameObject UI nào (Menu/BatteMap) — việc đó là trách nhiệm của
-    /// BattleSettingController.
+    /// power, CameraEffect, earnedCoin/earnedRuby) rồi đưa currentState về Intro (trạng thái "chưa
+    /// bắt đầu trận nào"). KHÔNG tự bật/tắt bất kỳ GameObject UI nào (Menu/BatteMap) — việc đó là
+    /// trách nhiệm của BattleSettingController.
+    ///
+    /// LƯU Ý: hàm này được gọi cho CẢ 3 trường hợp kết thúc BattleMap (Win, Lose, và bỏ dở/Abandon
+    /// giữa chừng khi đang Pause) — nên ResetBattleState() (qua CommitEarnedRewards()) là nơi DUY
+    /// NHẤT cộng earnedCoin/earnedRuby vào GameData, đảm bảo áp dụng đồng nhất cho cả 3 trường hợp.
     /// </summary>
     public void ReturnToMenu()
     {
@@ -427,6 +516,25 @@ public class BattleManager : Singleton<BattleManager>
         OnPowerChanged?.Invoke(power);
     }
 
+    // ─── Battle Rewards (Coin/Ruby) ──────────────────────────
+
+    /// <summary>
+    /// Cộng dồn Coin/Ruby TẠM tích luỹ được trong trận đấu (earnedCoin/earnedRuby) vào GameData
+    /// qua GameManager.AddBattleRewards(), rồi reset cả 2 về 0. Gọi từ ResetBattleState() — vì
+    /// hàm đó dùng chung cho StartBattle() (safety net) VÀ ReturnToMenu() (dùng chung cho Back
+    /// Menu lúc Pause/Abandon VÀ nút Back trên PanelWin/PanelLose), nên việc cộng thưởng luôn
+    /// xảy ra khi 1 BattleMap kết thúc — bất kể Win, Lose, hay bỏ dở giữa chừng.
+    /// </summary>
+    private void CommitEarnedRewards()
+    {
+        if (earnedCoin == 0 && earnedRuby == 0) return;
+
+        GameManager.Instance?.AddBattleRewards(earnedCoin, earnedRuby);
+
+        earnedCoin = 0;
+        earnedRuby = 0;
+    }
+
     // ─── Internal ───────────────────────────────────────────
 
     /// <summary>
@@ -434,8 +542,8 @@ public class BattleManager : Singleton<BattleManager>
     /// xong và đều được quản lý trong BattleSpawnEnemy) đều đã dead — kiểm tra qua
     /// battleSpawnEnemy.IsWaveCleared() — thì dọn sạch UnitDuck còn lại trên sân đấu
     /// (spawnDuck.DespawnAllDucks(), dùng PoolingManager.Despawn), cộng tiền thưởng thắng Wave
-    /// (AddMoney(moneyPerWaveWin) — BẤT KỂ đây là Wave cuối cùng hay còn Wave tiếp theo, vì
-    /// "thắng xong 1 Wave" luôn được thưởng tiền) rồi:
+    /// (AddMoney(moneyPerWaveWin) và earnedCoin += coinPerWaveWin — BẤT KỂ đây là Wave cuối cùng
+    /// hay còn Wave tiếp theo, vì "thắng xong 1 Wave" luôn được thưởng tiền/Coin) rồi:
     ///   - Nếu Wave hiện tại là Wave cuối cùng (currentWavesIndex >= CurrentMapBattleData.WaveCount)
     ///     → kết thúc trận đấu với BattleResult.Win.
     ///   - Ngược lại → chuyển Game về TurnSetup (BattleResult.Continue) để bắt đầu turn kế tiếp.
@@ -448,8 +556,10 @@ public class BattleManager : Singleton<BattleManager>
         if (spawnDuck != null)
             spawnDuck.DespawnAllDucks();
 
-        // Thắng xong 1 Wave -> +moneyPerWaveWin (mặc định 50), áp dụng cho MỌI Wave (kể cả Wave cuối).
+        // Thắng xong 1 Wave -> +moneyPerWaveWin (mặc định 50) và +coinPerWaveWin (mặc định 10 Coin
+        // thật, tích luỹ vào earnedCoin), áp dụng cho MỌI Wave (kể cả Wave cuối).
         AddMoney(moneyPerWaveWin);
+        earnedCoin += coinPerWaveWin;
 
         MapBattsleData mapData = currentMapBattleData ?? ResolveMapBattleData();
         bool isLastWave = mapData != null && currentWavesIndex >= mapData.WaveCount;
@@ -460,7 +570,9 @@ public class BattleManager : Singleton<BattleManager>
     /// <summary>
     /// Được gọi khi myTem.OnDeath bắn ra (HP của MyTeam đã về 0). Kết thúc trận đấu ngay lập
     /// tức với BattleState.Lose, bất kể đang ở TurnSetup hay TurnBattle (bỏ qua nếu trận đấu
-    /// đã kết thúc — Win/Lose — hoặc đang Pause).
+    /// đã kết thúc — Win/Lose — hoặc đang Pause). earnedCoin/earnedRuby tích luỹ được từ các
+    /// Wave đã vượt qua trước khi thua vẫn được giữ nguyên, sẽ được cộng vào GameData khi
+    /// ReturnToMenu() được gọi (xem CommitEarnedRewards()).
     /// </summary>
     private void HandleMyTeamDeath()
     {
@@ -535,6 +647,9 @@ public class BattleManager : Singleton<BattleManager>
     /// Dọn sạch TOÀN BỘ vật thể/trạng thái runtime của 1 trận đấu, dùng chung cho cả StartBattle()
     /// (đảm bảo trận mới không dính dữ liệu cũ, kể cả khi trận trước bị thoát bất thường) VÀ
     /// ReturnToMenu() (thoát ván đấu về Menu). Gồm:
+    ///   0. Cộng dồn earnedCoin/earnedRuby (Coin/Ruby thật tích luỹ được trong trận vừa kết thúc,
+    ///      dù Win/Lose/Abandon) vào GameData qua GameManager (CommitEarnedRewards()), rồi reset
+    ///      về 0 — PHẢI làm TRƯỚC khi các bước dưới đây có thể reset lại state khác.
     ///   1. Despawn toàn bộ UnitDuck đang sống (BattleSpawnDuck.DespawnAllDucks() — qua PoolingManager).
     ///   2. Xoá toàn bộ EnemyDuck đang sống + dừng coroutine spawn dở dang (BattleSpawnEnemy.ClearSpawnedEnemies()).
     ///   3. Reset Battle Grid về trạng thái ban đầu (BattleGridManager.ResetGrid() — chỉ 3x3 giữa Unlocked;
@@ -555,6 +670,11 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     private void ResetBattleState()
     {
+        // 0. Cộng dồn Coin/Ruby thật (earnedCoin/earnedRuby) vào GameData — áp dụng cho MỌI
+        // trường hợp kết thúc BattleMap (Win, Lose, hoặc Abandon), vì ResetBattleState() dùng
+        // chung cho StartBattle() (safety net) VÀ ReturnToMenu() (Back Menu/Pause + PanelWin/PanelLose).
+        CommitEarnedRewards();
+
         var enemySpawner = battleSpawnEnemy != null ? battleSpawnEnemy : spawnEnemy;
 
         if (spawnDuck != null)

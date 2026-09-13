@@ -11,6 +11,11 @@ using TMPro;
 /// Khi Gear được bật (OnEnable): populate cả 2 Grid (SectionCurrent / SectionAll)
 /// từ WeaponData. Mỗi slot trong SectionCurrent là Pistol_Slot với WeaponSlotGridUI.
 /// Khi click slot → mở WeaponInfoUI.
+///
+/// Tự động refresh lại toàn bộ Grid mỗi khi có weapon nào thay đổi (unlock, AddXP, hoặc
+/// nâng Level qua nút Update trong WeaponInfoUI — xem WeaponManager.OnWeaponChanged), nhờ
+/// lắng nghe event WeaponManager.OnWeaponChanged trong lúc Gear panel đang bật, nên không cần
+/// WeaponInfoUI biết/tham chiếu trực tiếp tới GearPanelUI.
 /// </summary>
 public class GearPanelUI : MonoBehaviour
 {
@@ -28,7 +33,23 @@ public class GearPanelUI : MonoBehaviour
     [Header("WeaponInfo Panel")]
     public WeaponInfoUI weaponInfoUI;        // UIGame/StartGame/MenuGame/WeaponInfo
 
-    void OnEnable()  => RefreshUI();
+    void OnEnable()
+    {
+        RefreshUI();
+        WeaponManager.OnWeaponChanged += HandleWeaponChanged;
+    }
+
+    void OnDisable()
+    {
+        WeaponManager.OnWeaponChanged -= HandleWeaponChanged;
+    }
+
+    /// <summary>
+    /// Gọi mỗi khi WeaponManager báo có 1 weapon bất kỳ thay đổi (unlock, AddXP, TryLevelUp
+    /// từ nút Update trong WeaponInfoUI, UpdateWeapon...). Refresh lại toàn bộ Grid để icon/
+    /// level/text ở SectionCurrent + SectionAll luôn khớp dữ liệu mới nhất.
+    /// </summary>
+    private void HandleWeaponChanged(WeaponEntry changed) => RefreshUI();
 
     public void RefreshUI()
     {
