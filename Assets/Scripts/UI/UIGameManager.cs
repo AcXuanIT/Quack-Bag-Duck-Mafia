@@ -41,6 +41,12 @@ public class UIGameManager : MonoBehaviour
              "được MenuPanelController gọi mỗi khi Panel Map được load")]
     [SerializeField] private TextMeshProUGUI textCurrentBattleMap;
 
+    [Tooltip("Text 2 dòng dạng \"Map {currentMap}\" xuống dòng \"({currentMap}/{tổng số MapBattle})\". " +
+             "currentMap = CurrentMapIndex hiện tại (GameManager → GameData). Tổng số = " +
+             "DataManager.Instance.MapBattleData.Count. Cập nhật cùng lúc với textCurrentBattleMap " +
+             "trong RefreshCurrentBattleMapText().")]
+    [SerializeField] private TextMeshProUGUI textNameMapIndex;
+
     [Tooltip("Text hiển thị số Ruby của Player")]
     [SerializeField] private TextMeshProUGUI textRuby;
 
@@ -164,11 +170,22 @@ public class UIGameManager : MonoBehaviour
 
     /// <summary>
     /// Cập nhật textCurrentBattleMap = CurrentMapIndex (đọc qua GameManager, giá trị thực lưu
-    /// trong GameData). Được MenuPanelController gọi mỗi khi Panel Map được load.
+    /// trong GameData) VÀ textNameMapIndex = "Map {currentMap}" xuống dòng "({currentMap}/{tổng
+    /// số MapBattle trong DataManager})". Được MenuPanelController gọi mỗi khi Panel Map được load.
     /// </summary>
     public void RefreshCurrentBattleMapText()
     {
-        if (gameManager == null || textCurrentBattleMap == null) return;
-        textCurrentBattleMap.text = "Cấp độ " + gameManager.CurrentMapIndex.ToString();
+        if (gameManager == null) return;
+
+        int currentMap = gameManager.CurrentMapIndex;
+
+        if (textCurrentBattleMap != null)
+            textCurrentBattleMap.text = "Cấp độ " + currentMap.ToString();
+
+        if (textNameMapIndex != null)
+        {
+            int totalMaps = DataManager.Instance != null ? DataManager.Instance.MapBattleData.Count : 0;
+            textNameMapIndex.text = "Map " + currentMap + "\n(" + currentMap + "/" + totalMaps + ")";
+        }
     }
 }

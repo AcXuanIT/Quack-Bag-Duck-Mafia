@@ -45,6 +45,19 @@ public class BottomButtonController : MonoBehaviour
             _iconDefaultPos = iconRect.anchoredPosition;
     }
 
+    /// <summary>
+    /// Cập nhật lại vị trí gốc (_btnDefaultPos) theo anchoredPosition HIỆN TẠI của button.
+    /// Gọi từ MenuBottomController.ScaleButtonsToFitWidth() ngay sau khi đổi X/width của
+    /// button (chia đều theo chiều rộng MenuBottom) — bắt buộc phải gọi, nếu không lần
+    /// SetState()/SetStateImmediate() animation Y tiếp theo sẽ tự đưa X về lại vị trí cũ
+    /// (ApplyState() luôn dùng _btnDefaultPos.x làm X cố định, xem bên dưới).
+    /// </summary>
+    public void RefreshDefaultPosition()
+    {
+        if (_rectTransform == null) _rectTransform = GetComponent<RectTransform>();
+        _btnDefaultPos = _rectTransform.anchoredPosition;
+    }
+
     /// <summary>Khởi tạo trạng thái không có animation (dùng khi setup lần đầu)</summary>
     public void SetStateImmediate(bool isOn)
     {
