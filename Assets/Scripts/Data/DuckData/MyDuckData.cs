@@ -1,10 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// Dữ liệu 1 con vịt của người chơi (Player-owned Duck).
-/// Kế thừa từ BaseDuckData, bổ sung các thông số liên quan tới việc
-/// sở hữu/nâng cấp bởi người chơi.
-/// </summary>
+
 [System.Serializable]
 public class MyDuckData : BaseDuckData
 {
@@ -19,7 +15,6 @@ public class MyDuckData : BaseDuckData
     public int UpgradeCoin;
 
     [Header("=== Unlock ===")]
-    [Tooltip("Level Player tối thiểu để mở khóa con vịt này (0 = không yêu cầu)")]
     [Min(0)]
     public int LevelLock;
 

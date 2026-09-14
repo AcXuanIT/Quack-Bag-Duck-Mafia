@@ -2,38 +2,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-/// <summary>
-/// HP Bar cho duck dung Canvas Image (fillAmount).
-/// Gan vao GO HPBar (child cua duck).
-/// - FillGreen : tut tuc thi khi nhan damage
-/// - FillWhite : tut tu tu ve vi tri cua Green (delay roi chase)
-/// - An toan bo khi HP = 100%, hien khi HP < 100%
-/// </summary>
+
 public class DuckHPBar : MonoBehaviour
 {
     [Header("Fill Images (dung fillAmount de fill)")]
-    [SerializeField] private Image fillGreen;   // tut tuc thi
-    [SerializeField] private Image fillWhite;   // tut tu tu theo sau
+    [SerializeField] private Image fillGreen;   
+    [SerializeField] private Image fillWhite;   
 
     [Header("White Chase Settings")]
     [SerializeField] private float chaseDelay    = 0.4f;
     [SerializeField] private float chaseDuration = 0.5f;
     [SerializeField] private Ease  chaseEase     = Ease.InOutQuad;
 
-    private float _currentHP = 1f;   // 0..1
+    private float _currentHP = 1f;   
     private Tween _whiteTween;
 
     private void Awake()
     {
         SetFill(fillGreen, 1f);
         SetFill(fillWhite, 1f);
-        gameObject.SetActive(false); // an luc dau (HP day)
+        gameObject.SetActive(false); 
     }
 
-    /// <summary>
-    /// Goi khi duck nhan damage.
-    /// hpRatio: gia tri HP moi, 0..1
-    /// </summary>
     public void SetHP(float hpRatio)
     {
         hpRatio = Mathf.Clamp01(hpRatio);
@@ -43,10 +33,8 @@ public class DuckHPBar : MonoBehaviour
         gameObject.SetActive(!full);
         if (full) return;
 
-        // Green tut tuc thi
         SetFill(fillGreen, hpRatio);
 
-        // White: cancel tween cu, doi roi chase
         _whiteTween?.Kill();
         _whiteTween = DOVirtual.DelayedCall(chaseDelay, () =>
         {
@@ -59,7 +47,6 @@ public class DuckHPBar : MonoBehaviour
         });
     }
 
-    /// <summary>Khi heal, White va Green deu len ngay.</summary>
     public void Heal(float hpRatio)
     {
         hpRatio = Mathf.Clamp01(hpRatio);

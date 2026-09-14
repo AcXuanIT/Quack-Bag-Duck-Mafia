@@ -4,35 +4,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Controller cho UI Gear Panel.
-/// Gắn vào GameObject "Gear" tại UIGame/StartGame/MenuGame/MenuMid/Gear.
-///
-/// Khi Gear được bật (OnEnable): populate cả 2 Grid (SectionCurrent / SectionAll)
-/// từ WeaponData. Mỗi slot trong SectionCurrent là Pistol_Slot với WeaponSlotGridUI.
-/// Khi click slot → mở WeaponInfoUI.
-///
-/// Tự động refresh lại toàn bộ Grid mỗi khi có weapon nào thay đổi (unlock, AddXP, hoặc
-/// nâng Level qua nút Update trong WeaponInfoUI — xem WeaponManager.OnWeaponChanged), nhờ
-/// lắng nghe event WeaponManager.OnWeaponChanged trong lúc Gear panel đang bật, nên không cần
-/// WeaponInfoUI biết/tham chiếu trực tiếp tới GearPanelUI.
-/// </summary>
 public class GearPanelUI : MonoBehaviour
 {
     [Header("Data")]
     public WeaponData weaponDatabase;
 
-    [Header("Grid - SectionCurrent (vũ khí đã mở khóa)")]
-    public Transform  currentGrid;          // SectionCurrent/Grid
-    public GameObject currentSlotPrefab;    // Pistol_Slot prefab có WeaponSlotGridUI
+    [Header("Grid - SectionCurrent")]
+    public Transform  currentGrid;          
+    public GameObject currentSlotPrefab;    
 
-    [Header("Grid - SectionAll (tất cả vũ khí còn lại)")]
-    public Transform  allGrid;              // SectionAll/Grid
-    public GameObject allSlotPrefab;        // Pistol_Slot prefab cho SectionAll
+    [Header("Grid - SectionAll")]
+    public Transform  allGrid;              
+    public GameObject allSlotPrefab;        
 
     [Header("WeaponInfo Panel")]
-    public WeaponInfoUI weaponInfoUI;        // UIGame/StartGame/MenuGame/WeaponInfo
-
+    public WeaponInfoUI weaponInfoUI;        
     void OnEnable()
     {
         RefreshUI();
@@ -44,11 +30,6 @@ public class GearPanelUI : MonoBehaviour
         WeaponManager.OnWeaponChanged -= HandleWeaponChanged;
     }
 
-    /// <summary>
-    /// Gọi mỗi khi WeaponManager báo có 1 weapon bất kỳ thay đổi (unlock, AddXP, TryLevelUp
-    /// từ nút Update trong WeaponInfoUI, UpdateWeapon...). Refresh lại toàn bộ Grid để icon/
-    /// level/text ở SectionCurrent + SectionAll luôn khớp dữ liệu mới nhất.
-    /// </summary>
     private void HandleWeaponChanged(WeaponEntry changed) => RefreshUI();
 
     public void RefreshUI()
@@ -61,8 +42,6 @@ public class GearPanelUI : MonoBehaviour
         var unlockedList = new List<WeaponEntry>();
         var lockedList   = new List<WeaponEntry>();
 
-        // weaponDatabase.Weapons giờ là WeaponDataAsset[] — dereference qua .Entry cho từng
-        // asset (GetEntries() bỏ qua phần tử null/Entry null giúp).
         foreach (var w in weaponDatabase.GetEntries())
         {
             if (!w.IsLocked) unlockedList.Add(w);
@@ -72,18 +51,15 @@ public class GearPanelUI : MonoBehaviour
         foreach (var w in unlockedList) SpawnCurrentSlot(w);
         foreach (var w in lockedList)   SpawnAllSlot(w);
 
-        // Rebuild layout sau khi spawn xong để ContentSizeFitter + VerticalLayoutGroup tính đúng chiều cao
         StartCoroutine(RebuildLayoutNextFrame());
     }
 
     IEnumerator RebuildLayoutNextFrame()
     {
-        // Chờ 1 frame để Unity hoàn tất việc khởi tạo các slot mới
         yield return null;
 
         Canvas.ForceUpdateCanvases();
 
-        // Rebuild từ trong ra ngoài
         if (currentGrid != null)
             LayoutRebuilder.ForceRebuildLayoutImmediate(currentGrid.GetComponent<RectTransform>());
         if (allGrid != null)
@@ -111,7 +87,6 @@ public class GearPanelUI : MonoBehaviour
         if (allGrid == null || allSlotPrefab == null) return;
         GameObject go = Instantiate(allSlotPrefab, allGrid);
 
-        // Icon: dùng SpriteTier1 (icon mặc định UIGear)
         var iconImg = go.transform.Find("IconWaepon");
         if (iconImg != null)
         {
@@ -119,7 +94,6 @@ public class GearPanelUI : MonoBehaviour
             if (img != null) img.sprite = data.GetUIIcon();
         }
 
-        // Level text: ẩn nếu chưa mở khoá
         var lvTxtT = go.transform.Find("LevelText");
         if (lvTxtT != null)
         {

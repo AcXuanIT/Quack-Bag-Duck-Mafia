@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// Lớp cơ sở cho dữ liệu 1 con vịt (Duck) trong game.
-/// EnemyDuckData và MyDuckData sẽ kế thừa từ lớp này.
-/// </summary>
+
 [System.Serializable]
 public class BaseDuckData
 {
@@ -26,21 +23,15 @@ public class BaseDuckData
     public Sprite SpriteTier4;
 
     [Header("=== Grid ===")]
-    [Tooltip("Sprite dùng để hiển thị grid/khung nền của Duck")]
     public Sprite GridSprite;
 
     [Header("=== Color theo Tier ===")]
-    [Tooltip("Màu gốc - Tier 1")]
     public Color ColorBase = Color.white;
-    [Tooltip("Màu xanh Blue - Tier 2")]
     public Color ColorBlue = Color.blue;
-    [Tooltip("Màu tím - Tier 3")]
     public Color ColorPurple = new Color(0.6f, 0.2f, 0.8f);
-    [Tooltip("Màu vàng - Tier 4")]
     public Color ColorYellow = Color.yellow;
 
-    // ─── Public API ───────────────────────────────────────────
-
+    // ─── Public API ─────
     public virtual Sprite GetSprite(int tier)
     {
         switch (tier)
@@ -60,7 +51,6 @@ public class BaseDuckData
         return SpriteTier4;
     }
 
-    /// <summary>Lấy màu tương ứng theo Tier (1=gốc, 2=blue, 3=purple, 4=yellow).</summary>
     public virtual Color GetColor(int tier)
     {
         switch (tier)

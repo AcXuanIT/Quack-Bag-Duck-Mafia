@@ -3,36 +3,24 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
-/// <summary>
-/// Gắn vào từng button trong MenuBottom.
-/// Quản lý trạng thái ON/OFF với hiệu ứng di chuyển lên/xuống.
-/// 
-/// Trạng thái ON  : button BG image hiện, text hiện, icon ở vị trí gốc
-/// Trạng thái OFF : button BG image ẩn, text ẩn, icon hơi thấp xuống
-/// Hiệu ứng       : button di chuyển lên (OFF→ON) hoặc xuống (ON→OFF)
-/// </summary>
 public class BottomButtonController : MonoBehaviour
 {
     [Header("References (auto-filled)")]
-    public Image   bgImage;          // Image component trên chính button này
-    public TextMeshProUGUI label;    // Text (TMP) child
-    public RectTransform   iconRect; // Image child (icon)
-
+    public Image   bgImage;          
+    public TextMeshProUGUI label;    
+    public RectTransform   iconRect;
     [Header("Icon Offset")]
-    [SerializeField] private float iconOffsetY = -20f;   // icon thấp xuống bao nhiêu khi OFF
+    [SerializeField] private float iconOffsetY = -20f;  
 
     [Header("Button Slide")]
-    [SerializeField] private float slideOffsetY = -40f;  // button dịch xuống bao nhiêu khi OFF
+    [SerializeField] private float slideOffsetY = -40f; 
 
-    // Vị trí gốc của button và icon
     private Vector2 _btnDefaultPos;
     private Vector2 _iconDefaultPos;
 
-    // Trạng thái hiện tại
     private bool _isOn = false;
     private Coroutine _animCoroutine;
 
-    // Index trong danh sách (dùng để so sánh vị trí với button khác khi switch)
     public int Index { get; set; }
 
     private RectTransform _rectTransform;
@@ -45,27 +33,18 @@ public class BottomButtonController : MonoBehaviour
             _iconDefaultPos = iconRect.anchoredPosition;
     }
 
-    /// <summary>
-    /// Cập nhật lại vị trí gốc (_btnDefaultPos) theo anchoredPosition HIỆN TẠI của button.
-    /// Gọi từ MenuBottomController.ScaleButtonsToFitWidth() ngay sau khi đổi X/width của
-    /// button (chia đều theo chiều rộng MenuBottom) — bắt buộc phải gọi, nếu không lần
-    /// SetState()/SetStateImmediate() animation Y tiếp theo sẽ tự đưa X về lại vị trí cũ
-    /// (ApplyState() luôn dùng _btnDefaultPos.x làm X cố định, xem bên dưới).
-    /// </summary>
     public void RefreshDefaultPosition()
     {
         if (_rectTransform == null) _rectTransform = GetComponent<RectTransform>();
         _btnDefaultPos = _rectTransform.anchoredPosition;
     }
 
-    /// <summary>Khởi tạo trạng thái không có animation (dùng khi setup lần đầu)</summary>
     public void SetStateImmediate(bool isOn)
     {
         _isOn = isOn;
         ApplyState(isOn ? 1f : 0f);
     }
 
-    /// <summary>Chuyển trạng thái với animation, duration tính bằng giây</summary>
     public void SetState(bool isOn, float duration)
     {
         if (_isOn == isOn) return;
@@ -81,7 +60,6 @@ public class BottomButtonController : MonoBehaviour
         float startT = toOn ? 0f : 1f;
         float endT   = toOn ? 1f : 0f;
 
-        // Snap visibility trước khi animate
         if (toOn)
         {
             if (bgImage != null) bgImage.enabled = true;
@@ -99,7 +77,6 @@ public class BottomButtonController : MonoBehaviour
 
         ApplyState(endT);
 
-        // Ẩn sau khi animate xong
         if (!toOn)
         {
             if (bgImage != null) bgImage.enabled = false;
@@ -107,10 +84,6 @@ public class BottomButtonController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// t = 0 : OFF state (button thấp, icon thấp, image/text ẩn)
-    /// t = 1 : ON  state (button vị trí gốc, icon gốc, image/text hiện)
-    /// </summary>
     private void ApplyState(float t)
     {
         // Button slide up/down

@@ -10,33 +10,21 @@ using UnityEngine;
 public class BattleSpawnEnemy : MonoBehaviour
 {
     [Header("=== Spawn ===")]
-    [Tooltip("Prefab EnemyObject dùng để Instantiate")]
     [SerializeField] private EnemyDuck enemyPrefab;
 
-    [Tooltip("Các điểm spawn enemy. Nếu để trống sẽ spawn tại vị trí của chính BattleSpawnEnemy")]
     [SerializeField] private Transform[] spawnPoints;
 
-    [Tooltip("Container chứa các enemy được spawn ra (tuỳ chọn)")]
     [SerializeField] private Transform enemyContainer;
 
     [Header("=== Timing ===")]
-    [Tooltip("Thời gian delay (giây) giữa mỗi lần spawn 1 enemy trong Wave")]
     [SerializeField] private float spawnDelay;
 
     private readonly List<EnemyDuck> _spawnedEnemies = new List<EnemyDuck>();
     private Coroutine _spawnRoutine;
 
-    // True kể từ khi SpawnWave() được gọi cho Wave hiện tại, dùng để phân biệt "chưa gọi
-    // SpawnWave() lần nào" (đều cho _spawnRoutine == null) với "đã spawn xong Wave".
     private bool _waveSpawnStarted;
 
-    // ─── Public API ─────────────────────────────────────────
-
-    /// <summary>
-    /// Spawn toàn bộ enemy thuộc Wave có WaveIndex = waveIndex, dữ liệu lấy từ
-    /// mapBattleData được BattleManager truyền vào (BattleManager lấy MapBattsleData
-    /// từ DataManager mỗi khi Turn Battle bắt đầu).
-    /// </summary>
+    // ─── Public API ──
     public void SpawnWave(int waveIndex, MapBattsleData mapBattleData)
     {
         if (mapBattleData == null) return;
@@ -48,15 +36,12 @@ public class BattleSpawnEnemy : MonoBehaviour
         if (_spawnRoutine != null)
             StopCoroutine(_spawnRoutine);
 
-        // Wave mới -> danh sách enemy đang quản lý cũng reset theo, để IsWaveCleared()
-        // chỉ xét đúng enemy của Wave hiện tại (không tính dồn enemy của các turn trước).
         _spawnedEnemies.Clear();
         _waveSpawnStarted = true;
 
         _spawnRoutine = StartCoroutine(SpawnEnemiesForWave(wave));
     }
 
-    /// <summary>Xoá toàn bộ enemy đã spawn (dùng khi bắt đầu lại trận/màn chơi).</summary>
     public void ClearSpawnedEnemies()
     {
         if (_spawnRoutine != null)
@@ -70,34 +55,21 @@ public class BattleSpawnEnemy : MonoBehaviour
         _spawnedEnemies.Clear();
         _waveSpawnStarted = false;
     }
-
-    /// <summary>
-    /// True khi Wave hiện tại đã "sạch": đã spawn xong toàn bộ enemy của Wave (coroutine
-    /// SpawnEnemiesForWave chạy xong, không còn nằm trong hàng đợi) VÀ toàn bộ enemy đã
-    /// spawn (quản lý trong _spawnedEnemies) đều đã chết (Duck.IsDead) hoặc đã bị huỷ (null).
-    ///
-    /// BattleManager dùng hàm này (poll mỗi Update() khi đang TurnBattle) để tự động kết
-    /// thúc Turn Battle sớm ngay khi dọn sạch quân địch, không cần đợi hết thời gian turn.
-    /// </summary>
     public bool IsWaveCleared()
     {
-        if (!_waveSpawnStarted) return false;      // SpawnWave() chưa được gọi cho Wave này
-        if (_spawnRoutine != null) return false;   // vẫn còn đang spawn dở trong coroutine
+        if (!_waveSpawnStarted) return false;     
+        if (_spawnRoutine != null) return false;   
 
         foreach (var enemy in _spawnedEnemies)
         {
             if (enemy != null && !enemy.IsDead)
-                return false; // còn ít nhất 1 enemy sống
+                return false; 
         }
 
-        return true; // Wave rỗng (0 enemy) hoặc toàn bộ enemy đã chết
+        return true; 
     }
 
-    // ─── Spawn Logic ────────────────────────────────────────
-
-    /// <summary>
-    /// Spawn lần lượt từng enemy trong Wave, mỗi lần spawn cách nhau spawnDelay giây.
-    /// </summary>
+    // ─── Spawn Logic ─
     private IEnumerator SpawnEnemiesForWave(WaveData wave)
     {
         if (wave.Enemies == null) yield break;
@@ -125,9 +97,6 @@ public class BattleSpawnEnemy : MonoBehaviour
 
         EnemyDuck obj = Instantiate(enemyPrefab, point.position, point.rotation, parent);
 
-        // GetWeaponEntry() trả về 1 bản Clone() độc lập của weapon gán qua data.weaponAsset —
-        // KHÔNG dùng trực tiếp weaponAsset.Entry, để tránh Enemy vô tình chia sẻ chung instance
-        // WeaponEntry với hệ thống nâng cấp vũ khí của Player (WeaponManager).
         obj.Init(data, data.GetWeaponEntry(), 1, 1);
 
         _spawnedEnemies.Add(obj);

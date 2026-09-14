@@ -1,11 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// UIGameManager - Script trung tâm quản lý toàn bộ UI trong game.
-/// Gắn vào GameObject UIGame trong scene.
-/// Điều phối các UI sub-controller.
-/// </summary>
+
 public class UIGameManager : MonoBehaviour
 {
     [Header("=== Loading ===")]
@@ -15,45 +11,24 @@ public class UIGameManager : MonoBehaviour
     [SerializeField] private MenuBottomController menuBottomController;
 
     [Header("=== Animation Settings ===")]
-    [Tooltip("Thời gian chuyển động button và panel (giây)")]
     [SerializeField] private float menuAnimDuration = 1f;
-
-    [Tooltip("Index button mặc định khi mở game (0=Shop, 1=Car, 2=Map, 3=Gear, 4=Talent)")]
     [SerializeField] private int defaultButtonIndex = 0;
 
     [Header("=== LoadMap Animation ===")]
-    [Tooltip("LoadMapAnimator gắn trên GameObject LoadMap")]
     [SerializeField] private LoadMapAnimator loadMapAnimator;
-
-    [Tooltip("Thời gian slide LoadMap từ trái sang phải (giây)")]
     [SerializeField] private float loadMapDuration = 1.5f;
 
     [Header("=== Battle Map UI ===")]
-    [Tooltip("UI BattleMap (UIGame/StartGame/BatteMap) - bật sau khi LoadMap xong")]
     [SerializeField] private BattleMapUI battleMapUI;
 
     [Header("=== Game Manager (Non-UI) ===")]
-    [Tooltip("GameManager quản lý các GameObject không phải UI. BattleManager được truy cập qua gameManager.battleManager")]
     [SerializeField] private GameManager gameManager;
 
     [Header("=== HUD Info ===")]
-    [Tooltip("Text hiển thị tên/thông tin BattleMap hiện tại — cập nhật qua RefreshCurrentBattleMapText(), " +
-             "được MenuPanelController gọi mỗi khi Panel Map được load")]
     [SerializeField] private TextMeshProUGUI textCurrentBattleMap;
-
-    [Tooltip("Text 2 dòng dạng \"Map {currentMap}\" xuống dòng \"({currentMap}/{tổng số MapBattle})\". " +
-             "currentMap = CurrentMapIndex hiện tại (GameManager → GameData). Tổng số = " +
-             "DataManager.Instance.MapBattleData.Count. Cập nhật cùng lúc với textCurrentBattleMap " +
-             "trong RefreshCurrentBattleMapText().")]
     [SerializeField] private TextMeshProUGUI textNameMapIndex;
-
-    [Tooltip("Text hiển thị số Ruby của Player")]
     [SerializeField] private TextMeshProUGUI textRuby;
-
-    [Tooltip("Text hiển thị số Coin của Player")]
     [SerializeField] private TextMeshProUGUI textCoin;
-
-    [Tooltip("Text hiển thị chỉ số Power của Player")]
     [SerializeField] private TextMeshProUGUI textPower;
 
     private void Start()
@@ -65,50 +40,30 @@ public class UIGameManager : MonoBehaviour
     {
         if (loadingStartGameUI != null)
             loadingStartGameUI.StartLoadingSequence();
-        else
-            Debug.LogWarning("[UIGameManager] LoadingStartGameUI chưa được gán!");
 
         if (menuBottomController != null)
             menuBottomController.Initialize(menuAnimDuration, defaultButtonIndex);
-        else
-            Debug.LogWarning("[UIGameManager] MenuBottomController chưa được gán!");
     }
 
-    /// <summary>
-    /// Gọi từ Button Play (MenuMid → Map).
-    /// Chạy LoadMap slide rồi mở BattleMap.
-    /// </summary>
     public void OnPlayButtonClicked()
     {
         if (loadMapAnimator == null)
         {
-            Debug.LogWarning("[UIGameManager] LoadMapAnimator chưa được gán!");
             OpenBattleMap();
             return;
         }
 
         loadMapAnimator.Play(loadMapDuration, onComplete: OpenBattleMap);
     }
-
-    /// <summary>
-    /// Bật UI BattleMap và GameObject BatteMap qua GameManager,
-    /// đồng thời bắt đầu trận đấu (BattleManager.StartBattle → state Intro).
-    /// Khi hiệu ứng fade-in (Intro) của BattleMapUI hoàn tất, gọi BattleManager.FinishIntro()
-    /// để chuyển sang TurnSetup.
-    /// </summary>
     private void OpenBattleMap()
     {
         if (gameManager != null)
             gameManager.EnableBatteMap();
-        else
-            Debug.LogWarning("[UIGameManager] GameManager chưa được gán!");
 
         BattleManager battleManager = gameManager != null ? gameManager.battleManager : null;
 
         if (battleManager != null)
             battleManager.StartBattle();
-        else
-            Debug.LogWarning("[UIGameManager] GameManager.battleManager chưa được gán!");
 
         if (battleMapUI != null)
         {
@@ -119,24 +74,13 @@ public class UIGameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[UIGameManager] BattleMapUI chưa được gán!");
-            // Không có UI để báo Intro xong, gọi thẳng FinishIntro để không kẹt state
             battleManager?.FinishIntro();
         }
     }
-
-    /// <summary>
-    /// Gọi từ Button quay lại Menu (VD: nút Back trong panelUIWin/panelUILose của BattleMapUI,
-    /// hoặc btnBackMenu trong UISetting).
-    /// Chạy LoadMap slide (chiều ngược lại với Play) để chuyển từ BattleMap về StartGame:
-    /// LoadMapAnimator.PlayReverse() tự tắt BattleMapUI/BatteMap GO và bật lại MenuGame
-    /// tại điểm giữa animation.
-    /// </summary>
     public void OnBackToStartGameClicked()
     {
         if (loadMapAnimator == null)
         {
-            Debug.LogWarning("[UIGameManager] LoadMapAnimator chưa được gán!");
             battleMapUI?.Hide();
             gameManager?.DisableBatteMap();
             return;
@@ -144,16 +88,6 @@ public class UIGameManager : MonoBehaviour
 
         loadMapAnimator.PlayReverse(loadMapDuration);
     }
-
-    /// <summary>
-    /// Cập nhật textPower, textRuby, textCoin (đọc qua GameManager, giá trị thực lưu trong
-    /// GameData). Được MenuPanelController gọi mỗi khi 1 Panel bất kỳ trong MenuMid được load.
-    ///
-    /// Trước khi đọc gameManager.Power, gọi gameManager.RecalculatePower() để tính lại Power từ
-    /// TOÀN BỘ weapon đã mở khoá (WeaponManager) và ghi vào GameData — đảm bảo textPower luôn
-    /// khớp với tiến độ nâng cấp/mở khoá vũ khí mới nhất mỗi khi Player chuyển Panel Menu, không
-    /// cần lắng nghe riêng sự kiện WeaponManager.OnWeaponChanged/OnDatabaseReloaded.
-    /// </summary>
     public void RefreshHUD()
     {
         if (gameManager == null)
@@ -168,11 +102,6 @@ public class UIGameManager : MonoBehaviour
         if (textCoin != null) textCoin.text = gameManager.Coin.ToString();
     }
 
-    /// <summary>
-    /// Cập nhật textCurrentBattleMap = CurrentMapIndex (đọc qua GameManager, giá trị thực lưu
-    /// trong GameData) VÀ textNameMapIndex = "Map {currentMap}" xuống dòng "({currentMap}/{tổng
-    /// số MapBattle trong DataManager})". Được MenuPanelController gọi mỗi khi Panel Map được load.
-    /// </summary>
     public void RefreshCurrentBattleMapText()
     {
         if (gameManager == null) return;

@@ -1,15 +1,9 @@
 using UnityEngine;
 
-/// <summary>
-/// Script gắn vào GameObject LoadingStartGame.
-/// Nhận lệnh từ UIGameManager để bắt đầu loading
-/// và tự tắt khi hoàn thành, sau đó bật MenuGame.
-/// </summary>
 [RequireComponent(typeof(LoadingBarController))]
 public class LoadingStartGameUI : MonoBehaviour
 {
     [Header("=== Menu Game ===")]
-    [Tooltip("MenuGame GameObject sẽ được bật sau khi loading xong")]
     [SerializeField] private GameObject menuGame;
 
     private LoadingBarController _loadingBar;
@@ -19,16 +13,8 @@ public class LoadingStartGameUI : MonoBehaviour
         _loadingBar = GetComponent<LoadingBarController>();
     }
 
-    /// <summary>
-    /// Được gọi bởi UIGameManager khi game khởi động.
-    /// Bắt đầu animation loading bar, khi xong sẽ tắt LoadStartGame và bật MenuGame.
-    /// </summary>
     public void StartLoadingSequence()
     {
-        // Đảm bảo TOÀN BỘ chuỗi GameObject cha (VD "StartGame") đều đang bật trước. Nếu 1 cha nào
-        // đó đang tắt, gameObject.SetActive(true) bên dưới chỉ bật activeSelf của riêng object này,
-        // activeInHierarchy vẫn là false -> Unity sẽ KHÔNG gọi Awake() -> _loadingBar vẫn null ->
-        // NullReferenceException ngay dòng StartLoading() phía dưới.
         Transform parent = transform.parent;
         while (parent != null)
         {
@@ -43,13 +29,9 @@ public class LoadingStartGameUI : MonoBehaviour
 
     private void OnLoadingComplete()
     {
-        // Tắt LoadStartGame (GameObject này)
         gameObject.SetActive(false);
 
-        // Bật MenuGame
         if (menuGame != null)
             menuGame.SetActive(true);
-        else
-            Debug.LogWarning("[LoadingStartGameUI] MenuGame chưa được gán! Hãy kéo MenuGame vào Inspector.");
     }
 }

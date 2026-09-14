@@ -1,24 +1,9 @@
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 
-/// <summary>
-/// UI của một Grid ShopItem trong Shop.
-///
-/// RULE ĐẶT ITEM:
-///   - Chỉ được drag vào ô Locked (để unlock chúng).
-///   - Toàn bộ shape phải nằm trên ô Locked.
-///   - Ít nhất 1 ô trong shape phải kề (4 hướng) với ô đã Unlocked
-///     (UnlockedEmpty hoặc UnlockedFull).
-///
-/// KHI ĐẶT THÀNH CÔNG:
-///   - Tất cả ô trong shape chuyển Locked → UnlockedEmpty (unlock).
-///
-/// SIZING:
-///   - Dùng chung ShopItemSizing (CellSize/CellGap) với GearItemUI/UnitPlayerItemUI
-///     để đảm bảo 1 ô luôn cùng kích thước vật lý giữa cả 3 loại item trong Shop.
-/// </summary>
 [RequireComponent(typeof(CanvasGroup))]
 public class GridShopItemUI : MonoBehaviour,
     IShopItem,
@@ -27,7 +12,6 @@ public class GridShopItemUI : MonoBehaviour,
     IDragHandler,
     IEndDragHandler
 {
-    // ─── Inspector ───────────────────────────────────────────
     [Header("Base UI")]
     [SerializeField] public Image           bgImage;
     [SerializeField] public Image           iconImage;
@@ -41,25 +25,22 @@ public class GridShopItemUI : MonoBehaviour,
     [SerializeField] private Sprite[] rarityFrames;
 
     [Header("Trash Zone")]
-    [SerializeField] private RectTransform trashZone;   // Close GO trong UIBatteMap
-    [SerializeField] private Image         trashImage;  // Image cua Close de highlight
+    [SerializeField] private RectTransform trashZone;   
+    [SerializeField] private Image         trashImage;  
     [SerializeField] private Color         colorTrash   = new Color(1f, 0.3f, 0.3f, 0.9f);
     private Color _trashOriginalColor;
     private bool  _overTrash;
 
     
-[Header("Highlight Colors")]
+    [Header("Highlight Colors")]
     [SerializeField] private Color colorValid   = new Color(0.2f, 1f,   0.3f, 0.9f);
     [SerializeField] private Color colorInvalid = new Color(1f,   0.2f, 0.2f, 0.9f);
 
     [Header("Drag Grab Offset")]
-    [Tooltip("Khoang cach (don vi UI local) tu goc tren-trai cua Item toi vi tri con tro chuot luc keo. VD (10,-10) = con tro cach top-left 10 sang phai, 10 xuong duoi.")]
     [SerializeField] private Vector2 dragGrabOffset = new Vector2(10f, -10f);
 
-    // ─── Runtime ─────────────────────────────────────────────
     [HideInInspector] public ShopItemData data;
 
-        // ─── IShopItem ───────────────────────────────────────────
         public ShopItemData ShopData    => data;
         public string       DisplayName => data != null ? data.itemName : string.Empty;
         public Sprite       DisplayIcon => data != null ? data.icon : null;
@@ -78,20 +59,12 @@ public class GridShopItemUI : MonoBehaviour,
     private Vector2        _originalAnchoredPos;
 
     private BattleGridManager _gridManager;
-    private BattleGridCell    _hoveredAnchor;   // anchor cell đang hover
+    private BattleGridCell    _hoveredAnchor;   
     private bool              _isDragging;
 
-    // ─── Init ────────────────────────────────────────────────
+    // Init 
     private void Awake() => EnsureCached();
 
-    /// <summary>
-    /// Dam bao cac tham chieu cache (RectTransform, LayoutElement, CanvasGroup, Canvas goc) da
-    /// san sang, KE CA khi Setup() duoc goi luc GameObject dang nam trong 1 hierarchy DANG INACTIVE
-    /// (VD panel Shop/UIBatteMap chua mo) — truong hop nay Unity TRI HOAN goi Awake() toi khi
-    /// hierarchy active, nen khong the chi dua vao Awake() de cache: neu khong co ham nay,
-    /// ApplyShapeSize()/kich thuoc se bi ShopItemSizing.ApplySize() bo qua am tham (rt/layoutElement
-    /// con null luc Setup() chay), item giu nguyen kich thuoc mac dinh cua prefab.
-    /// </summary>
     private void EnsureCached()
     {
         if (_rt == null)            _rt            = GetComponent<RectTransform>();
@@ -105,7 +78,7 @@ public class GridShopItemUI : MonoBehaviour,
         }
     }
 
-public void Setup(ShopItemData itemData, BattleGridManager gridManager,
+    public void Setup(ShopItemData itemData, BattleGridManager gridManager,
                          RectTransform trash = null, Image trashImg = null)
     {
         EnsureCached();
@@ -127,15 +100,14 @@ public void Setup(ShopItemData itemData, BattleGridManager gridManager,
         ShopItemSizing.ApplySize(_rt, _layoutElement, data.gridCells);
     }
 
-    // ─── Click ───────────────────────────────────────────────
+    // ─── Click ─
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_isDragging) return;
-        Debug.Log("[GridShopItemUI] Clicked: " + (data != null ? data.itemName : "null"));
     }
 
-    // ─── Drag ────────────────────────────────────────────────
-public void OnBeginDrag(PointerEventData eventData)
+    // ─── Drag ──
+    public void OnBeginDrag(PointerEventData eventData)
     {
         if (data == null) return;
 
@@ -157,23 +129,16 @@ public void OnBeginDrag(PointerEventData eventData)
         ShowAllLockedCells();
     }
 
-    /// <summary>
-    /// Dịch chuyển Item sao cho vị trí con trỏ chuột hiện tại nằm cách góc TRÊN-TRÁI của Item
-    /// đúng dragGrabOffset đơn vị (mặc định (10,-10): cách 10 sang phải, 10 xuống dưới so với
-    /// top-left) — bất kể người chơi bấm vào điểm nào bên trong Item. Gọi ngay sau khi reparent
-    /// item vào _rootCanvas lúc bắt đầu kéo (OnBeginDrag), để việc canh ô Grid lúc thả luôn nhất
-    /// quán theo đúng offset này trong suốt quá trình kéo.
-    /// </summary>
     private void SnapTopLeftOffsetToPointer(PointerEventData eventData)
     {
         if (_rt == null || _rootCanvas == null) return;
 
-        var canvasRT = _rootCanvas.transform as RectTransform;
+        RectTransform canvasRT = _rootCanvas.transform as RectTransform;
         if (canvasRT == null) return;
 
         Vector3[] corners = new Vector3[4];
         _rt.GetWorldCorners(corners);
-        Vector3 topLeftWorld = corners[1]; // GetWorldCorners: 0=BL,1=TL,2=TR,3=BR
+        Vector3 topLeftWorld = corners[1]; 
 
         Vector2 topLeftScreen = RectTransformUtility.WorldToScreenPoint(eventData.pressEventCamera, topLeftWorld);
 
@@ -181,12 +146,10 @@ public void OnBeginDrag(PointerEventData eventData)
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, topLeftScreen, eventData.pressEventCamera, out topLeftLocal);
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, eventData.position, eventData.pressEventCamera, out pointerLocal);
 
-        // Muc tieu: (topLeft + dragGrabOffset) phai trung voi pointerLocal
-        // => can dich Item them: pointerLocal - (topLeftLocal + dragGrabOffset)
         _rt.anchoredPosition += (pointerLocal - (topLeftLocal + dragGrabOffset));
     }
 
-public void OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
         _rt.anchoredPosition += eventData.delta / _rootCanvas.scaleFactor;
@@ -205,14 +168,14 @@ public void OnDrag(PointerEventData eventData)
             ClearHighlight();
     }
 
-public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
         _isDragging = false;
 
         if (trashImage != null) trashImage.color = _trashOriginalColor;
 
-        var anchor = GetCellUnderPointer(eventData);
+        BattleGridCell anchor = GetCellUnderPointer(eventData);
 
         ClearHighlight(hideLocked: true);
         HideAllLockedCells();
@@ -221,7 +184,6 @@ public void OnEndDrag(PointerEventData eventData)
 
         if (_overTrash || IsPointerOverTrash(eventData))
         {
-            Debug.Log("[GridShopItemUI] Discarded '" + data.itemName + "' vao trash.");
             Destroy(gameObject);
             return;
         }
@@ -232,34 +194,27 @@ public void OnEndDrag(PointerEventData eventData)
             transform.SetParent(_originalParent, true);
             transform.SetSiblingIndex(_originalSiblingIndex);
             _rt.anchoredPosition = _originalAnchoredPos;
-            Debug.Log("[GridShopItemUI] Drag cancelled.");
         }
         else
         {
-            Debug.Log("[GridShopItemUI] Unlocked cells with '" + data.itemName + "'!");
             Destroy(gameObject);
         }
     }
 
-    // ─── Placement logic ─────────────────────────────────────
 
     private BattleGridCell GetCellUnderPointer(PointerEventData eventData)
     {
         if (_gridManager == null) return null;
-        var results = new System.Collections.Generic.List<RaycastResult>();
+        List<RaycastResult> results = new System.Collections.Generic.List<RaycastResult>();
         EventSystem.current.RaycastAll(eventData, results);
         foreach (var r in results)
         {
-            var cell = r.gameObject.GetComponentInParent<BattleGridCell>();
+            BattleGridCell cell = r.gameObject.GetComponentInParent<BattleGridCell>();
             if (cell != null) return cell;
         }
         return null;
     }
 
-    /// <summary>
-    /// Kiểm tra có thể đặt shape tại anchorCell không.
-    /// Delegate hoàn toàn cho BattleGridManager.CanUnlock() để giữ logic ở 1 chỗ.
-    /// </summary>
     private bool CanUnlock(BattleGridCell anchorCell)
     {
         if (anchorCell == null || data?.gridCells == null) return false;
@@ -276,27 +231,27 @@ public void OnEndDrag(PointerEventData eventData)
         bool valid = CanUnlock(anchorCell);
         Color c = valid ? colorValid : colorInvalid;
 
-        foreach (var offset in data.gridCells)
+        foreach (Vector2Int offset in data.gridCells)
         {
-            var cell = _gridManager.GetCell(anchorCell.Row + offset.x, anchorCell.Col + offset.y);
+            BattleGridCell cell = _gridManager.GetCell(anchorCell.Row + offset.x, anchorCell.Col + offset.y);
             cell?.SetHighlightColor(c);
         }
     }
 
-private void ClearHighlight(bool hideLocked = false)
+    private void ClearHighlight(bool hideLocked = false)
     {
         if (_hoveredAnchor == null || data?.gridCells == null) return;
-        foreach (var offset in data.gridCells)
+        foreach (Vector2Int offset in data.gridCells)
         {
-            var cell = _gridManager.GetCell(_hoveredAnchor.Row + offset.x, _hoveredAnchor.Col + offset.y);
+            BattleGridCell cell = _gridManager.GetCell(_hoveredAnchor.Row + offset.x, _hoveredAnchor.Col + offset.y);
             if (cell != null)
             {
                 if (cell.State == BattleGridCell.CellState.Locked)
                 {
                     if (hideLocked)
-                        cell.HideLockedPreview(); // chi an khi EndDrag
+                        cell.HideLockedPreview(); 
                     else
-                        cell.SetHighlightColor(new Color(1f, 1f, 1f, 0.25f)); // tra ve mau hint mac dinh
+                        cell.SetHighlightColor(new Color(1f, 1f, 1f, 0.25f)); 
                 }
                 else
                     cell.RestoreVisual();
@@ -305,7 +260,6 @@ private void ClearHighlight(bool hideLocked = false)
         _hoveredAnchor = null;
     }
 
-    /// <summary>Unlock các ô nếu hợp lệ. Trả về true nếu thành công.</summary>
     private bool TryUnlockOnGrid(BattleGridCell anchorCell)
     {
         if (!CanUnlock(anchorCell)) return false;
@@ -314,14 +268,14 @@ private void ClearHighlight(bool hideLocked = false)
     }
 
 
-private void ShowAllLockedCells()
+    private void ShowAllLockedCells()
     {
         if (_gridManager == null) return;
         Color hint = new Color(1f, 1f, 1f, 0.25f);
         for (int r = 0; r < _gridManager.Rows; r++)
         for (int c = 0; c < _gridManager.Cols; c++)
         {
-            var cell = _gridManager.GetCell(r, c);
+            BattleGridCell cell = _gridManager.GetCell(r, c);
             if (cell != null && cell.State == BattleGridCell.CellState.Locked)
                 cell.SetHighlightColor(hint);
         }
@@ -333,13 +287,13 @@ private void ShowAllLockedCells()
         for (int r = 0; r < _gridManager.Rows; r++)
         for (int c = 0; c < _gridManager.Cols; c++)
         {
-            var cell = _gridManager.GetCell(r, c);
+            BattleGridCell cell = _gridManager.GetCell(r, c);
             if (cell != null && cell.State == BattleGridCell.CellState.Locked)
                 cell.HideLockedPreview();
         }
     }
 
-private bool IsPointerOverTrash(PointerEventData eventData)
+    private bool IsPointerOverTrash(PointerEventData eventData)
     {
         if (trashZone == null) return false;
         return RectTransformUtility.RectangleContainsScreenPoint(

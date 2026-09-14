@@ -2,51 +2,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-/// <summary>
-/// Quản lý hiệu ứng chuyển panel trong MenuMid.
-/// Panel mới slide vào từ trái hoặc phải tùy vào index của button.
-/// Panel cũ slide ra theo chiều ngược lại.
-///
-/// HUD (Power/Ruby/Coin/CurrentBattleMap):
-///   - Mỗi khi 1 Panel bất kỳ được load (ShowPanel/ShowPanelImmediate), gọi
-///     uiGameManager.RefreshHUD() để cập nhật textPower/textRuby/textCoin (UIGameManager đọc các
-///     giá trị này qua GameManager, giá trị thực lưu trong GameData).
-///   - Riêng khi Panel Map (index = MAP_PANEL_INDEX) được load, gọi thêm
-///     uiGameManager.RefreshCurrentBattleMapText() để cập nhật textCurrentBattleMap =
-///     CurrentMapIndex (cũng đọc qua GameManager).
-/// </summary>
 public class MenuPanelController : MonoBehaviour
 {
     [Header("Panels (theo thứ tự index button: Shop=0, Car=1, Map=2, Gear=3, Talent=4)")]
     public RectTransform[] panels;
 
     [Header("=== HUD ===")]
-    [Tooltip("UIGameManager — dùng để cập nhật textPower/textRuby/textCoin (mọi Panel) và " +
-             "textCurrentBattleMap (riêng Panel Map) mỗi khi 1 Panel được load")]
+
     [SerializeField] private UIGameManager uiGameManager;
 
-    // Index của Panel Map trong mảng panels (Shop=0, Car=1, Map=2, Gear=3, Talent=4)
     private const int MAP_PANEL_INDEX = 2;
 
     // Index panel đang hiển thị
     private int _currentIndex = -1;
 
-    // Width của mỗi panel (dùng để tính offset slide)
-    private float _panelWidth;
-
     private Coroutine _slideCoroutine;
 
-    private void Awake()
+    private float GetPanelWidth()
     {
-        if (panels != null && panels.Length > 0)
-            _panelWidth = panels[0].sizeDelta.x;
+        if (panels == null) return 0f;
+        for (int i = 0; i < panels.Length; i++)
+        {
+            if (panels[i] != null) return panels[i].rect.width;
+        }
+        return 0f;
     }
 
-    /// <summary>
-    /// Hiển thị panel tại index mới với hiệu ứng slide.
-    /// Nếu newIndex > currentIndex → slide từ phải vào.
-    /// Nếu newIndex < currentIndex → slide từ trái vào.
-    /// </summary>
     public void ShowPanel(int newIndex, float duration)
     {
         if (newIndex == _currentIndex) return;
@@ -58,8 +39,6 @@ public class MenuPanelController : MonoBehaviour
 
         NotifyPanelLoaded(newIndex);
     }
-
-    /// <summary>Hiển thị panel mặc định không có animation</summary>
     public void ShowPanelImmediate(int index)
     {
         _currentIndex = index;
@@ -73,11 +52,6 @@ public class MenuPanelController : MonoBehaviour
         NotifyPanelLoaded(index);
     }
 
-    /// <summary>
-    /// Gọi mỗi khi 1 Panel được load (ShowPanel/ShowPanelImmediate): cập nhật HUD chung
-    /// (Power/Ruby/Coin) qua UIGameManager, và riêng textCurrentBattleMap nếu panel vừa load là
-    /// Panel Map.
-    /// </summary>
     private void NotifyPanelLoaded(int index)
     {
         if (uiGameManager == null) return;
@@ -90,17 +64,17 @@ public class MenuPanelController : MonoBehaviour
 
     private IEnumerator SlideRoutine(int oldIndex, int newIndex, float duration)
     {
-        // Xác định hướng: newIndex lớn hơn → panel mới đến từ phải (+x)
         float dir = (newIndex > oldIndex) ? 1f : -1f;
 
         RectTransform outPanel = (oldIndex >= 0 && oldIndex < panels.Length) ? panels[oldIndex] : null;
         RectTransform inPanel  = (newIndex >= 0 && newIndex < panels.Length) ? panels[newIndex]  : null;
 
-        // Setup vị trí bắt đầu
+        float panelWidth = GetPanelWidth();
+
         if (inPanel != null)
         {
             inPanel.gameObject.SetActive(true);
-            inPanel.anchoredPosition = new Vector2(_panelWidth * dir, 0f);
+            inPanel.anchoredPosition = new Vector2(panelWidth * dir, 0f);
         }
 
         float elapsed = 0f;
@@ -110,15 +84,14 @@ public class MenuPanelController : MonoBehaviour
             float t = EaseInOutCubic(Mathf.Clamp01(elapsed / duration));
 
             if (inPanel != null)
-                inPanel.anchoredPosition = new Vector2(Mathf.Lerp(_panelWidth * dir, 0f, t), 0f);
+                inPanel.anchoredPosition = new Vector2(Mathf.Lerp(panelWidth * dir, 0f, t), 0f);
 
             if (outPanel != null)
-                outPanel.anchoredPosition = new Vector2(Mathf.Lerp(0f, -_panelWidth * dir, t), 0f);
+                outPanel.anchoredPosition = new Vector2(Mathf.Lerp(0f, -panelWidth * dir, t), 0f);
 
             yield return null;
         }
 
-        // Snap về vị trí cuối
         if (inPanel != null)  inPanel.anchoredPosition  = Vector2.zero;
         if (outPanel != null)
         {

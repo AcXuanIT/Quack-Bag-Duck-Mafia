@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fc20441afce3fb4eb6db6879ab13a50, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  coin: 2002
+  coin: 377
   ruby: 0
-  currentMapIndex: 2
-  power: 320
+  currentMapIndex: 1
+  power: 0
